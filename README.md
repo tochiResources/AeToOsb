@@ -1,2 +1,2 @@
-# AeToStorybrew
-After Effects script that will create a .json file that can be used to parse data into storybrew
+# AeToOsu
+After Effects script that exports the project as .osb or .cs script
