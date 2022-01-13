@@ -47,10 +47,6 @@
                 // app.executeCommand(8000);
                 launchScript();
             }
-            // AeToOsb.onClose = function () {
-            //     launchButton.enabled = true;
-            //     Launcher.update();
-            // }
         }
 
         return Launcher;

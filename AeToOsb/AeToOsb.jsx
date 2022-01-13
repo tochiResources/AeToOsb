@@ -25,9 +25,7 @@ function launchScript() {
             // var objShell = new ActiveXObject("shell.application");
             // objShell.ShellExecute("cmd.exe", "cd C: C:\\cd c:\\ext_file main.exe test.txt", "C:\\WINDOWS\\system32", "open", 1);
             
-            var settingsJsonFile = File(scriptFileFolderPath() + "/" + "settings.json");
-            var outputJsonFile = File(readSettings().outputFolderPath.toString().replaceAll("%20", " ") + "/AeToOsb.json");
-            
+            var settingsJsonFile = File(scriptFileFolderPath() + "\\" + "settings.json");
             var scriptSettings = { // the default settings
                 scriptslibraryFolderPath: "",
                 outputFolderPath: "",
@@ -65,7 +63,7 @@ function launchScript() {
             AeToOsb.spacing = 10;
             AeToOsb.margins = 16;
 
-            var logo_imgString = scriptFileFolderPath() + "/bitmap/l.png";
+            var logo_imgString = scriptFileFolderPath() + "\\bitmap\\l.png";
             var logo = AeToOsb.add("image", undefined, logo_imgString, { name: "logo" });
 
             // TABBEDPANEL
@@ -416,12 +414,12 @@ function launchScript() {
             export_section.margins = 0;
             export_section.alignment = ["center", "top"];
 
-            var export_button_imgString = scriptFileFolderPath() + "/bitmap/e.png";
+            var export_button_imgString = scriptFileFolderPath() + "\\bitmap\\e.png";
             var export_button = export_section.add("iconbutton", undefined, export_button_imgString, { name: "export_button", style: "toolbutton" });
             export_button.text = "Export compositions";
             export_button.alignment = ["center", "center"];
 
-            var renderAndImport_iconbutton_imgString = scriptFileFolderPath() + "/bitmap/f.png";
+            var renderAndImport_iconbutton_imgString = scriptFileFolderPath() + "\\bitmap\\f.png";
             var renderAndImport_iconbutton = export_section.add("iconbutton", undefined, renderAndImport_iconbutton_imgString, { name: "renderAndImport_iconbutton", style: "toolbutton" });
             renderAndImport_iconbutton.text = "Open file location";
             renderAndImport_iconbutton.alignment = ["center", "center"];
@@ -440,18 +438,18 @@ function launchScript() {
             group4.margins = 19;
             group4.alignment = ["center", "top"];
 
-            var github_imgString = scriptFileFolderPath() + "/bitmap/g.png"
+            var github_imgString = scriptFileFolderPath() + "\\bitmap\\g.png"
             var github = group4.add("iconbutton", undefined, File.decode(github_imgString), { name: "github" });
             github.helpTip = "storybrew wiki";
 
-            var discord_imgString = scriptFileFolderPath() + "/bitmap/d.png"
+            var discord_imgString = scriptFileFolderPath() + "\\bitmap\\d.png"
             var discord1 = group4.add("iconbutton", undefined, File.decode(discord_imgString), { name: "discord1" });
             discord1.helpTip = "osu! storyboarder banquet";
 
             var discord2 = group4.add("iconbutton", undefined, File.decode(discord_imgString), { name: "discord2" });
             discord2.helpTip = "pochiii (pono and tochi's sb discord server)";
 
-            var website_imgString = scriptFileFolderPath() + "/bitmap/w.png"
+            var website_imgString = scriptFileFolderPath() + "\\bitmap\\w.png"
             var website = group4.add("iconbutton", undefined, File.decode(website_imgString), { name: "website" });
             website.helpTip = "pochiii.com - storyboard resources website";
 
@@ -946,6 +944,8 @@ function launchScript() {
                 settingsJsonFile.close();
             }
 
+            var outputJsonFile = File(readSettings().outputFolderPath.toString().replaceAll("%20", " ") + "\\AeToOsb.json");
+            
             function readOutput() {
                 outputJsonFile.open('r');
                 var data = outputJsonFile.read();
