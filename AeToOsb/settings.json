@@ -7,12 +7,10 @@
         "allProjectSourceFiles": false,
         "textLayers": false,
         "imageLayers": false,
-        "ThreeDLayers": false,
-        "exportedComps": null,
-        "exportedCompsID": null
+        "ThreeDLayers": false
     },
     "KeyframeHelper": {
-        "utilKeyframeIntervalInput": "200",
+        "interval": "200",
         "xPosition": true,
         "yPosition": true,
         "scale": false,

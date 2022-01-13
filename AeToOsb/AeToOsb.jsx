@@ -34,12 +34,10 @@ function launchScript() {
                     allProjectSourceFiles: false,
                     textLayers: false,
                     imageLayers: false,
-                    ThreeDLayers: false,
-                    exportedComps: null,
-                    exportedCompsID: null
+                    ThreeDLayers: false
                 },
                 KeyframeHelper: {
-                    utilKeyframeIntervalInput: "200",
+                    interval: "200",
                     xPosition: true,
                     yPosition: true,
                     scale: false,
@@ -48,7 +46,9 @@ function launchScript() {
                     OpenOutputFolderBeforeRendering: true
                 },
                 settingsJsonFile: settingsJsonFile.fsName.toString(),
-                scriptFileFolderPath: scriptFileFolderPath().toString()
+                scriptFileFolderPath: scriptFileFolderPath().toString(),
+                exportedComps: null,
+                exportedCompsID: null
             };
 
             if (readSettings().settingsJsonFile == "")
