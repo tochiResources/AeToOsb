@@ -1,0 +1,27 @@
+{
+    "scriptslibraryFolderPath": "",
+    "outputFolderPath": "",
+    "options": {
+        "exportJsonOnly": false,
+        "exportTextPerLetter": false,
+        "allProjectSourceFiles": false,
+        "textLayers": false,
+        "imageLayers": false,
+        "ThreeDLayers": false,
+        "exportedComps": null,
+        "exportedCompsID": null
+    },
+    "KeyframeHelper": {
+        "utilKeyframeIntervalInput": "200",
+        "xPosition": true,
+        "yPosition": true,
+        "scale": false,
+        "rotation": false,
+        "opacity": false,
+        "OpenOutputFolderBeforeRendering": true
+    },
+    "settingsJsonFile": "",
+    "scriptFileFolderPath": "",
+    "exportedComps": null,
+    "exportedCompsID": null
+}
