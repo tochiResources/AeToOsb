@@ -19,14 +19,15 @@ function launchScript() {
                 var fullPath = diskLetter + ":" + "/" + scriptFileFolderPath.slice(3, scriptFileFolderPath.length);
                 var path = fullPath.slice(0, -1).replace(/\//g, "\\");
 
-                return path;
+                return path.toString().replaceAll("%20", " ");
             }
+
+            // var objShell = new ActiveXObject("shell.application");
+            // objShell.ShellExecute("cmd.exe", "cd C: C:\\cd c:\\ext_file main.exe test.txt", "C:\\WINDOWS\\system32", "open", 1);
             
             var settingsJsonFile = File(scriptFileFolderPath() + "/" + "settings.json");
-            var outputJsonFile = File(readSettings().outputFolderPath + "/AeToOsb.json");
-
-            alert(settingsJsonFile.fsName.toString().slice(0, -14));
-
+            var outputJsonFile = File(readSettings().outputFolderPath.toString().replaceAll("%20", " ") + "/AeToOsb.json");
+            
             var scriptSettings = { // the default settings
                 scriptslibraryFolderPath: "",
                 outputFolderPath: "",
@@ -47,12 +48,12 @@ function launchScript() {
                     rotation: false,
                     opacity: false
                 },
-                settingsJsonFile: settingsJsonFile.fsName.toString(),
+                settingsJsonFile: settingsJsonFile.fsName.toString().replaceAll("%20", " "),
                 scriptFileFolderPath: scriptFileFolderPath().toString(),
                 exportedComps: null,
                 exportedCompsID: null
             };
-
+            
             // AETOOSB
             // =============
             var AeToOsb = (thisObj instanceof Panel) ? thisObj : new Window("palette", 'AeToOsb', undefined, { resizeable: true });
@@ -567,10 +568,16 @@ function launchScript() {
             }
             importSettings();
 
-            // if (readSettings().settingsJsonFile == "")
-            // writeSettings(scriptSettings);
-            // if (readSettings().scriptFileFolderPath == "")
-            // writeSettings(scriptSettings);
+            if (readSettings().settingsJsonFile == "") {
+                scriptSettings = readSettings();
+                scriptSettings.settingsJsonFile = settingsJsonFile.fsName.toString().replaceAll("%20", " ");
+                writeSettings(scriptSettings);
+            }
+            if (readSettings().scriptFileFolderPath == "") {
+                scriptSettings = readSettings();
+                scriptSettings.scriptFileFolderPath = scriptFileFolderPath().toString();
+                writeSettings(scriptSettings);
+            }
 
             scriptslibrary_button.onClick = function () {
                 var scriptslibraryFolder = selectFolder("Please find and select the scriptslibrary folder.");
@@ -891,7 +898,7 @@ function launchScript() {
                         data.KeyframeHelper.optimizeKeyframesBasedOnMotion = optionValue;
                     }
                     var newData = {
-                        scriptslibraryFolderPath: data.scriptslibraryFolderPath,
+                        scriptslibraryFolderPath: data.scriptslibraryFolderPath.toString().replaceAll("%20", " "),
                         outputFolderPath: data.outputFolderPath,
                         options: {
                             exportJsonOnly: data.options.exportJsonOnly,
@@ -912,7 +919,7 @@ function launchScript() {
                             opacity: data.KeyframeHelper.opacity,
                             optimizeKeyframesBasedOnMotion: data.KeyframeHelper.optimizeKeyframesBasedOnMotion
                         },
-                        settingsJsonFile: settingsJsonFile.fsName.toString(),
+                        settingsJsonFile: settingsJsonFile.fsName.toString().replaceAll("%20", " "),
                         scriptFileFolderPath: scriptFileFolderPath().toString(),
                         exportedComps: data.exportedComps,
                         exportedCompsID: data.exportedCompsID
