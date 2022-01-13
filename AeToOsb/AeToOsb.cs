@@ -67,11 +67,13 @@ namespace StorybrewScripts
         // general globals
         private AeToOsbSettings aeToOsbSettings;
         private string pathOutput;
+        private int compStart;
+        private int compEnd;
+        private int compDuration;
         private double downScale;
         private float frameDuration;
 
-        // grid parameters
-        private int gridDuration;
+        // sprite parameters
         private int spriteStart;
         private int spriteEnd;
         private int spriteDuration;
@@ -189,9 +191,9 @@ namespace StorybrewScripts
                     var compBitmap = storyboard.CompBitmap;
                     frameDuration = storyboard.FrameDuration;
                     downScale = AspectRatio(compBitmap.Width, compBitmap.Height) + (downScaleShift - 1);
-                    var compStart = storyboard.StartTime;
-                    var compEnd = storyboard.EndTime;
-                    var compDuration = storyboard.Duration;
+                    compStart = storyboard.StartTime;
+                    compEnd = storyboard.EndTime;
+                    compDuration = storyboard.Duration;
 
                     // storyboard sprites (layers)
                     foreach (var compLayer in storyboard.Layers)
@@ -213,7 +215,6 @@ namespace StorybrewScripts
                             layerFileName = compLayer.FileName;
                             spriteType = compLayer.Type;
                             spriteLayer = compLayer.LayerLayer;
-                            gridDuration = compLayer.Duration;
 
                             spriteStart = compLayer.StartTime;
                             spriteEnd = compLayer.EndTime;
@@ -844,9 +845,10 @@ namespace StorybrewScripts
             if (showGrid)
             {
                 var gridBitmap = GetProjectBitmap("assetlibrary\\_AeToOsb\\grid.png");
-                var grid = GetLayer("GridOverlay").CreateSprite(ProjectPath + "\\assetlibrary\\_AeToOsb\\grid.png", origin);
-                grid.Fade(0, gridDuration, gridOpacity, gridOpacity);
-                grid.Scale(0, 480.0f / gridBitmap.Height);
+                var path = aeToOsbSettings.ScriptslibraryFolderPath.Replace("scriptslibrary", "assetlibrary\\_AeToOsb\\grid.png");
+                var grid = GetLayer("GridOverlay").CreateSprite(path, origin);
+                grid.Fade(compStart, compEnd, gridOpacity, gridOpacity);
+                grid.Scale(compStart, 480.0f / gridBitmap.Height);
             }
         }
     }
