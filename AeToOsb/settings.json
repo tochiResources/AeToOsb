@@ -1,14 +1,14 @@
 {
-    "scriptslibraryFolderPath": "",
-    "outputFolderPath": "",
+    "scriptslibraryFolderPath": "D:\\Stuff\\osu!\\Storyboard\\Storybrew\\projects\\Parsing Test\\scriptslibrary",
+    "outputFolderPath": "D:\\Stuff\\osu!\\Storyboard\\Storybrew\\projects\\Parsing Test\\AeToOsb.json",
     "options": {
         "exportJsonOnly": false,
         "exportTextPerLetter": false,
-        "OpenOutputFolderBeforeRendering": true,
         "allProjectSourceFiles": false,
         "textLayers": true,
         "imageLayers": true,
-        "ThreeDLayers": false
+        "ThreeDLayers": false,
+        "OpenOutputFolderBeforeRendering": true
     },
     "KeyframeHelper": {
         "interval": "200",
@@ -18,8 +18,8 @@
         "rotation": false,
         "opacity": false
     },
-    "settingsJsonFile": "",
-    "scriptFileFolderPath": "",
+    "settingsJsonFile": "D:\\Stuff\\osu!\\Storyboard\\(AeToOsb)\\AeToOsb\\settings.json",
+    "scriptFileFolderPath": "D:\\Stuff\\osu!\\Storyboard\\(AeToOsb)\\AeToOsb",
     "exportedComps": null,
     "exportedCompsID": null
 }

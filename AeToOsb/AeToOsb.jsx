@@ -21,9 +21,11 @@ function launchScript() {
 
                 return path;
             }
-
+            
             var settingsJsonFile = File(scriptFileFolderPath() + "/" + "settings.json");
             var outputJsonFile = File(readSettings().outputFolderPath + "/AeToOsb.json");
+
+            alert(settingsJsonFile.fsName.toString().slice(0, -14));
 
             var scriptSettings = { // the default settings
                 scriptslibraryFolderPath: "",
@@ -50,11 +52,6 @@ function launchScript() {
                 exportedComps: null,
                 exportedCompsID: null
             };
-
-            if (readSettings().settingsJsonFile == "")
-            writeSettings(scriptSettings);
-            if (readSettings().scriptFileFolderPath == "")
-            writeSettings(scriptSettings);
 
             // AETOOSB
             // =============
@@ -570,6 +567,11 @@ function launchScript() {
             }
             importSettings();
 
+            // if (readSettings().settingsJsonFile == "")
+            // writeSettings(scriptSettings);
+            // if (readSettings().scriptFileFolderPath == "")
+            // writeSettings(scriptSettings);
+
             scriptslibrary_button.onClick = function () {
                 var scriptslibraryFolder = selectFolder("Please find and select the scriptslibrary folder.");
 
@@ -707,11 +709,11 @@ function launchScript() {
             button3.onClick = function () {
                 if (osCheck() == "PC") {
                     var urlLaunchCode = "Start";
-                    system.callSystem("cmd.exe /c " + urlLaunchCode + " " + "https://github.com/T0chi/AeToOsb");
+                    system.callSystem("cmd.exe /c " + urlLaunchCode + " " + "https://github.com/T0chi/AeToOsb/wiki");
                 }
                 if (osCheck() == "MAC") {
                     var urlLaunchCode = "Open";
-                    system.callSystem(urlLaunchCode + " " + "https://github.com/T0chi/AeToOsb");
+                    system.callSystem(urlLaunchCode + " " + "https://github.com/T0chi/AeToOsb/wiki");
 
                 }
             }
@@ -835,7 +837,7 @@ function launchScript() {
                                     return pathFragment;
                                 }
                             }
-                            var sbProjectFolder = optionValue.replace(deletePathFragment(), exportedJsonName() + ".json");
+                            var sbProjectFolder = optionValue.replace(deletePathFragment(), "\\" + exportedJsonName() + ".json");
                             statictext2.text = sbProjectFolder;
                             data.outputFolderPath = sbProjectFolder;
                         }
