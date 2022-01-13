@@ -844,7 +844,7 @@ function launchScript() {
                                     return pathFragment;
                                 }
                             }
-                            var sbProjectFolder = optionValue.replace(deletePathFragment(), "\\" + exportedJsonName() + ".json");
+                            var sbProjectFolder = optionValue.replace(deletePathFragment(), "");
                             statictext2.text = sbProjectFolder;
                             data.outputFolderPath = sbProjectFolder;
                         }
@@ -963,6 +963,7 @@ function launchScript() {
                 file.close();
 
                 var scriptslibraryFolderFileObj;
+                var _AeToOsbFolderFileObj = new Folder(scriptSettings.scriptslibraryFolderPath.slice(0, -15) + "\\assetlibrary\\_AeToOsb");
                 var gridImage = new File(scriptSettings.scriptFileFolderPath + "\\bitmap\\grid.png");
                 var NewtonsoftFile = new File(scriptSettings.scriptFileFolderPath + "\\Newtonsoft.Json.dll");
                 var AeToOsbFile = new File(scriptSettings.scriptFileFolderPath + "\\AeToOsb.cs");
@@ -971,29 +972,32 @@ function launchScript() {
                 var DeleteBackgroundFile = new File(scriptSettings.scriptFileFolderPath + "\\DeleteBackground.cs");
                 // alert(scriptslibraryFolderFileObj.fsName);
 
+                if (!_AeToOsbFolderFileObj.exists)
+                createNewFolder(_AeToOsbFolderFileObj.fsName.replaceAll("%20", " "));
+                
                 scriptslibraryFolderFileObj = new File(scriptSettings.scriptslibraryFolderPath.slice(0, -15) + "\\assetlibrary\\_AeToOsb\\grid.png");
-                if (gridImage.exists != true)
-                gridImage.copy(scriptslibraryFolderFileObj.fsName.replace("%20", " "));
+                if (!scriptslibraryFolderFileObj.fsName.replaceAll("%20", " ").exists)
+                gridImage.copy(scriptslibraryFolderFileObj.fsName.replaceAll("%20", " "));
 
                 scriptslibraryFolderFileObj = new File(scriptSettings.scriptslibraryFolderPath + "\\Newtonsoft.Json.dll");
-                if (NewtonsoftFile.exists != true)
-                NewtonsoftFile.copy(scriptslibraryFolderFileObj.fsName.replace("%20", " "));
+                if (!scriptslibraryFolderFileObj.fsName.replaceAll("%20", " ").exists)
+                NewtonsoftFile.copy(scriptslibraryFolderFileObj.fsName.replaceAll("%20", " "));
 
                 scriptslibraryFolderFileObj = new File(scriptSettings.scriptslibraryFolderPath.slice(0, -15) + "\\AeToOsb.cs");
-                if (AeToOsbFile.exists != true)
-                AeToOsbFile.copy(scriptslibraryFolderFileObj.fsName.replace("%20", " "));
+                if (!scriptslibraryFolderFileObj.fsName.replaceAll("%20", " ").exists)
+                AeToOsbFile.copy(scriptslibraryFolderFileObj.fsName.replaceAll("%20", " "));
 
                 scriptslibraryFolderFileObj = new File(scriptSettings.scriptslibraryFolderPath + "\\AeToOsbParser.cs");
-                if (AeToOsbParserFile.exists != true)
-                AeToOsbParserFile.copy(scriptslibraryFolderFileObj.fsName.replace("%20", " "));
+                if (!scriptslibraryFolderFileObj.fsName.replaceAll("%20", " ").exists)
+                AeToOsbParserFile.copy(scriptslibraryFolderFileObj.fsName.replaceAll("%20", " "));
 
                 scriptslibraryFolderFileObj = new File(scriptSettings.scriptslibraryFolderPath + "\\AeToOsbSettings.cs");
-                if (AeToOsbSettingsFile.exists != true)
-                AeToOsbSettingsFile.copy(scriptslibraryFolderFileObj.fsName.replace("%20", " "));
+                if (!scriptslibraryFolderFileObj.fsName.replaceAll("%20", " ").exists)
+                AeToOsbSettingsFile.copy(scriptslibraryFolderFileObj.fsName.replaceAll("%20", " "));
 
                 scriptslibraryFolderFileObj = new File(scriptSettings.scriptslibraryFolderPath.slice(0, -15) + "\\DeleteBackground.cs");
-                if (DeleteBackgroundFile.exists != true)
-                DeleteBackgroundFile.copy(scriptslibraryFolderFileObj.fsName.replace("%20", " "));
+                if (!scriptslibraryFolderFileObj.fsName.replaceAll("%20", " ").exists)
+                DeleteBackgroundFile.copy(scriptslibraryFolderFileObj.fsName.replaceAll("%20", " "));
             }
 
             function exportedJsonName() {
@@ -1493,7 +1497,7 @@ function launchScript() {
                             "Output File Info":
                             {
                                 "Base Path": outputPath,
-                                "Subfolder Path": "assetlibrary\\_AeToOsb/AeAnimations/" + compName[I] + "/",
+                                "Subfolder Path": "assetlibrary/_AeToOsb/AeAnimations/" + compName[I] + "/",
                                 "File Name": compName[I] + "_[#####]"
                             }
                         };
