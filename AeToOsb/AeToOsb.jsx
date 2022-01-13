@@ -31,9 +31,10 @@ function launchScript() {
                 options: {
                     exportJsonOnly: false,
                     exportTextPerLetter: false,
+                    OpenOutputFolderBeforeRendering: true,
                     allProjectSourceFiles: false,
-                    textLayers: false,
-                    imageLayers: false,
+                    textLayers: true,
+                    imageLayers: true,
                     ThreeDLayers: false
                 },
                 KeyframeHelper: {
@@ -42,8 +43,7 @@ function launchScript() {
                     yPosition: true,
                     scale: false,
                     rotation: false,
-                    opacity: false,
-                    OpenOutputFolderBeforeRendering: true
+                    opacity: false
                 },
                 settingsJsonFile: settingsJsonFile.fsName.toString(),
                 scriptFileFolderPath: scriptFileFolderPath().toString(),
@@ -469,6 +469,7 @@ function launchScript() {
             /////////////////////////////////////////////////////////////////
             /////////////////////////////////////////////////////////////////
             function importSettings() {
+                scriptSettings = readSettings();
                 if (!settingsJsonFile.exists) {
 
                     settingsJsonFile.open('w');
