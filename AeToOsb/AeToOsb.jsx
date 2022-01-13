@@ -1438,7 +1438,9 @@ function launchScript() {
                             AeToOsb.update();
                             // alert("ATS GIF frames template does not exist");
 
-                            var ATSGIFframesProjectFilePath = new File(scriptSettings.scriptFileFolderPath + "\\AeToOsb\\" + "ATS GIF frames.aep")
+                            alert(scriptSettings.scriptFileFolderPath);
+
+                            var ATSGIFframesProjectFilePath = new File(scriptSettings.scriptFileFolderPath + "\\ATS GIF frames.aep")
                             ATSGIFframes = importFiles(ATSGIFframesProjectFilePath, true, '*.aep', 'footage', false, false)
                             if (ATSGIFframesProjectFilePath.exists == true) {
                                 atsStatusMessage2.text = "Importing 'ATS GIF frames'" + "..."; scriptSettings = readSettings(); scriptSettings.renderAndImportCompStatus = atsStatusMessage2.text; writeSettings(scriptSettings); scriptSettings = readSettings();
