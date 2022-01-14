@@ -1,4 +1,5 @@
 //@include 'array.generics.js'
+//@include 'splitter.aeosb'
 
 var script;
 
