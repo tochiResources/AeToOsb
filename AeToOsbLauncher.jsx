@@ -1,5 +1,5 @@
 {
-    //@include 'AeToOsb/AeToOsb.jsx'
+    $.evalFile('' + (File($.fileName).path) + '/AeToOsb/AeToOsb.jsx');
 
     var Launcher = (function (thisObj) {
 

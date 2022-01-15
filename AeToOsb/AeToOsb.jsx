@@ -1,5 +1,6 @@
-//@include 'array.generics.js'
-//@include 'splitter.aeosb'
+$.evalFile('' + (File($.fileName).path) + '/array.generics.js');
+$.evalFile('' + (File($.fileName).path) + '/splitter.aeosb');
+$.evalFile('' + (File($.fileName).path) + '/json2.js');
 
 var script;
 
@@ -64,8 +65,8 @@ function launchScript() {
             AeToOsb.spacing = 10;
             AeToOsb.margins = 16;
 
-            var logo_imgString = scriptFileFolderPath() + "\\bitmap\\l.png";
-            var logo = AeToOsb.add("image", undefined, logo_imgString, { name: "logo" });
+            var logo_imgString = (File($.fileName).path) + "/bitmap/l.png";
+            var logo = AeToOsb.add("image", undefined, File(logo_imgString));
 
             // TABBEDPANEL
             // ===========
@@ -415,12 +416,12 @@ function launchScript() {
             export_section.margins = 0;
             export_section.alignment = ["center", "top"];
 
-            var export_button_imgString = scriptFileFolderPath() + "\\bitmap\\e.png";
+            var export_button_imgString = (File($.fileName).path) + "/bitmap/e.png";
             var export_button = export_section.add("iconbutton", undefined, export_button_imgString, { name: "export_button", style: "toolbutton" });
             export_button.text = "Export compositions";
             export_button.alignment = ["center", "center"];
 
-            var renderAndImport_iconbutton_imgString = scriptFileFolderPath() + "\\bitmap\\f.png";
+            var renderAndImport_iconbutton_imgString = (File($.fileName).path) + "/bitmap/f.png";
             var renderAndImport_iconbutton = export_section.add("iconbutton", undefined, renderAndImport_iconbutton_imgString, { name: "renderAndImport_iconbutton", style: "toolbutton" });
             renderAndImport_iconbutton.text = "Open file location";
             renderAndImport_iconbutton.alignment = ["center", "center"];
@@ -439,18 +440,18 @@ function launchScript() {
             group4.margins = 19;
             group4.alignment = ["center", "top"];
 
-            var github_imgString = scriptFileFolderPath() + "\\bitmap\\g.png"
+            var github_imgString = (File($.fileName).path) + "/bitmap/g.png"
             var github = group4.add("iconbutton", undefined, File.decode(github_imgString), { name: "github" });
             github.helpTip = "storybrew wiki";
 
-            var discord_imgString = scriptFileFolderPath() + "\\bitmap\\d.png"
+            var discord_imgString = (File($.fileName).path) + "/bitmap/d.png"
             var discord1 = group4.add("iconbutton", undefined, File.decode(discord_imgString), { name: "discord1" });
             discord1.helpTip = "osu! storyboarder banquet";
 
             var discord2 = group4.add("iconbutton", undefined, File.decode(discord_imgString), { name: "discord2" });
             discord2.helpTip = "pochiii (pono and tochi's sb discord server)";
 
-            var website_imgString = scriptFileFolderPath() + "\\bitmap\\w.png"
+            var website_imgString = (File($.fileName).path) + "/bitmap/w.png"
             var website = group4.add("iconbutton", undefined, File.decode(website_imgString), { name: "website" });
             website.helpTip = "pochiii.com - storyboard resources website";
 
