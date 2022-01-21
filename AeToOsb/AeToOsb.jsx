@@ -1655,6 +1655,8 @@
 
                                     comp.layers.precompose(layerIndex, selectedComp[x].name + " ((old))", true);
                                     comp.layers.add(result);
+
+                                    result.mainSource.comment = "autoGen.AeToOsb.sequence";
                                     // alert("added");
 
                                     // alert("getFolderByName(_AeAnimations) !== null");
@@ -1676,6 +1678,8 @@
 
                                     comp.layers.precompose(layerIndex, selectedComp[x].name + " ((old))", true);
                                     comp.layers.add(result);
+
+                                    result.mainSource.comment = "autoGen.AeToOsb.sequence";
 
                                     // alert("getFolderByName(_AeAnimations) == null");
                                 }
@@ -1817,14 +1821,14 @@
                             var firstTextLayerIndex = [];
                             var currentComp = selectedComps[I];
                             var currentCompResolution = currentComp.resolutionFactor;
-
+                            
                             var composition = ({
                                 type: "composition",
                                 name: currentComp.name,
                                 compID: currentComp.id,
-                                startTime: milliseconds(currentComp.workAreaStart),
-                                endTime: milliseconds(currentComp.workAreaStart + currentComp.workAreaDuration),
-                                duration: milliseconds(currentComp.workAreaDuration),
+                                startTime: round(milliseconds(currentComp.workAreaStart + currentComp.displayStartTime), 0),
+                                endTime: round(milliseconds((currentComp.workAreaStart + currentComp.displayStartTime) + currentComp.workAreaDuration), 0),
+                                duration: round(milliseconds(currentComp.workAreaDuration), 0),
                                 frameRate: currentComp.frameRate,
                                 frameDuration: milliseconds(currentComp.frameDuration),
                                 compBitmap: {
@@ -1847,9 +1851,36 @@
                                 // alert("currentCompLayer.name: " + currentCompLayer.name);
 
                                 layer.index = currentCompLayer.index;
-                                if (layerType !== "Text" && layerType !== "NullLayer")
-                                    layer.name = currentCompLayer.source.mainSource.file.name;
-                                layer.layerName = currentCompLayer.name;
+                                if (layerType == "Sequence") layer.autoGen = false;
+                                if (layerType !== "Text" && layerType !== "NullLayer" && layerType !== "Composition")
+                                layer.name = currentCompLayer.source.mainSource.file.name;
+                                
+                                if (layerType == "Sequence" && currentCompLayer.name.indexOf('{') == -1) {
+                                    layer.layerName = currentCompLayer.name;
+                                    
+                                    if (currentCompLayer.source.mainSource.comment == "autoGen.AeToOsb.sequence") {
+                                        layer.name = currentCompLayer.name + "_.png";
+                                        layer.layerName = currentCompLayer.name;
+                                        layer.autoGen = true;
+                                    }
+                                    else if (currentCompLayer.source.mainSource.comment !== "autoGen.AeToOsb.sequence")
+                                    layer.path = currentCompLayer.source.mainSource.file.fsName;
+                                }
+                                else if (currentCompLayer.name.indexOf('{') !== -1) {
+                                    var nn = currentCompLayer.name;
+                                    var ext = nn.slice(nn.indexOf('.'), nn.length);
+                                    var nn2 = nn.slice(0, nn.indexOf('{')) + ext;
+                                    layer.name = nn2;
+                                    layer.layerName = currentCompLayer.name;
+                                    
+                                    if (currentCompLayer.source.mainSource.comment == "autoGen.AeToOsb.sequence") {
+                                        layer.name = currentCompLayer.name + "_.png";
+                                        layer.layerName = currentCompLayer.name;
+                                        layer.autoGen = true;
+                                    }
+                                    else if (currentCompLayer.source.mainSource.comment !== "autoGen.AeToOsb.sequence")
+                                    layer.path = currentCompLayer.source.mainSource.file.fsName;
+                                }
                                 layer.id = currentCompLayer.id;
 
                                 if (currentCompLayer.enabled === true || layerType === "NullLayer") {
@@ -1868,11 +1899,13 @@
                                         layer.hasParent = false;
                                     }
                                     layer.visible = currentCompLayer.enabled;
-                                    layer.startTime = milliseconds(layerStart(selectedComps[I], currentCompLayer.inPoint));
-                                    layer.endTime = layer.startTime + layerDuration();
-                                    layer.duration = layerDuration();
+                                    layer.startTime = round(milliseconds(layerStart(selectedComps[I], currentCompLayer.inPoint) + currentComp.displayStartTime), 0);
+                                    layer.endTime = round(layer.startTime + layerDuration(), 0);
+                                    layer.duration = round(layerDuration(), 0);
                                     layer.type = layerType;
                                     layer.layer = null;
+                                    if (layerType == "Sequence")
+                                        layer.loopType = null;
                                     if (layerType !== "Audio")
                                         layer.additive = false;
 
@@ -1900,7 +1933,7 @@
                                             // layer.transform.fade.keyframed = true;
                                             for (var k = 1; k <= currentCompLayer.opacity.numKeys; k++) {
                                                 var keyframe = {};
-                                                keyframe.time = milliseconds(currentCompLayer.opacity.keyTime(k));
+                                                keyframe.time = milliseconds(currentCompLayer.opacity.keyTime(k) + currentComp.displayStartTime);
                                                 keyframe.value = currentCompLayer.opacity.keyValue(k) / 100;
                                                 // keyframeEasing(currentCompLayer.opacity);
                                                 layer.transform.fade.push(keyframe);
@@ -1909,7 +1942,7 @@
                                         else if (currentCompLayer.opacity.numKeys === 0) {
                                             // layer.transform.fade.keyframed = false;
                                             var keyframe = {};
-                                            keyframe.time = milliseconds(layer.startTime);
+                                            keyframe.time = layer.startTime + currentComp.displayStartTime;
                                             keyframe.value = currentCompLayer.opacity.value / 100;
                                             layer.transform.fade.push(keyframe);
                                         }
@@ -1923,6 +1956,11 @@
                                             if (marker.match(new RegExp("(Background|Fail|Pass|Foreground|Overlay|Sound)", "i"))) {
                                                 layer.layer = marker;
                                             }
+                                            if (layerType == "Sequence") {
+                                                if (marker.match(new RegExp("(LoopOnce|LoopForever)", "i"))) {
+                                                    layer.loopType = marker;
+                                                }
+                                            }
                                             // if (layer.layer == null || layer.transform.origin == null) {
                                             //     alert("AeToOsb WARNING: Remember to add a marker on the layer '" + currentCompLayer.name + "' with a comment that represents the OsbOrigin and/or OsbLayer.");
                                             // }
@@ -1932,7 +1970,7 @@
                                         layer.transform.origin = "centre";
                                         layer.layer = "sound";
                                     }
-                                    markerStatement = [layer.transform.origin, layer.layer, layerType];
+                                    markerStatement = [layer.transform.origin, layer.layer, layer.loopType, layerType];
                                     layerDATA = currentCompLayer;
 
                                     if (layerType !== "Audio") {
@@ -1966,7 +2004,7 @@
                                         //     layer.transform.position.x = [];
                                         //     for (var k = 1; k <= currentCompLayer.property("Transform").property("X Position").numKeys; k++) {
                                         //         var keyframe = {};
-                                        //         keyframe.time = milliseconds(currentCompLayer.property("Transform").property("X Position").keyTime(k));
+                                        //         keyframe.time = milliseconds(currentCompLayer.property("Transform").property("X Position").keyTime(k) + currentComp.displayStartTime);
                                         //         keyframe.value = currentCompLayer.property("Transform").property("X Position").keyValue(k);
                                         //         // keyframeEasing(currentCompLayer.property("Transform").property("X Position"));
                                         //         layer.transform.position.x.push(keyframe);
@@ -1982,7 +2020,7 @@
                                         //     layer.transform.position.y = [];
                                         //     for (var k = 1; k <= currentCompLayer.property("Transform").property("Y Position").numKeys; k++) {
                                         //         var keyframe = {};
-                                        //         keyframe.time = milliseconds(currentCompLayer.property("Transform").property("Y Position").keyTime(k));
+                                        //         keyframe.time = milliseconds(currentCompLayer.property("Transform").property("Y Position").keyTime(k) + currentComp.displayStartTime);
                                         //         keyframe.value = currentCompLayer.property("Transform").property("Y Position").keyValue(k);
                                         //         // keyframeEasing(currentCompLayer.property("Transform").property("Y Position"));
                                         //         layer.transform.position.y.push(keyframe);
@@ -1998,7 +2036,7 @@
                                         //     layer.transform.position.z = [];
                                         //     for (var k = 1; k <= currentCompLayer.property("Transform").property("Z Position").numKeys; k++) {
                                         //         var keyframe = {};
-                                        //         keyframe.time = milliseconds(currentCompLayer.property("Transform").property("Z Position").keyTime(k));
+                                        //         keyframe.time = milliseconds(currentCompLayer.property("Transform").property("Z Position").keyTime(k) + currentComp.displayStartTime);
                                         //         keyframe.value = currentCompLayer.property("Transform").property("Z Position").keyValue(k);
                                         //         // keyframeEasing(currentCompLayer.property("Transform").property("YX Position"));
                                         //         layer.transform.position.z.push(keyframe);
@@ -2015,7 +2053,7 @@
                                         //     layer.transform.scale.keyframes = [];
                                         //     for (var k = 1; k <= currentCompLayer.scale.numKeys; k++) {
                                         //         var keyframe = {};
-                                        //         keyframe.time = milliseconds(currentCompLayer.scale.keyTime(k));
+                                        //         keyframe.time = milliseconds(currentCompLayer.scale.keyTime(k) + currentComp.displayStartTime);
                                         //         keyframe.value = currentCompLayer.scale.keyValue(k) / 100;
                                         //         // keyframeEasing(currentCompLayer.scale);
                                         //         layer.transform.scale.keyframes.push(keyframe);
@@ -2034,7 +2072,7 @@
                                         //     layer.transform.rotation.x = [];
                                         //     for (var k = 1; k <= currentCompLayer.property("Transform").property("X Rotation").numKeys; k++) {
                                         //         var keyframe = {};
-                                        //         keyframe.time = milliseconds(currentCompLayer.property("Transform").property("X Rotation").keyTime(k));
+                                        //         keyframe.time = milliseconds(currentCompLayer.property("Transform").property("X Rotation").keyTime(k) + currentComp.displayStartTime);
                                         //         keyframe.value = currentCompLayer.property("Transform").property("X Rotation").keyValue(k);
                                         //         // keyframeEasing(currentCompLayer.property("Transform").property("X Rotation"));
                                         //         layer.transform.rotation.x.push(keyframe);
@@ -2050,7 +2088,7 @@
                                         //     layer.transform.rotation.y = [];
                                         //     for (var k = 1; k <= currentCompLayer.property("Transform").property("Y Rotation").numKeys; k++) {
                                         //         var keyframe = {};
-                                        //         keyframe.time = milliseconds(currentCompLayer.property("Transform").property("Y Rotation").keyTime(k));
+                                        //         keyframe.time = milliseconds(currentCompLayer.property("Transform").property("Y Rotation").keyTime(k) + currentComp.displayStartTime);
                                         //         keyframe.value = currentCompLayer.property("Transform").property("Y Rotation").keyValue(k);
                                         //         // keyframeEasing(currentCompLayer.property("Transform").property("Y Rotation"));
                                         //         layer.transform.rotation.y.push(keyframe);
@@ -2066,7 +2104,7 @@
                                         //     layer.transform.rotation.z = [];
                                         //     for (var k = 1; k <= currentCompLayer.property("Transform").property("Z Rotation").numKeys; k++) {
                                         //         var keyframe = {};
-                                        //         keyframe.time = milliseconds(currentCompLayer.property("Transform").property("Z Rotation").keyTime(k));
+                                        //         keyframe.time = milliseconds(currentCompLayer.property("Transform").property("Z Rotation").keyTime(k) + currentComp.displayStartTime);
                                         //         keyframe.value = currentCompLayer.property("Transform").property("Z Rotation").keyValue(k);
                                         //         // keyframeEasing(currentCompLayer.property("Transform").property("YX Rotation"));
                                         //         layer.transform.rotation.z.push(keyframe);
@@ -2085,7 +2123,7 @@
                                         //     // layer.transform.rotation.orientation.keyframed = true;
                                         //     for (var k = 1; k <= currentCompLayer.orientation.numKeys; k++) {
                                         //         var keyframe = {};
-                                        //         keyframe.time = milliseconds(currentCompLayer.orientation.keyTime(k));
+                                        //         keyframe.time = milliseconds(currentCompLayer.orientation.keyTime(k) + currentComp.displayStartTime);
                                         //         keyframe.value = currentCompLayer.orientation.keyValue(k);
                                         //         // keyframeEasing(currentCompLayer.orientation);
                                         //         layer.transform.rotation.orientation.push(keyframe);
@@ -2097,13 +2135,13 @@
                                         //     // var keyframeY = {};
                                         //     // var keyframeZ = {};
 
-                                        //     // keyframeX.time = layer.startTime;
+                                        //     // keyframeX.time = layer.startTime + currentComp.displayStartTime;
                                         //     // keyframeX.value = currentCompLayer.orientation.value[0];
 
-                                        //     // keyframeY.time = layer.startTime;
+                                        //     // keyframeY.time = layer.startTime + currentComp.displayStartTime;
                                         //     // keyframeY.value = currentCompLayer.orientation.value[1];
 
-                                        //     // keyframeZ.time = layer.startTime;
+                                        //     // keyframeZ.time = layer.startTime + currentComp.displayStartTime;
                                         //     // keyframeZ.value = currentCompLayer.orientation.value[2];
 
                                         //     // // layer.transform.rotation.orientation.x = currentCompLayer.orientation.value[0];
@@ -2130,7 +2168,7 @@
                                                     for (var k = 1; k <= newLayerPosXAfter.numKeys; k++) {
                                                         // alert(newLayerPosXAfter.keyValue(k));
                                                         var keyframe = {};
-                                                        keyframe.time = milliseconds(newLayerPosXAfter.keyTime(k));
+                                                        keyframe.time = milliseconds(newLayerPosXAfter.keyTime(k) + currentComp.displayStartTime);
                                                         keyframe.value = round(newLayerPosXAfter.keyValue(k), 2);
                                                         // alert("child ID: " + layer.id + " | name: " + layer.name);
                                                         layer.transform.position.x.push(keyframe);
@@ -2142,7 +2180,7 @@
                                                     var newLayerPosXAfter = newLayer.property("Transform").property("X Position");
                                                     var keyframe = {};
 
-                                                    keyframe.time = milliseconds(layer.startTime);
+                                                    keyframe.time = layer.startTime + currentComp.displayStartTime;
                                                     keyframe.value = round(newLayerPosXAfter.valueAtTime(layer.startTime), 2);
                                                     layer.transform.position.x.push(keyframe);
                                                 }
@@ -2151,7 +2189,7 @@
                                                 // layer.transform.position.xKeyframed = true;
                                                 for (var k = 1; k <= currentCompLayer.property("Transform").property("X Position").numKeys; k++) {
                                                     var keyframe = {};
-                                                    keyframe.time = milliseconds(currentCompLayer.property("Transform").property("X Position").keyTime(k));
+                                                    keyframe.time = milliseconds(currentCompLayer.property("Transform").property("X Position").keyTime(k) + currentComp.displayStartTime);
                                                     keyframe.value = round(currentCompLayer.property("Transform").property("X Position").keyValue(k), 2);
                                                     // keyframeEasing(currentCompLayer.property("Transform").property("X Position"));
                                                     layer.transform.position.x.push(keyframe);
@@ -2167,7 +2205,7 @@
 
                                                     for (var k = 1; k <= newLayerPosXAfter.numKeys; k++) {
                                                         var keyframe = {};
-                                                        keyframe.time = milliseconds(newLayerPosXAfter.keyTime(k));
+                                                        keyframe.time = milliseconds(newLayerPosXAfter.keyTime(k) + currentComp.displayStartTime);
                                                         keyframe.value = round(newLayerPosXAfter.keyValue(k), 2);
                                                         layer.transform.position.x.push(keyframe);
                                                     }
@@ -2177,7 +2215,7 @@
                                                     var newLayerPosXAfter = newLayer.property("Transform").property("X Position");
                                                     var keyframe = {};
 
-                                                    keyframe.time = milliseconds(layer.startTime);
+                                                    keyframe.time = layer.startTime + currentComp.displayStartTime;
                                                     keyframe.value = round(newLayerPosXAfter.valueAtTime(layer.startTime), 2);
                                                     layer.transform.position.x.push(keyframe);
                                                 }
@@ -2187,7 +2225,7 @@
                                             // layer.transform.position.xKeyframed = false;
                                             var keyframe = {};
 
-                                            keyframe.time = milliseconds(layer.startTime);
+                                            keyframe.time = layer.startTime + currentComp.displayStartTime;
                                             keyframe.value = round(currentCompLayer.position.value[0], 2);
                                             layer.transform.position.x.push(keyframe);
                                         }
@@ -2202,7 +2240,7 @@
 
                                                         for (var k = 1; k <= newLayerPosYAfter.numKeys; k++) {
                                                             var keyframe = {};
-                                                            keyframe.time = milliseconds(newLayerPosYAfter.keyTime(k));
+                                                            keyframe.time = milliseconds(newLayerPosYAfter.keyTime(k) + currentComp.displayStartTime);
                                                             keyframe.value = round(newLayerPosYAfter.keyValue(k), 2);
                                                             layer.transform.position.y.push(keyframe);
                                                         }
@@ -2214,7 +2252,7 @@
 
                                                         for (var k = 1; k <= newLayerPosYAfter.numKeys; k++) {
                                                             var keyframe = {};
-                                                            keyframe.time = milliseconds(newLayerPosYAfter.keyTime(k));
+                                                            keyframe.time = milliseconds(newLayerPosYAfter.keyTime(k) + currentComp.displayStartTime);
                                                             keyframe.value = round(newLayerPosYAfter.keyValue(k), 2);
                                                             layer.transform.position.y.push(keyframe);
                                                         }
@@ -2225,7 +2263,7 @@
                                                     var newLayerPosYAfter = newLayer.property("Transform").property("Y Position");
                                                     var keyframe = {};
 
-                                                    keyframe.time = milliseconds(layer.startTime);
+                                                    keyframe.time = layer.startTime + currentComp.displayStartTime;
                                                     keyframe.value = round(newLayerPosYAfter.valueAtTime(layer.startTime), 2);
                                                     layer.transform.position.y.push(keyframe);
                                                 }
@@ -2234,7 +2272,7 @@
                                                 // layer.transform.position.y.yKeyframed = true;
                                                 for (var k = 1; k <= currentCompLayer.property("Transform").property("Y Position").numKeys; k++) {
                                                     var keyframe = {};
-                                                    keyframe.time = milliseconds(currentCompLayer.property("Transform").property("Y Position").keyTime(k));
+                                                    keyframe.time = milliseconds(currentCompLayer.property("Transform").property("Y Position").keyTime(k) + currentComp.displayStartTime);
                                                     keyframe.value = round(currentCompLayer.property("Transform").property("Y Position").keyValue(k), 2);
                                                     // keyframeEasing(currentCompLayer.property("Transform").property("YX Position"));
                                                     layer.transform.position.y.push(keyframe);
@@ -2249,7 +2287,7 @@
 
                                                         for (var k = 1; k <= newLayerPosYAfter.numKeys; k++) {
                                                             var keyframe = {};
-                                                            keyframe.time = milliseconds(newLayerPosYAfter.keyTime(k));
+                                                            keyframe.time = milliseconds(newLayerPosYAfter.keyTime(k) + currentComp.displayStartTime);
                                                             keyframe.value = round(newLayerPosYAfter.keyValue(k), 2);
                                                             layer.transform.position.y.push(keyframe);
                                                         }
@@ -2261,7 +2299,7 @@
 
                                                         for (var k = 1; k <= newLayerPosYAfter.numKeys; k++) {
                                                             var keyframe = {};
-                                                            keyframe.time = milliseconds(newLayerPosYAfter.keyTime(k));
+                                                            keyframe.time = milliseconds(newLayerPosYAfter.keyTime(k) + currentComp.displayStartTime);
                                                             keyframe.value = round(newLayerPosYAfter.keyValue(k), 2);
                                                             layer.transform.position.y.push(keyframe);
                                                         }
@@ -2272,7 +2310,7 @@
                                                     var newLayerPosYAfter = newLayer.property("Transform").property("Y Position");
                                                     var keyframe = {};
 
-                                                    keyframe.time = milliseconds(layer.startTime);
+                                                    keyframe.time = layer.startTime + currentComp.displayStartTime;
                                                     keyframe.value = round(newLayerPosYAfter.valueAtTime(layer.startTime), 2);
                                                     layer.transform.position.y.push(keyframe);
                                                 }
@@ -2281,7 +2319,7 @@
                                                 // layer.transform.position.yKeyframed = false;
                                                 var keyframe = {};
 
-                                                keyframe.time = milliseconds(layer.startTime);
+                                                keyframe.time = layer.startTime + currentComp.displayStartTime;
                                                 keyframe.value = round(currentCompLayer.position.value[1], 2);
                                                 layer.transform.position.y.push(keyframe);
                                             }
@@ -2313,11 +2351,11 @@
                                             var keyframeX = {};
                                             var keyframeY = {};
 
-                                            keyframeX.time = layer.startTime;
+                                            keyframeX.time = layer.startTime + currentComp.displayStartTime;
                                             keyframeX.value = round(currentCompLayer.scale.value[0] / 100, 2);
                                             layer.transform.scale.x.push(keyframeX);
 
-                                            keyframeY.time = layer.startTime;
+                                            keyframeY.time = layer.startTime + currentComp.displayStartTime;
                                             keyframeY.value = round(currentCompLayer.scale.value[1] / 100, 2);
                                             layer.transform.scale.y.push(keyframeY);
                                         }
@@ -2329,7 +2367,7 @@
                                             for (var k = 1; k <= currentCompLayer.rotation.numKeys; k++) {
                                                 layer.transform.isRotating = true;
                                                 var keyframe = {};
-                                                keyframe.time = milliseconds(currentCompLayer.rotation.keyTime(k));
+                                                keyframe.time = milliseconds(currentCompLayer.rotation.keyTime(k) + currentComp.displayStartTime);
                                                 keyframe.value = currentCompLayer.rotation.keyValue(k);
                                                 // keyframeEasing(currentCompLayer.rotation);
                                                 layer.transform.rotation.push(keyframe);
@@ -2343,7 +2381,7 @@
                                             layer.transform.isRotating = false;
                                             // layer.transform.rotation.keyframed = false;
                                             var keyframe = {};
-                                            keyframe.time = milliseconds(layer.startTime);
+                                            keyframe.time = layer.startTime + currentComp.displayStartTime + currentComp.displayStartTime;
                                             keyframe.value = currentCompLayer.rotation.value;
                                             layer.transform.rotation.push(keyframe);
 
@@ -2386,7 +2424,7 @@
                                                                                 // layer.text.lineSpacingOffset.keyframes = [];
                                                                                 for (var k = 1; k <= animator.numKeys; k++) {
                                                                                     var keyframe = {};
-                                                                                    keyframe.time = milliseconds(animator.keyTime(k));
+                                                                                    keyframe.time = milliseconds(animator.keyTime(k) + currentComp.displayStartTime);
                                                                                     keyframe.value = round(animator.keyValue(k));
                                                                                     // keyframeEasing(animator);
                                                                                     layer.text.lineSpacingOffset.push(keyframe);
@@ -2397,7 +2435,7 @@
                                                                                 lineSpacingOffsetKeyframed.push(false);
                                                                                 // layer.text.lineSpacingOffset.keyframed = false;
                                                                                 var keyframe = {};
-                                                                                keyframe.time = milliseconds(layer.startTime);
+                                                                                keyframe.time = layer.startTime + currentComp.displayStartTime;
                                                                                 keyframe.value = round(animator.value, 2);
                                                                                 layer.text.lineSpacingOffset.push(keyframe);
                                                                             }
@@ -2617,7 +2655,7 @@
                                                                         // et.transform.fade.keyframed = true;
                                                                         for (var k = 1; k <= explodedTextLayer.opacity.numKeys; k++) {
                                                                             var keyframe = {};
-                                                                            keyframe.time = milliseconds(explodedTextLayer.opacity.keyTime(k));
+                                                                            keyframe.time = milliseconds(explodedTextLayer.opacity.keyTime(k) + currentComp.displayStartTime);
                                                                             keyframe.value = explodedTextLayer.opacity.keyValue(k) / 100;
                                                                             // keyframeEasing(explodedTextLayer.opacity);
                                                                             et.transform.fade.push(keyframe);
@@ -2626,7 +2664,7 @@
                                                                     else if (explodedTextLayer.opacity.numKeys === 0) {
                                                                         // et.transform.fade.keyframed = false;
                                                                         var keyframe = {};
-                                                                        keyframe.time = milliseconds(layer.startTime);
+                                                                        keyframe.time = layer.startTime + currentComp.displayStartTime;
                                                                         keyframe.value = explodedTextLayer.opacity.value / 100;
                                                                         et.transform.fade.push(keyframe);
                                                                     }
@@ -2653,7 +2691,7 @@
 
                                                                                 for (var k = 1; k <= explodedTextLayerPosXAfter.numKeys; k++) {
                                                                                     var keyframe = {};
-                                                                                    keyframe.time = milliseconds(explodedTextLayerPosXAfter.keyTime(k));
+                                                                                    keyframe.time = milliseconds(explodedTextLayerPosXAfter.keyTime(k) + currentComp.displayStartTime);
                                                                                     keyframe.value = round(explodedTextLayerPosXAfter.keyValue(k), 2);
                                                                                     et.transform.position.x.push(keyframe);
                                                                                 }
@@ -2665,7 +2703,7 @@
 
                                                                                 for (var k = 1; k <= explodedTextLayerPosXAfter.numKeys; k++) {
                                                                                     var keyframe = {};
-                                                                                    keyframe.time = milliseconds(explodedTextLayerPosXAfter.keyTime(k));
+                                                                                    keyframe.time = milliseconds(explodedTextLayerPosXAfter.keyTime(k) + currentComp.displayStartTime);
                                                                                     keyframe.value = round(explodedTextLayerPosXAfter.keyValue(k), 2);
                                                                                     et.transform.position.x.push(keyframe);
                                                                                 }
@@ -2707,7 +2745,7 @@
                                                                                 //         spacingAtTime = lineSpacingOffsetProp[0].keyValue(lineSpacingOffsetProp[0].numKeys * 0.7);
                                                                                 //     }
 
-                                                                                //     keyframe.time = milliseconds(explodedTextLayerPosXAfter.keyTime(k));
+                                                                                //     keyframe.time = milliseconds(explodedTextLayerPosXAfter.keyTime(k) + currentComp.displayStartTime);
                                                                                 //     keyframe.value = round(explodedTextLayerPosXAfter.keyValue(k), 2);
 
                                                                                 //     // increased spacing
@@ -2793,7 +2831,7 @@
 
                                                                                 for (var k = 1; k <= explodedTextLayerPosXAfter.numKeys; k++) {
                                                                                     var keyframe = {};
-                                                                                    keyframe.time = milliseconds(explodedTextLayerPosXAfter.keyTime(k));
+                                                                                    keyframe.time = milliseconds(explodedTextLayerPosXAfter.keyTime(k) + currentComp.displayStartTime);
                                                                                     keyframe.value = round(explodedTextLayerPosXAfter.keyValue(k), 2);
                                                                                     et.transform.position.x.push(keyframe);
                                                                                 }
@@ -2803,14 +2841,14 @@
                                                                             if (lineSpacingOffsetKeyframed[0] == false) {
                                                                                 var keyframe = {};
 
-                                                                                keyframe.time = milliseconds(layer.startTime);
+                                                                                keyframe.time = layer.startTime + currentComp.displayStartTime;
                                                                                 keyframe.value = round(explodedTextLayerPosX.valueAtTime(layer.startTime, false), 2);
                                                                                 et.transform.position.x.push(keyframe);
                                                                             }
                                                                             else if (lineSpacingOffsetKeyframed[0] == true) {
                                                                                 var keyframe = {};
 
-                                                                                keyframe.time = milliseconds(layer.startTime);
+                                                                                keyframe.time = layer.startTime + currentComp.displayStartTime;
                                                                                 keyframe.value = round(explodedTextLayerPosX.valueAtTime(layer.startTime, false), 2);
                                                                                 et.transform.position.x.push(keyframe);
 
@@ -2851,7 +2889,7 @@
                                                                                 //         spacingAtTime = lineSpacingOffsetProp[0].keyValue(lineSpacingOffsetProp[0].numKeys * 0.7);
                                                                                 //     }
 
-                                                                                //     keyframe.time = milliseconds(explodedTextLayerPosXAfter.keyTime(k));
+                                                                                //     keyframe.time = milliseconds(explodedTextLayerPosXAfter.keyTime(k) + currentComp.displayStartTime);
                                                                                 //     keyframe.value = round(explodedTextLayerPosXAfter.keyValue(k), 2);
 
                                                                                 //     // increased spacing
@@ -2939,7 +2977,7 @@
                                                                             else if (lineSpacingOffsetKeyframed.length == 0 && layer.transform.isRotating == false) {
                                                                                 var keyframe = {};
                                                                                 explodedTextLayer.parent = null;
-                                                                                keyframe.time = milliseconds(layer.startTime);
+                                                                                keyframe.time = layer.startTime + currentComp.displayStartTime;
                                                                                 keyframe.value = round(explodedTextLayerPosX.valueAtTime(layer.startTime, false), 2);
                                                                                 et.transform.position.x.push(keyframe);
                                                                             }
@@ -2950,7 +2988,7 @@
 
                                                                                 for (var k = 1; k <= explodedTextLayerPosXAfter.numKeys; k++) {
                                                                                     var keyframe = {};
-                                                                                    keyframe.time = milliseconds(explodedTextLayerPosXAfter.keyTime(k));
+                                                                                    keyframe.time = milliseconds(explodedTextLayerPosXAfter.keyTime(k) + currentComp.displayStartTime);
                                                                                     keyframe.value = round(explodedTextLayerPosXAfter.keyValue(k), 2);
                                                                                     et.transform.position.x.push(keyframe);
                                                                                 }
@@ -2962,7 +3000,7 @@
 
                                                                                 for (var k = 1; k <= explodedTextLayerPosXAfter.numKeys; k++) {
                                                                                     var keyframe = {};
-                                                                                    keyframe.time = milliseconds(explodedTextLayerPosXAfter.keyTime(k));
+                                                                                    keyframe.time = milliseconds(explodedTextLayerPosXAfter.keyTime(k) + currentComp.displayStartTime);
                                                                                     keyframe.value = round(explodedTextLayerPosXAfter.keyValue(k), 2);
                                                                                     et.transform.position.x.push(keyframe);
                                                                                 }
@@ -2980,7 +3018,7 @@
 
                                                                                     for (var k = 1; k <= explodedTextLayerPosYAfter.numKeys; k++) {
                                                                                         var keyframe = {};
-                                                                                        keyframe.time = milliseconds(explodedTextLayerPosYAfter.keyTime(k));
+                                                                                        keyframe.time = milliseconds(explodedTextLayerPosYAfter.keyTime(k) + currentComp.displayStartTime);
                                                                                         keyframe.value = round(explodedTextLayerPosYAfter.keyValue(k), 2);
                                                                                         et.transform.position.y.push(keyframe);
                                                                                     }
@@ -2992,7 +3030,7 @@
 
                                                                                     for (var k = 1; k <= explodedTextLayerPosYAfter.numKeys; k++) {
                                                                                         var keyframe = {};
-                                                                                        keyframe.time = milliseconds(explodedTextLayerPosYAfter.keyTime(k));
+                                                                                        keyframe.time = milliseconds(explodedTextLayerPosYAfter.keyTime(k) + currentComp.displayStartTime);
                                                                                         keyframe.value = round(explodedTextLayerPosYAfter.keyValue(k), 2);
                                                                                         et.transform.position.y.push(keyframe);
                                                                                     }
@@ -3028,7 +3066,7 @@
                                                                                     //     }
 
                                                                                     //     // alert("spacingAtTime: " + spacingAtTime);
-                                                                                    //     keyframe.time = milliseconds(explodedTextLayerPosYAfter.keyTime(k));
+                                                                                    //     keyframe.time = milliseconds(explodedTextLayerPosYAfter.keyTime(k) + currentComp.displayStartTime);
                                                                                     //     keyframe.value = round(explodedTextLayerPosYAfter.keyValue(k), 2);
 
                                                                                     //     // increased spacing
@@ -3086,7 +3124,7 @@
 
                                                                                     for (var k = 1; k <= explodedTextLayerPosYAfter.numKeys; k++) {
                                                                                         var keyframe = {};
-                                                                                        keyframe.time = milliseconds(explodedTextLayerPosYAfter.keyTime(k));
+                                                                                        keyframe.time = milliseconds(explodedTextLayerPosYAfter.keyTime(k) + currentComp.displayStartTime);
                                                                                         keyframe.value = round(explodedTextLayerPosYAfter.keyValue(k), 2);
                                                                                         et.transform.position.y.push(keyframe);
                                                                                     }
@@ -3098,7 +3136,7 @@
 
                                                                                     for (var k = 1; k <= explodedTextLayerPosYAfter.numKeys; k++) {
                                                                                         var keyframe = {};
-                                                                                        keyframe.time = milliseconds(explodedTextLayerPosYAfter.keyTime(k));
+                                                                                        keyframe.time = milliseconds(explodedTextLayerPosYAfter.keyTime(k) + currentComp.displayStartTime);
                                                                                         keyframe.value = round(explodedTextLayerPosYAfter.keyValue(k), 2);
                                                                                         et.transform.position.y.push(keyframe);
                                                                                     }
@@ -3111,7 +3149,7 @@
                                                                                     for (var k = 1; k <= explodedTextLayerPosYAfter.numKeys; k++) {
                                                                                         var keyframe = {};
                                                                                         // alert("y time: " + explodedTextLayerPosYAfter.keyTime(k));
-                                                                                        keyframe.time = milliseconds(explodedTextLayerPosYAfter.keyTime(k));
+                                                                                        keyframe.time = milliseconds(explodedTextLayerPosYAfter.keyTime(k) + currentComp.displayStartTime);
                                                                                         keyframe.value = round(explodedTextLayerPosYAfter.keyValue(k), 2);
                                                                                         et.transform.position.y.push(keyframe);
                                                                                     }
@@ -3122,7 +3160,7 @@
                                                                                     for (var k = 1; k <= explodedTextLayerPosYAfter.numKeys; k++) {
                                                                                         var keyframe = {};
                                                                                         // alert("y time: " + explodedTextLayerPosYAfter.keyTime(k));
-                                                                                        keyframe.time = milliseconds(explodedTextLayerPosYAfter.keyTime(k));
+                                                                                        keyframe.time = milliseconds(explodedTextLayerPosYAfter.keyTime(k) + currentComp.displayStartTime);
                                                                                         keyframe.value = round(explodedTextLayerPosYAfter.keyValue(k), 2);
                                                                                         et.transform.position.y.push(keyframe);
                                                                                     }
@@ -3156,7 +3194,7 @@
                                                                                     //     }
 
                                                                                     //     // alert("spacingAtTime: " + spacingAtTime);
-                                                                                    //     keyframe.time = milliseconds(explodedTextLayerPosYAfter.keyTime(k));
+                                                                                    //     keyframe.time = milliseconds(explodedTextLayerPosYAfter.keyTime(k) + currentComp.displayStartTime);
                                                                                     //     keyframe.value = round(explodedTextLayerPosYAfter.keyValue(k), 2);
 
                                                                                     //     // increased spacing
@@ -3213,7 +3251,7 @@
                                                                                     for (var k = 1; k <= explodedTextLayerPosYAfter.numKeys; k++) {
                                                                                         var keyframe = {};
                                                                                         // alert("y time: " + explodedTextLayerPosYAfter.keyTime(k));
-                                                                                        keyframe.time = milliseconds(explodedTextLayerPosYAfter.keyTime(k));
+                                                                                        keyframe.time = milliseconds(explodedTextLayerPosYAfter.keyTime(k) + currentComp.displayStartTime);
                                                                                         keyframe.value = round(explodedTextLayerPosYAfter.keyValue(k), 2);
                                                                                         et.transform.position.y.push(keyframe);
                                                                                     }
@@ -3224,7 +3262,7 @@
                                                                                     for (var k = 1; k <= explodedTextLayerPosYAfter.numKeys; k++) {
                                                                                         var keyframe = {};
                                                                                         // alert("y time: " + explodedTextLayerPosYAfter.keyTime(k));
-                                                                                        keyframe.time = milliseconds(explodedTextLayerPosYAfter.keyTime(k));
+                                                                                        keyframe.time = milliseconds(explodedTextLayerPosYAfter.keyTime(k) + currentComp.displayStartTime);
                                                                                         keyframe.value = round(explodedTextLayerPosYAfter.keyValue(k), 2);
                                                                                         et.transform.position.y.push(keyframe);
                                                                                     }
@@ -3240,7 +3278,7 @@
                                                                                         for (var k = 1; k <= explodedTextLayerPosY.numKeys; k++) {
                                                                                             var keyframe = {};
                                                                                             // alert("y time: " + explodedTextLayerPosY.keyTime(k));
-                                                                                            keyframe.time = milliseconds(explodedTextLayerPosY.keyTime(k));
+                                                                                            keyframe.time = milliseconds(explodedTextLayerPosY.keyTime(k) + currentComp.displayStartTime);
                                                                                             keyframe.value = round(explodedTextLayerPosY.keyValue(k), 2);
                                                                                             et.transform.position.y.push(keyframe);
                                                                                         }
@@ -3251,7 +3289,7 @@
                                                                                         for (var k = 1; k <= explodedTextLayerPosY.numKeys; k++) {
                                                                                             var keyframe = {};
                                                                                             // alert("y time: " + explodedTextLayerPosY.keyTime(k));
-                                                                                            keyframe.time = milliseconds(explodedTextLayerPosY.keyTime(k));
+                                                                                            keyframe.time = milliseconds(explodedTextLayerPosY.keyTime(k) + currentComp.displayStartTime);
                                                                                             keyframe.value = round(explodedTextLayerPosY.keyValue(k), 2);
                                                                                             et.transform.position.y.push(keyframe);
                                                                                         }
@@ -3266,7 +3304,7 @@
                                                                                         // var offset2 = 1.0;
                                                                                         // for (var k = 1; k <= explodedTextLayerPosYAfter.numKeys; k++) {
                                                                                         //     var keyframe = {};
-                                                                                        //     keyframe.time = milliseconds(explodedTextLayerPosYAfter.keyTime(k));
+                                                                                        //     keyframe.time = milliseconds(explodedTextLayerPosYAfter.keyTime(k) + currentComp.displayStartTime);
 
                                                                                         //     var spaceIncrease;
                                                                                         //     var spaceDecrease;
@@ -3319,7 +3357,7 @@
 
                                                                                         for (var k = 1; k <= explodedTextLayerPosYAfter.numKeys; k++) {
                                                                                             var keyframe = {};
-                                                                                            keyframe.time = milliseconds(explodedTextLayerPosYAfter.keyTime(k));
+                                                                                            keyframe.time = milliseconds(explodedTextLayerPosYAfter.keyTime(k) + currentComp.displayStartTime);
                                                                                             keyframe.value = round(explodedTextLayerPosYAfter.keyValue(k), 2);
                                                                                             et.transform.position.y.push(keyframe);
                                                                                         }
@@ -3331,7 +3369,7 @@
 
                                                                                         for (var k = 1; k <= explodedTextLayerPosYAfter.numKeys; k++) {
                                                                                             var keyframe = {};
-                                                                                            keyframe.time = milliseconds(explodedTextLayerPosYAfter.keyTime(k));
+                                                                                            keyframe.time = milliseconds(explodedTextLayerPosYAfter.keyTime(k) + currentComp.displayStartTime);
                                                                                             keyframe.value = round(explodedTextLayerPosYAfter.keyValue(k), 2);
                                                                                             et.transform.position.y.push(keyframe);
                                                                                         }
@@ -3343,7 +3381,7 @@
                                                                                     for (var k = 1; k <= explodedTextLayerPosYAfter.numKeys; k++) {
                                                                                         var keyframe = {};
                                                                                         explodedTextLayer.parent = null;
-                                                                                        keyframe.time = milliseconds(layer.startTime);
+                                                                                        keyframe.time = milliseconds(explodedTextLayerPosYAfter.keyTime(k) + currentComp.displayStartTime);
                                                                                         keyframe.value = round(explodedTextLayerPosYAfter.valueAtTime(explodedTextLayerPosYAfter.setValueAtKey(k), false), 2);
                                                                                         et.transform.position.y.push(keyframe);
                                                                                     }
@@ -3352,7 +3390,7 @@
                                                                             else if (layer.transform.isRotating == false) {
                                                                                 var keyframe = {};
                                                                                 explodedTextLayer.parent = null;
-                                                                                keyframe.time = milliseconds(layer.startTime);
+                                                                                keyframe.time = layer.startTime + currentComp.displayStartTime;
                                                                                 keyframe.value = round(explodedTextLayer.transform("Y Position").valueAtTime(layer.startTime, false), 2);
                                                                                 et.transform.position.y.push(keyframe);
                                                                             }
@@ -3384,11 +3422,11 @@
                                                                             var keyframeX = {};
                                                                             var keyframeY = {};
 
-                                                                            keyframeX.time = layer.startTime;
+                                                                            keyframeX.time = layer.startTime + currentComp.displayStartTime;
                                                                             keyframeX.value = round(explodedTextLayer.scale.value[0] / 100, 2);
                                                                             et.transform.scale.x.push(keyframeX);
 
-                                                                            keyframeY.time = layer.startTime;
+                                                                            keyframeY.time = layer.startTime + currentComp.displayStartTime;
                                                                             keyframeY.value = round(explodedTextLayer.scale.value[1] / 100, 2);
                                                                             et.transform.scale.y.push(keyframeY);
                                                                         }
@@ -3397,14 +3435,14 @@
                                                                         if (explodedTextLayer.rotation.numKeys !== 0) {
                                                                             for (var k = 1; k <= explodedTextLayer.rotation.numKeys; k++) {
                                                                                 var keyframe = {};
-                                                                                keyframe.time = milliseconds(explodedTextLayer.rotation.keyTime(k));
+                                                                                keyframe.time = milliseconds(explodedTextLayer.rotation.keyTime(k) + currentComp.displayStartTime);
                                                                                 keyframe.value = explodedTextLayer.rotation.keyValue(k);
                                                                                 et.transform.rotation.push(keyframe);
                                                                             }
                                                                         }
                                                                         else if (explodedTextLayer.rotation.numKeys === 0) {
                                                                             var keyframe = {};
-                                                                            keyframe.time = milliseconds(layer.startTime);
+                                                                            keyframe.time = layer.startTime + currentComp.displayStartTime;
                                                                             keyframe.value = explodedTextLayer.rotation.value;
                                                                             et.transform.rotation.push(keyframe);
                                                                         }
@@ -3617,7 +3655,7 @@
                 // }
 
                 function milliseconds(num) {
-                    return num * 1000;
+                    return round(num * 1000, 0);
                 }
 
                 if (!checkUnsupportedLayers()) selectedCompList_array = compSelectionNames;
@@ -3708,10 +3746,18 @@
                             for (var c = 0; c <= compIDs.length; c++) {
                                 for (var l = 1; l <= app.project.item(I).numLayers; l++) {
                                     if ((compIDs[c] == app.project.item(I).id)) {
-                                        if (layerTypeSplit(getLayerType(app.project.item(I).layer(l))).match(/^(Composition|Shape|Adjustment|Light|Solid|Placeholder|Video|3D|Vector|Script|JSON|mgJSON|CSV|TXT)$/)) {
-                                            return true;
+                                        var visibility = app.project.item(I).layer(l).enabled;
+                                        var layerType = layerTypeSplit(getLayerType(app.project.item(I).layer(l)));
+                                        
+                                        if (layerType.match(/^(Composition|Shape|Adjustment|Light|Solid|Placeholder|Video|3D|Vector|Script|JSON|mgJSON|CSV|TXT)$/)) {
+                                            if (visibility == true) {
+                                                return true;
+                                            }
+                                            else if (visibility == false) {
+                                                return false;
+                                            }
                                         }
-                                        else if (layerTypeSplit(getLayerType(app.project.item(I).layer(l))).match(/^(Image|Text|Audio|Null|Camera|Sequence)$/)) {
+                                        else if (layerType.match(/^(Image|Text|Audio|Null|Camera|Sequence)$/)) {
                                             return false;
                                         }
                                     }
@@ -3985,15 +4031,22 @@
             }
 
             function markerWarning(statement, layer) {
-                if (statement[2] !== "Audio") {
-                    if (statement[0] === null || statement[1] === null) {
-                        if (statement[0] === null) {
-                            alert("AeToOsb error: The layer '" + layer.name + "' doesn't have any marker with an OsbOrigin value." + "\r\n" + "\r\n" + "Layer '" + layer.name + "' in composition '" + layer.containingComp.name + "'" + "\r\n" + "\r\n" + "To fix this; please add a marker on the layer. The comment should be one of the following origins:" + "\r\n" + "\r\n" + "TopLeft, TopCentre, TopRight, CentreLeft, Centre, CentreRight, BottomLeft, BottomCentre, BottomRight");
+                if (layer.enabled == true) {
+                    if (statement[3] !== "Audio") {
+                        if (statement[0] === null || statement[1] === null) {
+                            if (statement[0] === null) {
+                                alert("AeToOsb error: The layer '" + layer.name + "' doesn't have any marker with an OsbOrigin value." + "\r\n" + "\r\n" + "Layer '" + layer.name + "' in composition '" + layer.containingComp.name + "'" + "\r\n" + "\r\n" + "To fix this; please add a marker on the layer. The comment should be one of the following origins:" + "\r\n" + "\r\n" + "TopLeft, TopCentre, TopRight, CentreLeft, Centre, CentreRight, BottomLeft, BottomCentre, BottomRight");
+                            }
+                            if (statement[1] === null) {
+                                alert("AeToOsb error: The layer '" + layer.name + "' doesn't have any marker with an OsbLayer value." + "\r\n" + "\r\n" + "Layer '" + layer.name + "' in composition '" + layer.containingComp.name + "'" + "\r\n" + "\r\n" + "To fix this; please add a marker on the layer. The comment should be one of the following layers:" + "\r\n" + "\r\n" + "Background, Fail, Pass, Foreground, Overlay, Sound");
+                            }
+                            if (statement[3] == "Sequence") {
+                                if (statement[2] === null) {
+                                    alert("AeToOsb error: The layer '" + layer.name + "' doesn't have any marker with an OsbLoopType value." + "\r\n" + "\r\n" + "Layer '" + layer.name + "' in composition '" + layer.containingComp.name + "'" + "\r\n" + "\r\n" + "To fix this; please add a marker on the layer. The comment should be one of the following layers:" + "\r\n" + "\r\n" + "LoopOnce, LoopForever");
+                                }
+                            }
+                            alert(ujkdsfs);
                         }
-                        if (statement[1] === null) {
-                            alert("AeToOsb error: The layer '" + layer.name + "' doesn't have any marker with an OsbLayer value." + "\r\n" + "\r\n" + "Layer '" + layer.name + "' in composition '" + layer.containingComp.name + "'" + "\r\n" + "\r\n" + "To fix this; please add a marker on the layer. The comment should be one of the following layers:" + "\r\n" + "\r\n" + "Background, Fail, Pass, Foreground, Overlay, Sound");
-                        }
-                        alert(ujkdsfs);
                     }
                 }
             }

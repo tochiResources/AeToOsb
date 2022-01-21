@@ -108,13 +108,17 @@ namespace StorybrewScripts
         private OsbSprite nullItem;
         private int spriteIndex;
         private string name;
+        private string layerName;
         private string layerFileName;
-        private int id;
+        private bool autoGen;
         private bool hasParent;
         private string parentName;
-        private int parentId;
         private string spriteType;
         private string spriteLayer;
+        private string sequenceLoopType;
+        private OsbLoopType spriteLoopType;
+        private string sequenceFilePath;
+        private string sequenceFileName;
         private string spriteFont;
         private string spriteFontFamily;
         private float spriteFontSize;
@@ -204,17 +208,19 @@ namespace StorybrewScripts
                             spriteIndex = compLayer.Index;
                             name = compLayer.Name;
 
-                            id = compLayer.Id;
+                            autoGen = compLayer.AutoGen;
                             hasParent = compLayer.HasParent;
                             if (hasParent)
                             {
                                 parentName = compLayer.ParentName;
-                                parentId = compLayer.ParentID;
                             }
 
+                            layerName = compLayer.Name;
                             layerFileName = compLayer.FileName;
                             spriteType = compLayer.Type;
                             spriteLayer = compLayer.LayerLayer;
+                            sequenceLoopType = compLayer.LoopType;
+                            sequenceFilePath = compLayer.Path;
 
                             spriteStart = compLayer.StartTime;
                             spriteEnd = compLayer.EndTime;
@@ -254,7 +260,7 @@ namespace StorybrewScripts
                                     if (aeToOsbSettings.Options != null && aeToOsbSettings.Options.ExportTextPerLetter == true) {
                                         fontName = spriteFontFamily;
                                         fontScale = (int)(spriteFontSize * 1.5f);
-                                        font = FontGenerator(textOutputFolder + "/characters");
+                                        font = FontGenerator(textOutputFolder + "/" + compName + "/characters");
                                         fontScaleShift = 1f;
                                         
                                         characters = spriteTextProps.Characters;
@@ -339,7 +345,7 @@ namespace StorybrewScripts
                                                     if (!texture.IsEmpty)
                                                     {
                                                         sprite = new OsbSprite();
-                                                        sprite = GetLayer(name + ": " + spriteLayer + ": " + spriteIndex).CreateSprite(texture.Path, origin);
+                                                        sprite = GetLayer(spriteType + ": " + spriteLayer + ": " + spriteIndex).CreateSprite(texture.Path, origin);
 
                                                         // fade
                                                         fade(charaTransform.Fade, sprite);
@@ -395,7 +401,76 @@ namespace StorybrewScripts
                             {
                                 // sprites
                                 sprite = new OsbSprite();
-                                sprite = GetLayer(name + ": " + spriteLayer + ": " + spriteIndex).CreateSprite("sb/" + layerFileName, origin);
+
+                                if (spriteType == "Sequence") {
+                                    if (string.Equals(sequenceLoopType, "LoopOnce", StringComparison.OrdinalIgnoreCase))
+                                    spriteLoopType = OsbLoopType.LoopOnce;
+                                    else if (string.Equals(sequenceLoopType, "LoopForever", StringComparison.OrdinalIgnoreCase))
+                                    spriteLoopType = OsbLoopType.LoopForever;
+                                    else spriteLoopType = OsbLoopType.LoopOnce;
+
+                                    string sequencePath = "";
+                                    int sequenceEntries = 0;
+                                    string seqPath = "";
+                                    if (autoGen) {
+                                        var destinationPath = MapsetPath + "/sb/AeAnimations/" + layerName;
+                                        sequencePath = aeToOsbSettings.ScriptslibraryFolderPath.Replace("scriptslibrary", "assetlibrary\\_AeToOsb\\AeAnimations\\" + layerName);
+                                        sequenceEntries = Directory.GetFiles(sequencePath).Length;
+
+                                        var sourceDir = new DirectoryInfo(sequencePath);
+                                        var destinationDir = new DirectoryInfo(destinationPath);
+
+                                        if (!destinationDir.Exists)
+                                        Directory.CreateDirectory(destinationPath);
+
+                                        foreach (var file in sourceDir.GetFiles())
+                                        {
+                                            if (file.Exists)
+                                            {
+                                                string filePath = Path.Combine(destinationPath, file.Name);
+
+                                                if (!FileExists(filePath))
+                                                file.CopyTo(filePath);
+                                                else continue;
+                                            }
+                                            else continue;
+                                        }
+                                        
+                                        var i = 0;
+                                        foreach (var file in sourceDir.GetFiles())
+                                        {
+                                            var newFile = IncrementFileName(i, file.Name, destinationPath, layerFileName);
+                                            var oldFileFullName = newFile.FullName.Replace(newFile.Name, file.Name);
+
+                                            if (!newFile.Exists) {
+                                                File.Move(oldFileFullName, newFile.FullName);
+                                                
+                                            }
+                                            else if (File.Exists(oldFileFullName))
+                                                File.Delete(oldFileFullName);
+                                            else continue;
+                                            ++i;
+                                        }
+
+                                        seqPath = "sb/AeAnimations/" + layerName + "/" + sequenceFileName;
+                                    }
+                                    else if (!autoGen) {
+                                        var sbIndex = sequenceFilePath.IndexOf("sb");
+                                        var sbLastIndex = sequenceFilePath.LastIndexOf('\\');
+                                        var sequencePathRemove = sequenceFilePath.Substring(sbLastIndex);
+
+                                        sequencePath = sequenceFilePath.Substring(sbIndex);
+                                        sequencePath = MapsetPath + "/" + sequencePath.Replace(sequencePathRemove, "").Replace(@"\", "/");
+                                        sequenceEntries = Directory.GetFiles(sequencePath).Length;
+
+                                        seqPath = sequencePath.Substring(sequencePath.IndexOf("sb")) + "/" + layerFileName;
+                                    }
+                                    Log("seqPath: " + seqPath);
+
+                                    sprite = GetLayer(spriteType + ": " + spriteLayer + ": " + spriteIndex).CreateAnimation(seqPath, sequenceEntries, frameDuration, spriteLoopType, origin);
+                                }
+                                else if (spriteType != "Sequence")
+                                sprite = GetLayer(spriteType + ": " + spriteLayer + ": " + spriteIndex).CreateSprite("sb/" + layerFileName, origin);
                                 
                                 // fade
                                 fade(spriteTransform.Fade, sprite);
@@ -449,7 +524,7 @@ namespace StorybrewScripts
                                     // shadowColor = CommandColor.FromHtml(spriteTextShadowColor);
 
                                     text = spriteText;
-                                    font = FontGenerator(textOutputFolder);
+                                    font = FontGenerator(textOutputFolder + "/" + compName);
 
                                     sentenceTexture = font.GetTexture(text.ToString());
 
@@ -457,7 +532,7 @@ namespace StorybrewScripts
                                     if (!texture.IsEmpty)
                                     {
                                         sprite = new OsbSprite();
-                                        sprite = GetLayer(name + ": " + spriteLayer + ": " + spriteIndex).CreateSprite(texture.Path, origin);
+                                        sprite = GetLayer(spriteType + ": " + spriteLayer + ": " + spriteIndex).CreateSprite(texture.Path, origin);
 
                                         // fade
                                         fade(spriteTransform.Fade, sprite);
@@ -482,7 +557,7 @@ namespace StorybrewScripts
                             {
                                 if (enableSamples)
                                 {
-                                    var audioSprite = GetLayer(name + ": " + spriteLayer + ": " + spriteIndex).CreateSample(layerFileName, (double)compLayer.StartTime, samplesVolume);
+                                    var audioSprite = GetLayer(spriteType + ": " + spriteLayer + ": " + spriteIndex).CreateSample(layerFileName, (double)compLayer.StartTime, samplesVolume);
                                 }
                             }
                         }
@@ -530,6 +605,35 @@ namespace StorybrewScripts
             });
 
             return font;
+        }
+
+        public bool FileExists(string path)
+        {
+            // check if file or folder exists function
+            // FileAttributes attributes = File.GetAttributes(path);
+
+            if (File.Exists(path))
+                return true;
+            else
+                return false;
+        }
+
+        public FileInfo IncrementFileName(int n, string sourceFileName, string path, string newName)
+        {          
+            // rename files
+            path = path.Replace("/", "\\") + "\\" + sourceFileName;
+            string dir = Path.GetDirectoryName(path);
+            string fileName = Path.GetFileNameWithoutExtension(path);
+            string fileExt = Path.GetExtension(path);
+            string newFileName = newName.Replace("_.png", "");
+
+            if (!File.Exists(path))
+                return new FileInfo(path);
+
+            path = Path.Combine(dir, fileName.Replace(fileName, newFileName + "(aeosb)_" + n + fileExt));
+            sequenceFileName = newFileName + "(aeosb)_" + fileExt;
+            
+            return new FileInfo(path);
         }
 
         public double AspectRatio(float width, float height)
@@ -641,7 +745,7 @@ namespace StorybrewScripts
                 {
                     foreach (var keyframe in transform)
                     {
-                        sprite.Fade(keyframe.Time, keyframe.Value);
+                        sprite.Fade(keyframe.Time, spriteEnd, keyframe.Value, keyframe.Value);
                     }
                 }
             }

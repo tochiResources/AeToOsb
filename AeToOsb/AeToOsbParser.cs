@@ -53,8 +53,8 @@ namespace AeToOsbParser
         [JsonProperty("index")]
         public int Index { get; set; }
 
-        [JsonProperty("id")]
-        public int Id { get; set; }
+        [JsonProperty("autoGen")]
+        public bool AutoGen { get; set; }
 
         [JsonProperty("hasParent")]
         public bool HasParent { get; set; }
@@ -83,6 +83,9 @@ namespace AeToOsbParser
         [JsonProperty("layer")]
         public string LayerLayer { get; set; }
 
+        [JsonProperty("loopType")]
+        public string LoopType { get; set; }
+
         [JsonProperty("additive")]
         public bool Additive { get; set; }
 
@@ -97,6 +100,9 @@ namespace AeToOsbParser
 
         [JsonProperty("layerName", NullValueHandling = NullValueHandling.Ignore)]
         public string Name { get; set; }
+
+        [JsonProperty("path", NullValueHandling = NullValueHandling.Ignore)]
+        public string Path { get; set; }
     }
 
     public partial class Text

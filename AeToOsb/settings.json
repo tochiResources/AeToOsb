@@ -3,7 +3,7 @@
     "outputFolderPath": "",
     "options": {
         "exportJsonOnly": false,
-        "exportTextPerLetter": false,
+        "exportTextPerLetter": true,
         "allProjectSourceFiles": false,
         "textLayers": true,
         "imageLayers": true,
