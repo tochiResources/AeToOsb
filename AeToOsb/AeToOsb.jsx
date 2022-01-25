@@ -47,7 +47,7 @@
                 settingsJsonFile: File.decode(settingsJsonFile.fsName),
                 scriptFileFolderPath: scriptFileFolderPath(),
                 exportedComps: null,
-                exportedCompsID: null
+                exportedCompNames: null
             };
 
             // AETOOSB
@@ -919,7 +919,7 @@
                         settingsJsonFile: File.decode(settingsJsonFile.fsName),
                         scriptFileFolderPath: scriptFileFolderPath(),
                         exportedComps: data.exportedComps,
-                        exportedCompsID: data.exportedCompsID
+                        exportedCompNames: data.exportedCompNames
                     };
                     return writeSettings(newData);
                 }
@@ -1114,7 +1114,8 @@
 
                 if (scriptSettings.scriptslibraryFolderPath !== "") {
                     var comps = [];
-                    var compIDs = [];
+                    var comps2 = [];
+                    // var compIDs = [];
                     var compNames = [];
                     var compUnsupportedIDs = [];
                     var compUnsupportedComps = [];
@@ -1132,29 +1133,31 @@
 
                     if (aps.length >= 1) {
                         scriptSettings.exportedComps = apsName;
-                        scriptSettings.exportedCompsID = apsID;
+                        scriptSettings.exportedCompNames = apsID;
                         writeSettings(scriptSettings);
                     }
                     else if (aps.length === 0) {
                         scriptSettings.exportedComps = null;
-                        scriptSettings.exportedCompsID = null;
+                        scriptSettings.exportedCompNames = null;
                         writeSettings(scriptSettings);
                         scriptSettings = readSettings();
                     }
 
-                    if (scriptSettings.exportedCompsID === null) {
+                    if (scriptSettings.exportedCompNames === null) {
                         for (var I = 1; I <= app.project.numItems; I++) {
                             var itemsAll = app.project.item(I);
                             if (itemsAll instanceof CompItem) {
-                                compIDs.push(itemsAll.id);
+                                compNames.push(itemsAll.name);
+                                // compIDs.push(itemsAll.id);
                             }
                         }
                     }
-                    else if (scriptSettings.exportedCompsID !== null) {
-                        compIDs = scriptSettings.exportedCompsID;
+                    else if (scriptSettings.exportedCompNames !== null) {
+                        // compIDs = scriptSettings.exportedCompNames;
+                        compNames = scriptSettings.exportedCompNames;
                         for (var I = 1; I <= app.project.numItems; I++) {
-                            for (var c = 0; c <= compIDs.length; c++)
-                                if (app.project.item(I).id == compIDs[c])
+                            for (var c = 0; c <= compNames.length; c++)
+                                if (app.project.item(I).name == compNames[c])
                                     comps.push(app.project.item(I));
                         }
                     }
@@ -1162,14 +1165,14 @@
                     if (scriptSettings.exportedComps !== null) {
                         var ec = scriptSettings.exportedComps;
                         for (var I = 0; I <= ec.length; I++)
-                            compNames.push(ec[I]);
+                            comps2.push(ec[I]);
                     }
 
                     if (scriptSettings.exportedComps === null)
                         for (var I = 1; I <= app.project.numItems; I++) {
-                            for (var c = 0; c <= compIDs.length; c++) {
+                            for (var c = 0; c <= compNames.length; c++) {
                                 for (var l = 1; l <= app.project.item(I).numLayers; l++) {
-                                    if ((compIDs[c] == app.project.item(I).id)) {
+                                    if ((compNames[c] == app.project.item(I).name)) {
 
                                         var itemName;
                                         if (app.project.item(I).name.indexOf("((old))") >= 0) {
@@ -1204,18 +1207,18 @@
                     // removeDuplicates(compUnsupportedIDs)
                     // alert(removeDuplicates(compUnsupportedIDs).length);
 
-                    if (scriptSettings.exportedCompsID === null)
+                    if (scriptSettings.exportedCompNames === null)
                         var message = "Found unsupported layers in " + removeDuplicates(compUnsupportedIDs).length + " compositions.";
-                    if (scriptSettings.exportedCompsID !== null)
-                        var message = "Found unsupported layers in " + removeDuplicates(compIDs).length + " compositions.";
+                    if (scriptSettings.exportedCompNames !== null)
+                        var message = "Found unsupported layers in " + removeDuplicates(compNames).length + " compositions.";
                     atsStatusMessage1.text = message;
                     atsStatusMessage2.text = "Do you want to proceed?";
 
                     yesButton.onClick = function () {
-                        if (scriptSettings.exportedCompsID === null)
+                        if (scriptSettings.exportedCompNames === null)
                             renderAndImportComp(removeDuplicates(compUnsupportedNames), removeDuplicates(compUnsupportedComps), removeDuplicates(compUnsupportedIDs));
-                        if (scriptSettings.exportedCompsID !== null)
-                            renderAndImportComp(removeDuplicates(compNames), removeDuplicates(comps), removeDuplicates(compIDs));
+                        if (scriptSettings.exportedCompNames !== null)
+                            renderAndImportComp(removeDuplicates(comps2), removeDuplicates(comps), removeDuplicates(compNames));
                         yesButton.enabled = false;
                         noButton.text = "Cancel";
                         AeToOsb.update();
@@ -1790,11 +1793,12 @@
                 }
 
                 scriptSettings = readSettings();
-                if (scriptSettings.outputFolderPath == "")
-                alert("AeToOsb error: Please specify an output directory before exporting selected compositions.");
-                alert(ksdjfkdsf);
+                if (scriptSettings.outputFolderPath == "") {
+                    alert("AeToOsb error: Please specify an output directory before exporting selected compositions.");
+                    alert(ksdjfkdsf);
+                }
                 scriptSettings.exportedComps = apsName;
-                scriptSettings.exportedCompsID = apsID;
+                scriptSettings.exportedCompNames = apsID;
                 writeSettings(scriptSettings);
 
                 var layerDATA;
@@ -1910,16 +1914,16 @@
                                     else if (currentCompLayer.source.mainSource.comment !== "autoGen.AeToOsb.sequence")
                                         layer.path = currentCompLayer.source.mainSource.file.fsName;
                                 }
-                                layer.id = currentCompLayer.id;
+                                // layer.id = currentCompLayer.id;
 
                                 if (currentCompLayer.enabled === true || layerType === "NullLayer") {
                                     if (currentCompLayer.parent !== null) {
                                         layer.hasParent = true;
                                         layer.parentName = currentCompLayer.parent.name;
-                                        layer.parentID = currentCompLayer.parent.id;
+                                        // layer.parentID = currentCompLayer.parent.id;
 
                                         for (var j = 1; j <= currentComp.numLayers; j++) {
-                                            if (currentComp.layer(j).id == currentCompLayer.parent.id)
+                                            if (currentComp.layer(j).name == currentCompLayer.parent.name)
                                                 parentLayerData = currentComp.layer(j);
                                         }
                                         // alert("parent ID: " + parentLayerData.id + " | name: " + parentLayerData.name);
@@ -3909,14 +3913,14 @@
                     alert("AeToOsb error: Please select at least one composition.");
                     scriptSettings = readSettings();
                     scriptSettings.exportedComps = null;
-                    scriptSettings.exportedCompsID = null;
+                    scriptSettings.exportedCompNames = null;
                     writeSettings(scriptSettings);
                 }
 
                 if (selectedCompList_array[0] !== "Please select a composition.") {
                     scriptSettings = readSettings();
                     scriptSettings.exportedComps = compSelectionNames;
-                    scriptSettings.exportedCompsID = selectedCompsID;
+                    scriptSettings.exportedCompNames = selectedCompsID;
                     writeSettings(scriptSettings);
 
                     confirmSelection.onClick = function () {
@@ -3958,15 +3962,15 @@
                 /////////////////////////////////////////
 
                 function checkUnsupportedLayers() {
-                    var compIDs = [];
-                    if (scriptSettings.exportedCompsID !== null) {
-                        compIDs = scriptSettings.exportedCompsID;
+                    var compNames = [];
+                    if (scriptSettings.exportedCompNames !== null) {
+                        compNames = scriptSettings.exportedCompNames;
 
-                        // alert(compIDs.length);
+                        // alert(compNames.length);
                         for (var I = 1; I <= app.project.numItems; I++) {
-                            for (var c = 0; c <= compIDs.length; c++) {
+                            for (var c = 0; c <= compNames.length; c++) {
                                 for (var l = 1; l <= app.project.item(I).numLayers; l++) {
-                                    if ((compIDs[c] == app.project.item(I).id)) {
+                                    if ((compNames[c] == app.project.item(I).name)) {
                                         var visibility = app.project.item(I).layer(l).enabled;
                                         var layerType = layerTypeSplit(getLayerType(app.project.item(I).layer(l)));
 
@@ -4687,14 +4691,14 @@
             AeToOsb.onShow = function () {
                 scriptSettings = readSettings();
                 scriptSettings.exportedComps = null;
-                scriptSettings.exportedCompsID = null;
+                scriptSettings.exportedCompNames = null;
                 writeSettings(scriptSettings);
             }
 
             AeToOsb.onClose = function () {
                 scriptSettings = readSettings();
                 scriptSettings.exportedComps = null;
-                scriptSettings.exportedCompsID = null;
+                scriptSettings.exportedCompNames = null;
                 writeSettings(scriptSettings);
             }
 
