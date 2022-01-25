@@ -963,42 +963,63 @@
                 file.write(JSON.stringify(data, null, '    '));
                 file.close();
 
+                var decodedName = "";
+                var decodedName2 = "";
                 var scriptslibraryFolderFileObj;
                 var _AeToOsbFolderFileObj = new Folder(scriptSettings.scriptslibraryFolderPath.slice(0, -15) + "\\assetlibrary\\_AeToOsb");
                 var gridImage = new File(scriptSettings.scriptFileFolderPath + "\\bitmap\\grid.png");
+                var bImage = new File(scriptSettings.scriptFileFolderPath + "\\bitmap\\b.png");
+                var pImage = new File(scriptSettings.scriptFileFolderPath + "\\bitmap\\p.png");
                 var NewtonsoftFile = new File(scriptSettings.scriptFileFolderPath + "\\Newtonsoft.Json.dll");
                 var AeToOsbFile = new File(scriptSettings.scriptFileFolderPath + "\\AeToOsb.cs");
                 var AeToOsbParserFile = new File(scriptSettings.scriptFileFolderPath + "\\AeToOsbParser.cs");
                 var AeToOsbSettingsFile = new File(scriptSettings.scriptFileFolderPath + "\\AeToOsbSettings.cs");
                 var DeleteBackgroundFile = new File(scriptSettings.scriptFileFolderPath + "\\DeleteBackground.cs");
                 // alert(scriptslibraryFolderFileObj.fsName);
-
+                
+                decodedName2 = _AeToOsbFolderFileObj.fsName.replaceAll("%20", " ");
                 if (!_AeToOsbFolderFileObj.exists)
-                    createNewFolder(_AeToOsbFolderFileObj.fsName.replaceAll("%20", " "));
-
+                createNewFolder(decodedName2);
+                
                 scriptslibraryFolderFileObj = new File(scriptSettings.scriptslibraryFolderPath.slice(0, -15) + "\\assetlibrary\\_AeToOsb\\grid.png");
-                if (!scriptslibraryFolderFileObj.fsName.replaceAll("%20", " ").exists)
-                    gridImage.copy(scriptslibraryFolderFileObj.fsName.replaceAll("%20", " "));
+                decodedName = scriptslibraryFolderFileObj.fsName.replaceAll("%20", " ");
+                if (!decodedName.exists)
+                    gridImage.copy(decodedName);
+
+                scriptslibraryFolderFileObj = new File(scriptSettings.scriptslibraryFolderPath.slice(0, -15) + "\\assetlibrary\\_AeToOsb\\b.png");
+                decodedName = scriptslibraryFolderFileObj.fsName.replaceAll("%20", " ");
+                if (!decodedName.exists)
+                    bImage.copy(decodedName);
+
+                scriptslibraryFolderFileObj = new File(scriptSettings.scriptslibraryFolderPath.slice(0, -15) + "\\assetlibrary\\_AeToOsb\\p.png");
+                decodedName = scriptslibraryFolderFileObj.fsName.replaceAll("%20", " ");
+                if (!decodedName.exists)
+                    pImage.copy(decodedName);
 
                 scriptslibraryFolderFileObj = new File(scriptSettings.scriptslibraryFolderPath + "\\Newtonsoft.Json.dll");
-                if (!scriptslibraryFolderFileObj.fsName.replaceAll("%20", " ").exists)
-                    NewtonsoftFile.copy(scriptslibraryFolderFileObj.fsName.replaceAll("%20", " "));
+                decodedName = scriptslibraryFolderFileObj.fsName.replaceAll("%20", " ");
+                if (!decodedName.exists)
+                    NewtonsoftFile.copy(decodedName);
 
                 scriptslibraryFolderFileObj = new File(scriptSettings.scriptslibraryFolderPath.slice(0, -15) + "\\AeToOsb.cs");
-                if (!scriptslibraryFolderFileObj.fsName.replaceAll("%20", " ").exists)
-                    AeToOsbFile.copy(scriptslibraryFolderFileObj.fsName.replaceAll("%20", " "));
+                decodedName = scriptslibraryFolderFileObj.fsName.replaceAll("%20", " ");
+                if (!decodedName.exists)
+                    AeToOsbFile.copy(decodedName);
 
                 scriptslibraryFolderFileObj = new File(scriptSettings.scriptslibraryFolderPath + "\\AeToOsbParser.cs");
-                if (!scriptslibraryFolderFileObj.fsName.replaceAll("%20", " ").exists)
-                    AeToOsbParserFile.copy(scriptslibraryFolderFileObj.fsName.replaceAll("%20", " "));
+                decodedName = scriptslibraryFolderFileObj.fsName.replaceAll("%20", " ");
+                if (!decodedName.exists)
+                    AeToOsbParserFile.copy(decodedName);
 
                 scriptslibraryFolderFileObj = new File(scriptSettings.scriptslibraryFolderPath + "\\AeToOsbSettings.cs");
-                if (!scriptslibraryFolderFileObj.fsName.replaceAll("%20", " ").exists)
-                    AeToOsbSettingsFile.copy(scriptslibraryFolderFileObj.fsName.replaceAll("%20", " "));
+                decodedName = scriptslibraryFolderFileObj.fsName.replaceAll("%20", " ");
+                if (!decodedName.exists)
+                    AeToOsbSettingsFile.copy(decodedName);
 
                 scriptslibraryFolderFileObj = new File(scriptSettings.scriptslibraryFolderPath.slice(0, -15) + "\\DeleteBackground.cs");
-                if (!scriptslibraryFolderFileObj.fsName.replaceAll("%20", " ").exists)
-                    DeleteBackgroundFile.copy(scriptslibraryFolderFileObj.fsName.replaceAll("%20", " "));
+                decodedName = scriptslibraryFolderFileObj.fsName.replaceAll("%20", " ");
+                if (!decodedName.exists)
+                    DeleteBackgroundFile.copy(decodedName);
             }
 
             function exportedJsonName() {
@@ -1038,7 +1059,7 @@
 
                 if (layerItem.source instanceof (FootageItem || FootageSource) && layerItem.hasVideo) {
                     if (layerItem.source.mainSource.isStill && !layerItem.hasAudio)
-                        if (layerFileExt.match(new RegExp("(bmp|bw|cin|cr2|crw|dcr|dng|dib|dpx|eps|erf|exr|hdr|icb|iff|jpe|jpeg|jpg|mos|mrw|nef|orf|pbm|pef|pct|pcx|pdf|pic|pict|png|ps|psd|pxr|raf|raw|rgb|rgbe|rla|rle|rpf|sgi|srf|tdi|tga|tif|tiff|vda|vst|x3f|xyze)", "i")))
+                        if (layerFileExt.match(new RegExp("(bmp|bw|cin|cr2|crw|dcr|dng|dib|dpx|eps|erf|exr|hdr|icb|iff|jpe|jpeg|jpg|mos|mrw|nef|orf|pbm|pef|pct|pcx|pdf|pic|pict|png|ps|pxr|raf|raw|rgb|rgbe|rla|rle|rpf|sgi|srf|tdi|tga|tif|tiff|vda|vst|x3f|xyze)", "i")))
                             return layerItem.containingComp.id + ".Image";
                     if (!layerItem.source.mainSource.isStill && layerItem.hasAudio)
                         if (layerFileExt.match(new RegExp("(crm|mfx|mov|3gpp|3gp|3g2|amc|flv|f4v|m2ts|mpg|mpe|mpa|mpv|mod|mp2|m2v|m2a|m2t|mp4|m4v|omf|avi|wmv|wma)", "i")))
@@ -1158,19 +1179,23 @@
                                         // alert(itemName);
 
                                         if (itemName === undefined) {
-                                            if (layerTypeSplit(getLayerType(app.project.item(I).layer(l))).match(/^(Composition|Shape|Adjustment|Light|Solid|Placeholder|Video|3D|Vector|Script|JSON|mgJSON|CSV|TXT)$/)) {
-                                                compUnsupportedIDs.push(getLayerType(app.project.item(I).layer(l)).substr(0, getLayerType(app.project.item(I).layer(l)).indexOf('.')));
-                                                compUnsupportedComps.push(app.project.item(I));
-                                                compUnsupportedNames.push(app.project.item(I).name);
-                                                // alert(app.project.item(I).layer(l).name);
+                                            if (app.project.item(I).layer(l).enabled) {
+                                                if (layerTypeSplit(getLayerType(app.project.item(I).layer(l))).match(/^(Composition|Adjustment|Light|Solid|Placeholder|Video|3D|Vector|Script|JSON|mgJSON|CSV|TXT)$/)) {
+                                                    compUnsupportedIDs.push(getLayerType(app.project.item(I).layer(l)).substr(0, getLayerType(app.project.item(I).layer(l)).indexOf('.')));
+                                                    compUnsupportedComps.push(app.project.item(I));
+                                                    compUnsupportedNames.push(app.project.item(I).name);
+                                                    // alert(app.project.item(I).layer(l).name);
+                                                }
                                             }
                                         }
                                         else if (app.project.item(I).name !== itemName && app.project.item(I).name !== itemName.slice(0, -8)) {
-                                            if (layerTypeSplit(getLayerType(app.project.item(I).layer(l))).match(/^(Composition|Shape|Adjustment|Light|Solid|Placeholder|Video|3D|Vector|Script|JSON|mgJSON|CSV|TXT)$/)) {
-                                                compUnsupportedIDs.push(getLayerType(app.project.item(I).layer(l)).substr(0, getLayerType(app.project.item(I).layer(l)).indexOf('.')));
-                                                compUnsupportedComps.push(app.project.item(I));
-                                                compUnsupportedNames.push(app.project.item(I).name);
-                                                // alert(app.project.item(I).layer(l).name);
+                                            if (app.project.item(I).layer(l).enabled) {
+                                                if (layerTypeSplit(getLayerType(app.project.item(I).layer(l))).match(/^(Composition|Adjustment|Light|Solid|Placeholder|Video|3D|Vector|Script|JSON|mgJSON|CSV|TXT)$/)) {
+                                                    compUnsupportedIDs.push(getLayerType(app.project.item(I).layer(l)).substr(0, getLayerType(app.project.item(I).layer(l)).indexOf('.')));
+                                                    compUnsupportedComps.push(app.project.item(I));
+                                                    compUnsupportedNames.push(app.project.item(I).name);
+                                                    // alert(app.project.item(I).layer(l).name);
+                                                }
                                             }
                                         }
                                     }
@@ -1821,7 +1846,7 @@
                             var firstTextLayerIndex = [];
                             var currentComp = selectedComps[I];
                             var currentCompResolution = currentComp.resolutionFactor;
-                            
+
                             var composition = ({
                                 type: "composition",
                                 name: currentComp.name,
@@ -1851,20 +1876,22 @@
                                 // alert("currentCompLayer.name: " + currentCompLayer.name);
 
                                 layer.index = currentCompLayer.index;
+                                layer.index = currentCompLayer.index;
                                 if (layerType == "Sequence") layer.autoGen = false;
-                                if (layerType !== "Text" && layerType !== "NullLayer" && layerType !== "Composition")
+                                if (layerType !== "Text" && layerType !== "Shape" && layerType !== "NullLayer" && layerType !== "Composition")
                                 layer.name = currentCompLayer.source.mainSource.file.name;
                                 
+                                layer.layerName = currentCompLayer.name;
                                 if (layerType == "Sequence" && currentCompLayer.name.indexOf('{') == -1) {
                                     layer.layerName = currentCompLayer.name;
-                                    
+
                                     if (currentCompLayer.source.mainSource.comment == "autoGen.AeToOsb.sequence") {
                                         layer.name = currentCompLayer.name + "_.png";
                                         layer.layerName = currentCompLayer.name;
                                         layer.autoGen = true;
                                     }
                                     else if (currentCompLayer.source.mainSource.comment !== "autoGen.AeToOsb.sequence")
-                                    layer.path = currentCompLayer.source.mainSource.file.fsName;
+                                        layer.path = currentCompLayer.source.mainSource.file.fsName;
                                 }
                                 else if (currentCompLayer.name.indexOf('{') !== -1) {
                                     var nn = currentCompLayer.name;
@@ -1872,14 +1899,14 @@
                                     var nn2 = nn.slice(0, nn.indexOf('{')) + ext;
                                     layer.name = nn2;
                                     layer.layerName = currentCompLayer.name;
-                                    
+
                                     if (currentCompLayer.source.mainSource.comment == "autoGen.AeToOsb.sequence") {
                                         layer.name = currentCompLayer.name + "_.png";
                                         layer.layerName = currentCompLayer.name;
                                         layer.autoGen = true;
                                     }
                                     else if (currentCompLayer.source.mainSource.comment !== "autoGen.AeToOsb.sequence")
-                                    layer.path = currentCompLayer.source.mainSource.file.fsName;
+                                        layer.path = currentCompLayer.source.mainSource.file.fsName;
                                 }
                                 layer.id = currentCompLayer.id;
 
@@ -1985,6 +2012,226 @@
                                             }
                                         }
                                     }
+                                    
+                                    if (layerType == "Shape") {
+                                        layer.shape = {};
+                                        // var deselectAll = app.findMenuCommandId("Deselect All");
+                                        // var convertToBezier = app.findMenuCommandId("Convert To Bezier Path");
+                                        app.beginUndoGroup("Export Shapes");
+                                        if (currentCompLayer("Contents").numProperties !== 0) {
+                                                var shapePropName = currentCompLayer("Contents")(1)("Contents")(1).name;
+                                                // alert("layer: " + currentCompLayer.name);
+                                                // alert(shapePropName);
+                                                
+                                            if (shapePropName.length < 7) {
+                                                layer.shape.type = "Path";
+                                                if (currentCompLayer("Contents")(1)("Contents")(1)("Path").value.vertices.length > 1) {
+                                                    getPathData();
+                                                }
+                                                else if ((currentCompLayer("Contents")(1)("Contents")(1)("Path").value.vertices.length < 2)) {
+                                                    alert("AeToOsb error: The ShapeLayer '" + currentCompLayer.name + "' will be ignored because it only has 1 vertex (point).");
+                                                    continue;
+                                                }
+                                            }
+                                            else if (shapePropName.length == 16) {
+                                                layer.shape.type = "Rectangle";
+                                                layer.shape.closed = true;
+                                                layer.shape.shapeSize = {};
+                                                layer.shape.shapeSize.x = round(currentCompLayer("Contents")(1)("Contents")(1)("Size").value[0], 2);
+                                                layer.shape.shapeSize.y = round(currentCompLayer("Contents")(1)("Contents")(1)("Size").value[1], 2);
+                                                layer.shape.rectRoundness = currentCompLayer("Contents")(1)("Contents")(1)("Roundness").value;
+                                                layer.shape.posOffset = {};
+                                                layer.shape.posOffset.x = round(currentCompLayer("Contents")(1)("Transform")("Position").value[0], 2);
+                                                layer.shape.posOffset.y = round(currentCompLayer("Contents")(1)("Transform")("Position").value[1], 2);
+                                            }
+                                            else if (shapePropName.length == 14) {
+                                                layer.shape.type = "Ellipse";
+                                                layer.shape.closed = true;
+                                                layer.shape.shapeSize = {};
+                                                layer.shape.shapeSize.x = round(currentCompLayer("Contents")(1)("Contents")(1)("Size").value[0], 2);
+                                                layer.shape.shapeSize.y = round(currentCompLayer("Contents")(1)("Contents")(1)("Size").value[1], 2);
+                                                layer.shape.posOffset = {};
+                                                layer.shape.posOffset.x = round(currentCompLayer("Contents")(1)("Transform")("Position").value[0], 2);
+                                                layer.shape.posOffset.y = round(currentCompLayer("Contents")(1)("Transform")("Position").value[1], 2);
+                                            }
+                                            else {
+                                                alert("AeToOsb error: The ShapeLayer: '" + currentCompLayer.name + "' is not supported. Only Rectangles, Ellipses and Shapes created with the Pen Tool are supported." +
+                                                "\r\n" + "\r\n" + "This layer will be ignored.");
+                                                continue;
+    
+                                                // layer.shape.type = "Other";
+                                                // if (currentCompLayer("Contents")(1)("Contents")(1)("Path") == null) {
+                                                //     app.executeCommand(deselectAll); // deselect all layers
+                                                //     currentCompLayer.selected = true;
+                                                //     currentCompLayer("Contents")(1)("Contents")(1).selected = true;
+                                                //     app.executeCommand(convertToBezier); // convert to bezier path
+                                                //     getPathData();
+                                                //     app.executeCommand(deselectAll); // deselect all layers
+                                                // }
+                                                // else if (currentCompLayer("Contents")(1)("Contents")(1)("Path") !== null) {
+                                                //     getPathData();
+                                                // }
+                                            }
+    
+                                            function getPathData() {
+                                                // pathData[pathValueVertices, inTangents, outTangents]
+                                                var pathData = getShapeData(currentCompLayer);
+                                                var path = currentCompLayer("Contents")(1)("Contents")(1)("Path").value;
+                                                
+                                                layer.shape.verticesPosition = [];
+                                                layer.shape.inTangent = [];
+                                                layer.shape.outTangent = [];
+                                                
+                                                var pathValueVertices = pathData[0];
+                                                var inTangents = pathData[1];
+                                                var outTangents = pathData[2];
+                                                
+                                                for (var v = 0; v < pathValueVertices.length; v++) {
+                                                    var values = {};
+                                                    values.x = round(pathValueVertices[v][0], 2);
+                                                    values.y = round(pathValueVertices[v][1], 2);
+                                                    
+                                                    layer.shape.verticesPosition.push(values);
+                                                }
+                                                for (var it = 0; it < inTangents.length; it++) {
+                                                    var values = {};
+                                                    values.x = round(inTangents[it][0], 2);
+                                                    values.y = round(inTangents[it][1], 2);
+                                                    
+                                                    layer.shape.inTangent.push(values);
+                                                }
+                                                for (var ot = 0; ot < inTangents.length; ot++) {
+                                                    var values = {};
+                                                    values.x = round(outTangents[ot][0], 2);
+                                                    values.y = round(outTangents[ot][1], 2);
+                                                    layer.shape.outTangent.push(values);
+                                                }
+                                                layer.shape.closed = path.closed;
+                                            }
+    
+                                            layer.shape.hasStroke = currentCompLayer("Contents")(1)("Contents")(2).enabled;
+                                            // stroke color
+                                            layer.shape.strokeColor = [];
+                                            var strokeColorProp = currentCompLayer("Contents")(1)("Contents")(2)("Color");
+                                            if (strokeColorProp.numKeys !== 0) {
+                                                // layer.shape.strokeColor.keyframed = true;
+                                                for (var k = 1; k <= strokeColorProp.numKeys; k++) {
+                                                    var keyframe = {};
+                                                    keyframe.time = milliseconds(strokeColorProp.keyTime(k) + currentComp.displayStartTime);
+                                                    keyframe.value = rgbColor(strokeColorProp.keyValue(k));
+                                                    // keyframeEasing(strokeColorProp);
+                                                    layer.shape.strokeColor.push(keyframe);
+                                                }
+                                            }
+                                            else if (strokeColorProp.numKeys === 0) {
+                                                // layer.shape.strokeColor.keyframed = false;
+                                                var keyframe = {};
+                                                keyframe.time = layer.startTime + currentComp.displayStartTime;
+                                                keyframe.value = rgbColor(strokeColorProp.value);
+                                                layer.shape.strokeColor.push(keyframe);
+                                            }
+                                            
+                                            if (layer.shape.hasStroke)
+                                                layer.shape.strokeWidth = currentCompLayer("Contents")(1)("Contents")(2)("Stroke Width").value;
+                                            if (!layer.shape.hasStroke) layer.shape.strokeWidth = 0;
+                                            
+                                            var shapeFillComposite = currentCompLayer("Contents")(1)("Contents")(2)("Line Cap").value;
+                                            if (shapeFillComposite == 1) layer.shape.lineCap = "Butt";
+                                            if (shapeFillComposite == 2) layer.shape.lineCap = "Round";
+                                            if (shapeFillComposite == 3) layer.shape.lineCap = "Projecting";
+                                            
+                                            var shapeFillComposite = currentCompLayer("Contents")(1)("Contents")(2)("Line Join").value;
+                                            if (shapeFillComposite == 1) layer.shape.lineJoin = "Miter";
+                                            if (shapeFillComposite == 2) layer.shape.lineJoin = "Round";
+                                            if (shapeFillComposite == 3) layer.shape.lineJoin = "Bevel";
+                                            
+                                            layer.shape.lineMiterLimit = currentCompLayer("Contents")(1)("Contents")(2)("Miter Limit").value;
+                                            
+                                            var strokeHashDash = false; if (currentCompLayer("Contents")(1)("Contents")(2)("Dashes").canSetExpression) strokeHashDash = true;
+                                            layer.shape.hasDash = strokeHashDash;
+    
+                                            if (currentCompLayer("Contents")(1)("Contents")(2)("Dashes")("Dash").canSetExpression)
+                                            layer.shape.dashSpacing = currentCompLayer("Contents")(1)("Contents")(2)("Dashes")("Dash").value;
+                                            if (currentCompLayer("Contents")(1)("Contents")(2)("Dashes")("Offset").canSetExpression)
+                                                layer.shape.dashOffset = currentCompLayer("Contents")(1)("Contents")(2)("Dashes")("Offset").value;
+    
+                                            layer.shape.hasFill = currentCompLayer("Contents")(1)("Contents")(3).enabled;
+                                            var shapeFillComposite = currentCompLayer("Contents")(1)("Contents")(3)("Composite").value;
+                                            if (shapeFillComposite == 1) layer.shape.fillComposite = "Below";
+                                            if (shapeFillComposite == 2) layer.shape.fillComposite = "Above";
+                                            
+                                            // fill color
+                                            layer.shape.fillColor = [];
+                                            var fillColorProp = currentCompLayer("Contents")(1)("Contents")(3)("Color");
+                                            if (fillColorProp.numKeys !== 0) {
+                                                // layer.shape.fillColor.keyframed = true;
+                                                for (var k = 1; k <= fillColorProp.numKeys; k++) {
+                                                    var keyframe = {};
+                                                    keyframe.time = milliseconds(fillColorProp.keyTime(k) + currentComp.displayStartTime);
+                                                    keyframe.value = rgbColor(fillColorProp.keyValue(k));
+                                                    // keyframeEasing(fillColorProp);
+                                                    layer.shape.fillColor.push(keyframe);
+                                                }
+                                            }
+                                            else if (fillColorProp.numKeys === 0) {
+                                                // layer.shape.fillColor.keyframed = false;
+                                                var keyframe = {};
+                                                keyframe.time = layer.startTime + currentComp.displayStartTime;
+                                                keyframe.value = rgbColor(fillColorProp.value);
+                                                layer.shape.fillColor.push(keyframe);
+                                            }
+                                        }
+                                        else if (currentCompLayer("Contents").numProperties == 0) {
+                                            alert("AeToOsb error: The ShapeLayer '" + currentCompLayer.name + "' doesn't have any Contents." + "\r\n" + "\r\n" +
+                                            "Please check if the layer's property 'Content' can be expanded, if not then this layer will be ignored.");
+                                            continue;
+                                        }
+                                        app.endUndoGroup();
+                                    }
+                                
+                                    function getShapeData(shapeLayer) {
+                                        var pathData = [];
+                                        var shapeLayerProperty = shapeLayer("Contents")(1)("Contents")(1)("Path");
+
+                                        // From https://terriblejunkshow.com/tutorial/getpathui
+                                        // mPnl.mPathProp = shapeLayerProperty;
+                                        
+                                        var pathValue = shapeLayerProperty.value;
+                                        var pathValueVertices = pathValue.vertices;
+                                        var inTangents = pathValue.inTangents;
+                                        var outTangents = pathValue.outTangents;
+
+                                        // get the center position (viewer coordinates)
+                                        var pathX = [];
+                                        var pathY = [];
+
+                                        for (var i = 0; i < pathValueVertices.length; i++) {
+                                            var CurrentPathValueVertex = pathValueVertices[i];
+                                            pathX.push(CurrentPathValueVertex[0]);
+                                            pathY.push(CurrentPathValueVertex[1]);
+                                        }
+                                        pathX.sort(function (a, b) { return a - b; });
+                                        pathY.sort(function (a, b) { return a - b; });
+
+                                        var pathMinX = pathX[0];
+                                        var pathMaxX = pathX[pathX.length - 1];
+                                        var pathMinY = pathY[0];
+                                        var pathMaxY = pathY[pathY.length - 1];
+                                        var pathCenter = [(pathMaxX + pathMinX) / 2, (pathMaxY + pathMinY) / 2];
+
+                                        // set the coordinates with the center position as the origin [0,0]
+                                        for (var i = 0; i < pathValueVertices.length; i++) {
+                                            pathValueVertices[i] = pathValueVertices[i] - pathCenter;
+                                        }
+                                        // save path data
+                                        pathData.push(pathValueVertices);
+                                        pathData.push(inTangents);
+                                        pathData.push(outTangents);
+
+                                        // pathData: [pathValueVertices, inTangents, outTangents]
+                                        return pathData;
+                                    }
+                                    
                                     layer.transform.position = {};
                                     layer.transform.scale = {};
                                     layer.transform.isRotating = false;
@@ -2334,7 +2581,7 @@
                                                 var keyframeX = {};
                                                 var keyframeY = {};
 
-                                                var scaleTime = milliseconds(currentCompLayer.scale.keyTime(k));
+                                                var scaleTime = milliseconds(currentCompLayer.scale.keyTime(k) + currentComp.displayStartTime);
                                                 var scaleValues = currentCompLayer.scale.keyValue(k) / 100;
 
                                                 keyframeX.time = scaleTime;
@@ -2469,27 +2716,12 @@
                                                     if (layer.text.alignment == 7412)
                                                         layer.text.alignment = "multiple_justifications";
 
-                                                    var obj = [];
-                                                    var colorFill = [];
-                                                    var r, g, b;
-
                                                     layer.text.hasColorFill = sourceText.applyFill;
                                                     if (layer.text.hasColorFill !== true) {
                                                         layer.text.color = "#ffffff";
                                                     }
-                                                    if (layer.text.hasColorFill == true) {
-                                                        r = 255 * sourceText.fillColor[0];
-                                                        g = 255 * sourceText.fillColor[1];
-                                                        b = 255 * sourceText.fillColor[2];
-                                                        if (r == Infinity) r = 0; if (g == Infinity) g = 0; if (b == Infinity) b = 0;
-
-                                                        colorFill.push(round(r, 1));
-                                                        colorFill.push(round(g, 1));
-                                                        colorFill.push(round(b, 1));
-
-                                                        layer.text.color = rgbToHex(colorFill[0], colorFill[1], colorFill[2]);
-                                                        colorFill = obj;
-                                                    }
+                                                    if (layer.text.hasColorFill == true)
+                                                        layer.text.color = rgbColor(sourceText.fillColor);
 
                                                     layer.text.hasStroke = sourceText.applyStroke;
                                                     if (layer.text.hasStroke !== true) {
@@ -2497,18 +2729,8 @@
                                                         layer.text.strokeThickness = 0;
                                                     }
                                                     if (layer.text.hasStroke == true) {
-                                                        r = 255 * sourceText.strokeColor[0];
-                                                        g = 255 * sourceText.strokeColor[1];
-                                                        b = 255 * sourceText.strokeColor[2];
-                                                        if (r == Infinity) r = 0; if (g == Infinity) g = 0; if (b == Infinity) b = 0;
-
-                                                        colorFill.push(round(r, 1));
-                                                        colorFill.push(round(g, 1));
-                                                        colorFill.push(round(b, 1));
-
-                                                        layer.text.strokeColor = rgbToHex(colorFill[0], colorFill[1], colorFill[2]);
+                                                        layer.text.color = rgbColor(sourceText.strokeColor);
                                                         layer.text.strokeThickness = sourceText.strokeWidth;
-                                                        colorFill = obj;
                                                     }
 
 
@@ -2606,19 +2828,8 @@
                                                                     if (et.hasColorFill !== true) {
                                                                         et.color = "#ffffff";
                                                                     }
-                                                                    if (et.hasColorFill == true) {
-                                                                        r = 255 * explodedText.fillColor[0];
-                                                                        g = 255 * explodedText.fillColor[1];
-                                                                        b = 255 * explodedText.fillColor[2];
-                                                                        if (r == Infinity) r = 0; if (g == Infinity) g = 0; if (b == Infinity) b = 0;
-
-                                                                        colorFill.push(round(r, 1));
-                                                                        colorFill.push(round(g, 1));
-                                                                        colorFill.push(round(b, 1));
-
-                                                                        et.color = rgbToHex(colorFill[0], colorFill[1], colorFill[2]);
-                                                                        colorFill = obj;
-                                                                    }
+                                                                    if (et.hasColorFill == true)
+                                                                        et.color = rgbColor(explodedText.fillColor);
 
                                                                     et.hasStroke = explodedText.applyStroke;
                                                                     if (et.hasStroke !== true) {
@@ -2626,18 +2837,8 @@
                                                                         et.strokeThickness = 0;
                                                                     }
                                                                     if (et.hasStroke == true) {
-                                                                        r = 255 * explodedText.strokeColor[0];
-                                                                        g = 255 * explodedText.strokeColor[1];
-                                                                        b = 255 * explodedText.strokeColor[2];
-                                                                        if (r == Infinity) r = 0; if (g == Infinity) g = 0; if (b == Infinity) b = 0;
-
-                                                                        colorFill.push(round(r, 1));
-                                                                        colorFill.push(round(g, 1));
-                                                                        colorFill.push(round(b, 1));
-
-                                                                        et.strokeColor = rgbToHex(colorFill[0], colorFill[1], colorFill[2]);
+                                                                        et.color = rgbColor(explodedText.strokeColor);
                                                                         et.strokeThickness = explodedText.strokeWidth;
-                                                                        colorFill = obj;
                                                                     }
 
                                                                     et.transform = {};
@@ -3405,7 +3606,7 @@
                                                                                 var keyframeX = {};
                                                                                 var keyframeY = {};
 
-                                                                                var scaleTime = milliseconds(explodedTextLayer.scale.keyTime(k));
+                                                                                var scaleTime = milliseconds(explodedTextLayer.scale.keyTime(k) + currentComp.displayStartTime);
                                                                                 var scaleValues = explodedTextLayer.scale.keyValue(k) / 100;
 
                                                                                 keyframeX.time = scaleTime;
@@ -3476,8 +3677,9 @@
                                         wasSelected = true;
                                     }
                                 }
-
+                                
                                 composition.layers.push(layer);
+
                                 if (dimensionAlreadySeparated == false)
                                     currentCompLayer.property("Transform").property("Position").dimensionsSeparated = false;
                                 if (parentDimensionAlreadySeparated == false)
@@ -3644,6 +3846,23 @@
                     return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
                 }
 
+                
+                function rgbColor(color) {
+                    var r, g, b;
+                    var strokeColorFill = [];
+                    
+                    r = 255 * color[0];
+                    g = 255 * color[1];
+                    b = 255 * color[2];
+                    if (r == Infinity) r = 0; if (g == Infinity) g = 0; if (b == Infinity) b = 0;
+
+                    strokeColorFill.push(round(r, 1));
+                    strokeColorFill.push(round(g, 1));
+                    strokeColorFill.push(round(b, 1));
+
+                    return rgbToHex(strokeColorFill[0], strokeColorFill[1], strokeColorFill[2]);
+                }
+
                 // function containsObject(obj, list) {
                 //     var x;
                 //     for (x in list) {
@@ -3748,8 +3967,8 @@
                                     if ((compIDs[c] == app.project.item(I).id)) {
                                         var visibility = app.project.item(I).layer(l).enabled;
                                         var layerType = layerTypeSplit(getLayerType(app.project.item(I).layer(l)));
-                                        
-                                        if (layerType.match(/^(Composition|Shape|Adjustment|Light|Solid|Placeholder|Video|3D|Vector|Script|JSON|mgJSON|CSV|TXT)$/)) {
+
+                                        if (layerType.match(/^(Composition|Adjustment|Light|Solid|Placeholder|Video|3D|Vector|Script|JSON|mgJSON|CSV|TXT)$/)) {
                                             if (visibility == true) {
                                                 return true;
                                             }
@@ -3757,7 +3976,7 @@
                                                 return false;
                                             }
                                         }
-                                        else if (layerType.match(/^(Image|Text|Audio|Null|Camera|Sequence)$/)) {
+                                        else if (layerType.match(/^(Image|Text|Audio|Null|Camera|Sequence|Shape)$/)) {
                                             return false;
                                         }
                                     }
@@ -3832,7 +4051,7 @@
                             var valueNextY = pos[p].keyValue(y2Index);
 
                             var angle = Math.atan2((valueY - valueNextY), (valueX - valueNextX)) - Math.PI / 2;
-                            if (angle < 0) angle = angle - (angle * 2);
+                            if (angle < 0) angle = angle + (Math.abs(angle) * 2);
 
                             if (k > 1 && k < pos[p].numKeys - 1 && angle < threshold) {
 

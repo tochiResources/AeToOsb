@@ -5,7 +5,7 @@
  * Copyright (c) 2013 Alex K @plusdude
  * http://opensource.org/licenses/MIT
  */
- (function (global, infinity, undefined) {
+(function (global, infinity, undefined) {
     /*jshint bitwise:false, maxlen:95, plusplus:false, validthis:true*/
     "use strict";
 
@@ -90,6 +90,21 @@
         return result;
     }
 
+    // includes()
+    if (!String.prototype.includes) {
+        String.prototype.includes = function (search, start) {
+            'use strict';
+
+            if (search instanceof RegExp) {
+                throw TypeError('first argument must not be a RegExp');
+            }
+            if (start === undefined) {
+                start = 0;
+            }
+            return this.indexOf(search, start) !== -1;
+        };
+    }
+
     /**
      * Returns the first index at which a given element
      * can be found in the array.
@@ -159,7 +174,7 @@
             index = length - 1;
         }
         // iterate over elements backwards
-        for (; -1 < index; --index) {
+        for (; - 1 < index; --index) {
 
             // current index exists, target element is equal to current element
             if (index in elements && target === elements[index]) {
@@ -225,8 +240,8 @@
             // current index exists
             if (index in elements &&
 
-            // callback returns false
-            !callback.call(scope, elements[index], index, elements)) {
+                // callback returns false
+                !callback.call(scope, elements[index], index, elements)) {
 
                 // break loop, test failed
                 return false;
@@ -260,8 +275,8 @@
             // current index exists
             if (index in elements &&
 
-            // callback returns true
-            callback.call(scope, elements[index], index, elements)) {
+                // callback returns true
+                callback.call(scope, elements[index], index, elements)) {
 
                 // break loop, test passed
                 return true;
@@ -278,7 +293,8 @@
      */
     function filter(callback, scope) {
         /*jshint newcap:false*/
-        var result = [], elements, length, index, count;
+        var result = [],
+            elements, length, index, count;
 
         // convert elements to object
         elements = Object(this);
@@ -295,8 +311,8 @@
             // current index exists
             if (index in elements &&
 
-            // callback returns true
-            callback.call(scope, elements[index], index, elements)) {
+                // callback returns true
+                callback.call(scope, elements[index], index, elements)) {
 
                 // copy current element to result array
                 result[count++] = elements[index];
@@ -312,7 +328,8 @@
      */
     function map(callback, scope) {
         /*jshint newcap:false*/
-        var result = [], elements, length, index;
+        var result = [],
+            elements, length, index;
 
         // convert elements to object
         elements = Object(this);
@@ -404,7 +421,7 @@
         index = (elements.length >>> 0) - 1;
 
         // iterate over elements backwards
-        for (; -1 < index; --index) {
+        for (; - 1 < index; --index) {
 
             // current index exists
             if (index in elements) {
@@ -563,8 +580,8 @@
      * @author Chris Ferdinandi
      * @license MIT
      */
-     if (!String.prototype.replaceAll) {
-        String.prototype.replaceAll = function(str, newStr){
+    if (!String.prototype.replaceAll) {
+        String.prototype.replaceAll = function (str, newStr) {
 
             // If a regex pattern
             if (Object.prototype.toString.call(str).toLowerCase() === '[object regexp]') {

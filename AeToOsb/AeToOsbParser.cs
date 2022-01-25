@@ -92,6 +92,9 @@ namespace AeToOsbParser
         [JsonProperty("transform")]
         public Transform Transform { get; set; }
 
+        [JsonProperty("shape")]
+        public Shape Shape { get; set; }
+
         [JsonProperty("text", NullValueHandling = NullValueHandling.Ignore)]
         public Text Text { get; set; }
 
@@ -232,6 +235,132 @@ namespace AeToOsbParser
 
         [JsonProperty("isRotating", NullValueHandling = NullValueHandling.Ignore)]
         public bool IsRotating { get; set; }
+    }
+
+    public partial class Shape
+    {
+        [JsonProperty("verticesPosition")]
+        public List<VerticesPosition> VerticesPosition { get; set; }
+
+        [JsonProperty("inTangent")]
+        public List<InTangent> InTangent { get; set; }
+
+        [JsonProperty("outTangent")]
+        public List<OutTangent> OutTangent { get; set; }
+
+        [JsonProperty("type")]
+        public string Type { get; set; }
+
+        [JsonProperty("closed")]
+        public bool Closed { get; set; }
+
+        [JsonProperty("shapeSize")]
+        public ShapeSize ShapeSize { get; set; }
+
+        [JsonProperty("rectRoundness")]
+        public float RectRoundness { get; set; }
+
+        [JsonProperty("posOffset")]
+        public PosOffset PosOffset { get; set; }
+
+        [JsonProperty("hasStroke")]
+        public bool HasStroke { get; set; }
+
+        [JsonProperty("strokeColor")]
+        public List<StrokeColor> StrokeColor { get; set; }
+
+        [JsonProperty("strokeWidth")]
+        public float StrokeWidth { get; set; }
+
+        [JsonProperty("lineCap")]
+        public string LineCap { get; set; }
+
+        [JsonProperty("lineJoin")]
+        public string LineJoin { get; set; }
+
+        [JsonProperty("lineMiterLimit")]
+        public float LineMiterLimit { get; set; }
+
+        [JsonProperty("hasDash")]
+        public bool HasDash { get; set; }
+
+        [JsonProperty("dashSpacing")]
+        public float DashSpacing { get; set; }
+
+        [JsonProperty("dashOffset")]
+        public float DashOffset { get; set; }
+
+        [JsonProperty("hasFill")]
+        public bool HasFill { get; set; }
+
+        [JsonProperty("fillComposite")]
+        public string FillComposite { get; set; }
+
+        [JsonProperty("fillColor")]
+        public List<FillColor> FillColor { get; set; }
+    }
+
+    public partial class VerticesPosition
+    {
+        [JsonProperty("x")]
+        public float X { get; set; }
+
+        [JsonProperty("y")]
+        public float Y { get; set; }
+    }
+
+    public partial class InTangent
+    {
+        [JsonProperty("x")]
+        public float X { get; set; }
+
+        [JsonProperty("y")]
+        public float Y { get; set; }
+    }
+
+    public partial class OutTangent
+    {
+        [JsonProperty("x")]
+        public float X { get; set; }
+
+        [JsonProperty("y")]
+        public float Y { get; set; }
+    }
+
+    public partial class ShapeSize
+    {
+        [JsonProperty("x")]
+        public float X { get; set; }
+
+        [JsonProperty("y")]
+        public float Y { get; set; }
+    }
+
+    public partial class PosOffset
+    {
+        [JsonProperty("x")]
+        public float X { get; set; }
+
+        [JsonProperty("y")]
+        public float Y { get; set; }
+    }
+
+    public partial class StrokeColor
+    {
+        [JsonProperty("time")]
+        public int Time { get; set; }
+
+        [JsonProperty("value")]
+        public string Value { get; set; }
+    }
+
+    public partial class FillColor
+    {
+        [JsonProperty("time")]
+        public int Time { get; set; }
+
+        [JsonProperty("value")]
+        public string Value { get; set; }
     }
 
     public partial class Fade
