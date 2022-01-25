@@ -24,8 +24,8 @@ namespace StorybrewScripts
 {
     public class AeToOsb : StoryboardObjectGenerator
     {
-        [Configurable]
-        public string pathSettings = ".../AeToOsb/settings.json";
+        // [Configurable]
+        // public string pathSettings = ".../AeToOsb/settings.json";
 
         [Configurable]
         public string sbFolderName = "sb";
@@ -195,6 +195,9 @@ namespace StorybrewScripts
 
         public override void Generate()
         {
+            var documentsFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            var pathSettings = documentsFolder + @"\AeToOsb\settings.json";
+            
             aeToOsbSettings = AeToOsbSettings.FromJson(File.ReadAllText(pathSettings));
             pathOutput = aeToOsbSettings.OutputFolderPath + "\\AeToOsb.json";
 

@@ -1,5 +1,5 @@
 {
-    $.evalFile('' + (File($.fileName).path) + '/AeToOsb/AeToOsb.jsx');
+    $.evalFile('~/Documents/AeToOsb/AeToOsb.jsx');
 
     var Launcher = (function (thisObj) {
 

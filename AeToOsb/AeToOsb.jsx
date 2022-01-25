@@ -1,31 +1,29 @@
 {
     function launchScript() {
-        $.evalFile('' + (File($.fileName).path) + '/array.generics.js');
-        $.evalFile('' + (File($.fileName).path) + '/splitter.aeosb');
-        $.evalFile('' + (File($.fileName).path) + '/json2.js');
-
+        // $.evalFile('' + (File($.fileName).path) + '/array.generics.js');
+        // $.evalFile('' + (File($.fileName).path) + '/splitter.aeosb');
+        // $.evalFile('' + (File($.fileName).path) + '/json2.js');
+        $.evalFile('~/Documents/AeToOsb/array.generics.js');
+        $.evalFile('~/Documents/AeToOsb/splitter.aeosb');
+        $.evalFile('~/Documents/AeToOsb/json2.js');
+        
         var AeToOsb = (function (thisObj) {
-
+            
             function scriptFileName() {
-                var scriptFileFullPath = new File($.fileName);
+                var scriptFileFullPath = File($.fileName);
                 var scriptFileName = scriptFileFullPath.name;
                 return scriptFileName;
             }
-
+            
             function scriptFileFolderPath() {
-                var scriptFileFP = new File($.fileName);
-                var scriptFileFolderPath = scriptFileFP.toString().replace(scriptFileName(), "");
-                var diskLetter = scriptFileFolderPath.slice(1, 2).toUpperCase();
-                var fullPath = diskLetter + ":" + "/" + scriptFileFolderPath.slice(3, scriptFileFolderPath.length);
-                var path = fullPath.slice(0, -1).replace(/\//g, "\\");
-
-                return path.toString().replaceAll("%20", " ");
+                var scriptFileFP = File($.fileName);
+                var scriptFileFolderPath = Folder.decode(scriptFileFP.fsName.replace(scriptFileName(), ""));
+                return scriptFileFolderPath;
             }
+            
+            // var settingsJsonFile = File(scriptFileFolderPath() + "\\" + "settings.json");
+            var settingsJsonFile = File('~/Documents/AeToOsb/settings.json');
 
-            // var objShell = new ActiveXObject("shell.application");
-            // objShell.ShellExecute("cmd.exe", "cd C: C:\\cd c:\\ext_file main.exe test.txt", "C:\\WINDOWS\\system32", "open", 1);
-
-            var settingsJsonFile = File(scriptFileFolderPath() + "\\" + "settings.json");
             var scriptSettings = { // the default settings
                 scriptslibraryFolderPath: "",
                 outputFolderPath: "",
@@ -46,8 +44,8 @@
                     rotation: false,
                     opacity: false
                 },
-                settingsJsonFile: settingsJsonFile.fsName.toString().replaceAll("%20", " "),
-                scriptFileFolderPath: scriptFileFolderPath().toString(),
+                settingsJsonFile: File.decode(settingsJsonFile.fsName),
+                scriptFileFolderPath: scriptFileFolderPath(),
                 exportedComps: null,
                 exportedCompsID: null
             };
@@ -569,12 +567,12 @@
 
             if (readSettings().settingsJsonFile == "") {
                 scriptSettings = readSettings();
-                scriptSettings.settingsJsonFile = settingsJsonFile.fsName.toString().replaceAll("%20", " ");
+                scriptSettings.settingsJsonFile = File.decode(settingsJsonFile.fsName);
                 writeSettings(scriptSettings);
             }
             if (readSettings().scriptFileFolderPath == "") {
                 scriptSettings = readSettings();
-                scriptSettings.scriptFileFolderPath = scriptFileFolderPath().toString();
+                scriptSettings.scriptFileFolderPath = scriptFileFolderPath();
                 writeSettings(scriptSettings);
             }
 
@@ -897,7 +895,7 @@
                         data.KeyframeHelper.optimizeKeyframesBasedOnMotion = optionValue;
                     }
                     var newData = {
-                        scriptslibraryFolderPath: data.scriptslibraryFolderPath.toString().replaceAll("%20", " "),
+                        scriptslibraryFolderPath: Folder.decode(data.scriptslibraryFolderPath),
                         outputFolderPath: data.outputFolderPath,
                         options: {
                             exportJsonOnly: data.options.exportJsonOnly,
@@ -918,8 +916,8 @@
                             opacity: data.KeyframeHelper.opacity,
                             optimizeKeyframesBasedOnMotion: data.KeyframeHelper.optimizeKeyframesBasedOnMotion
                         },
-                        settingsJsonFile: settingsJsonFile.fsName.toString().replaceAll("%20", " "),
-                        scriptFileFolderPath: scriptFileFolderPath().toString(),
+                        settingsJsonFile: File.decode(settingsJsonFile.fsName),
+                        scriptFileFolderPath: scriptFileFolderPath(),
                         exportedComps: data.exportedComps,
                         exportedCompsID: data.exportedCompsID
                     };
@@ -945,7 +943,7 @@
                 settingsJsonFile.close();
             }
 
-            var outputJsonFile = File(readSettings().outputFolderPath.toString().replaceAll("%20", " ") + "\\AeToOsb.json");
+            var outputJsonFile = File(Folder.decode(readSettings().outputFolderPath) + "\\AeToOsb.json");
 
             function readOutput() {
                 outputJsonFile.open('r');
@@ -966,58 +964,59 @@
                 var decodedName = "";
                 var decodedName2 = "";
                 var scriptslibraryFolderFileObj;
+                var docuPath = '~/Documents/AeToOsb';
                 var _AeToOsbFolderFileObj = new Folder(scriptSettings.scriptslibraryFolderPath.slice(0, -15) + "\\assetlibrary\\_AeToOsb");
-                var gridImage = new File(scriptSettings.scriptFileFolderPath + "\\bitmap\\grid.png");
-                var bImage = new File(scriptSettings.scriptFileFolderPath + "\\bitmap\\b.png");
-                var pImage = new File(scriptSettings.scriptFileFolderPath + "\\bitmap\\p.png");
-                var NewtonsoftFile = new File(scriptSettings.scriptFileFolderPath + "\\Newtonsoft.Json.dll");
-                var AeToOsbFile = new File(scriptSettings.scriptFileFolderPath + "\\AeToOsb.cs");
-                var AeToOsbParserFile = new File(scriptSettings.scriptFileFolderPath + "\\AeToOsbParser.cs");
-                var AeToOsbSettingsFile = new File(scriptSettings.scriptFileFolderPath + "\\AeToOsbSettings.cs");
-                var DeleteBackgroundFile = new File(scriptSettings.scriptFileFolderPath + "\\DeleteBackground.cs");
+                var gridImage = new File(docuPath + "/bitmap/grid.png");
+                var bImage = new File(docuPath + "/bitmap/b.png");
+                var pImage = new File(docuPath + "/bitmap/p.png");
+                var NewtonsoftFile = new File(docuPath + "/Newtonsoft.Json.dll");
+                var AeToOsbFile = new File(docuPath + "/AeToOsb.cs");
+                var AeToOsbParserFile = new File(docuPath + "/AeToOsbParser.cs");
+                var AeToOsbSettingsFile = new File(docuPath + "/AeToOsbSettings.cs");
+                var DeleteBackgroundFile = new File(docuPath + "/DeleteBackground.cs");
                 // alert(scriptslibraryFolderFileObj.fsName);
                 
-                decodedName2 = _AeToOsbFolderFileObj.fsName.replaceAll("%20", " ");
+                decodedName2 = File.decode(_AeToOsbFolderFileObj.fsName);
                 if (!_AeToOsbFolderFileObj.exists)
                 createNewFolder(decodedName2);
                 
                 scriptslibraryFolderFileObj = new File(scriptSettings.scriptslibraryFolderPath.slice(0, -15) + "\\assetlibrary\\_AeToOsb\\grid.png");
-                decodedName = scriptslibraryFolderFileObj.fsName.replaceAll("%20", " ");
+                decodedName = File.decode(scriptslibraryFolderFileObj.fsName);
                 if (!decodedName.exists)
                     gridImage.copy(decodedName);
 
                 scriptslibraryFolderFileObj = new File(scriptSettings.scriptslibraryFolderPath.slice(0, -15) + "\\assetlibrary\\_AeToOsb\\b.png");
-                decodedName = scriptslibraryFolderFileObj.fsName.replaceAll("%20", " ");
+                decodedName = File.decode(scriptslibraryFolderFileObj.fsName);
                 if (!decodedName.exists)
                     bImage.copy(decodedName);
 
                 scriptslibraryFolderFileObj = new File(scriptSettings.scriptslibraryFolderPath.slice(0, -15) + "\\assetlibrary\\_AeToOsb\\p.png");
-                decodedName = scriptslibraryFolderFileObj.fsName.replaceAll("%20", " ");
+                decodedName = File.decode(scriptslibraryFolderFileObj.fsName);
                 if (!decodedName.exists)
                     pImage.copy(decodedName);
 
                 scriptslibraryFolderFileObj = new File(scriptSettings.scriptslibraryFolderPath + "\\Newtonsoft.Json.dll");
-                decodedName = scriptslibraryFolderFileObj.fsName.replaceAll("%20", " ");
+                decodedName = File.decode(scriptslibraryFolderFileObj.fsName);
                 if (!decodedName.exists)
                     NewtonsoftFile.copy(decodedName);
 
                 scriptslibraryFolderFileObj = new File(scriptSettings.scriptslibraryFolderPath.slice(0, -15) + "\\AeToOsb.cs");
-                decodedName = scriptslibraryFolderFileObj.fsName.replaceAll("%20", " ");
+                decodedName = File.decode(scriptslibraryFolderFileObj.fsName);
                 if (!decodedName.exists)
                     AeToOsbFile.copy(decodedName);
 
                 scriptslibraryFolderFileObj = new File(scriptSettings.scriptslibraryFolderPath + "\\AeToOsbParser.cs");
-                decodedName = scriptslibraryFolderFileObj.fsName.replaceAll("%20", " ");
+                decodedName = File.decode(scriptslibraryFolderFileObj.fsName);
                 if (!decodedName.exists)
                     AeToOsbParserFile.copy(decodedName);
 
                 scriptslibraryFolderFileObj = new File(scriptSettings.scriptslibraryFolderPath + "\\AeToOsbSettings.cs");
-                decodedName = scriptslibraryFolderFileObj.fsName.replaceAll("%20", " ");
+                decodedName = File.decode(scriptslibraryFolderFileObj.fsName);
                 if (!decodedName.exists)
                     AeToOsbSettingsFile.copy(decodedName);
 
                 scriptslibraryFolderFileObj = new File(scriptSettings.scriptslibraryFolderPath.slice(0, -15) + "\\DeleteBackground.cs");
-                decodedName = scriptslibraryFolderFileObj.fsName.replaceAll("%20", " ");
+                decodedName = File.decode(scriptslibraryFolderFileObj.fsName.replaceAll);
                 if (!decodedName.exists)
                     DeleteBackgroundFile.copy(decodedName);
             }
@@ -1464,9 +1463,9 @@
                             AeToOsb.update();
                             // alert("ATS GIF frames template does not exist");
 
-                            alert(scriptSettings.scriptFileFolderPath);
+                            // alert(scriptSettings.scriptFileFolderPath);
 
-                            var ATSGIFframesProjectFilePath = new File(scriptSettings.scriptFileFolderPath + "\\ATS GIF frames.aep")
+                            var ATSGIFframesProjectFilePath = new File("~/Documents/AeToOsb/ATS GIF frames.aep")
                             ATSGIFframes = importFiles(ATSGIFframesProjectFilePath, true, '*.aep', 'footage', false, false)
                             if (ATSGIFframesProjectFilePath.exists == true) {
                                 atsStatusMessage2.text = "Importing 'ATS GIF frames'" + "..."; scriptSettings = readSettings(); scriptSettings.renderAndImportCompStatus = atsStatusMessage2.text; writeSettings(scriptSettings); scriptSettings = readSettings();
@@ -1791,6 +1790,9 @@
                 }
 
                 scriptSettings = readSettings();
+                if (scriptSettings.outputFolderPath == "")
+                alert("AeToOsb error: Please specify an output directory before exporting selected compositions.");
+                alert(ksdjfkdsf);
                 scriptSettings.exportedComps = apsName;
                 scriptSettings.exportedCompsID = apsID;
                 writeSettings(scriptSettings);
