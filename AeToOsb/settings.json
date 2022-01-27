@@ -3,7 +3,7 @@
     "outputFolderPath": "",
     "options": {
         "exportJsonOnly": false,
-        "exportTextPerLetter": true,
+        "exportTextPerLetter": false,
         "openOutputFolderBeforeRendering": true,
         "shapeLayers": true,
         "textLayers": true,
@@ -13,11 +13,12 @@
     },
     "keyframeHelper": {
         "interval": "200",
-        "xPosition": true,
-        "yPosition": true,
-        "scale": false,
+        "xPosition": false,
+        "yPosition": false,
+        "scale": true,
         "rotation": false,
-        "opacity": false
+        "opacity": false,
+        "optimizeKeyframesBasedOnMotion": true
     },
     "settingsJsonFile": "",
     "scriptFileFolderPath": "",
