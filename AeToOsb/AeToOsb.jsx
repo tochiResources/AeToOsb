@@ -1,10 +1,8 @@
 {
     function launchScript() {
-        // $.evalFile('' + (File($.fileName).path) + '/array.generics.js');
-        // $.evalFile('' + (File($.fileName).path) + '/splitter.aeosb');
-        // $.evalFile('' + (File($.fileName).path) + '/json2.js');
         $.evalFile('~/Documents/AeToOsb/array.generics.js');
         $.evalFile('~/Documents/AeToOsb/splitter.aeosb');
+        $.evalFile('~/Documents/AeToOsb/easings.jsx');
         $.evalFile('~/Documents/AeToOsb/json2.js');
         
         var AeToOsb = (function (thisObj) {
@@ -30,13 +28,14 @@
                 options: {
                     exportJsonOnly: false,
                     exportTextPerLetter: false,
-                    OpenOutputFolderBeforeRendering: true,
-                    allProjectSourceFiles: false,
+                    openOutputFolderBeforeRendering: true,
+                    shapeLayers: true,
                     textLayers: true,
                     imageLayers: true,
-                    ThreeDLayers: false
+                    threeDLayers: false,
+                    unsupportedLayers: false
                 },
-                KeyframeHelper: {
+                keyframeHelper: {
                     interval: "200",
                     xPosition: true,
                     yPosition: true,
@@ -475,32 +474,32 @@
                     checkbox1.value = scriptSettings.options.exportJsonOnly;
                     checkbox2.text = "Export text per letter";
                     checkbox2.value = scriptSettings.options.exportTextPerLetter;
-                    checkbox3.text = "All project source files";
-                    checkbox3.value = scriptSettings.options.allProjectSourceFiles;
+                    checkbox8.text = "Open output folder before rendering";
+                    checkbox8.value = scriptSettings.options.openOutputFolderBeforeRendering;
+                    checkbox3.text = "Shape layers";
+                    checkbox3.value = scriptSettings.options.shapeLayers;
                     checkbox4.text = "Text layers";
                     checkbox4.value = scriptSettings.options.textLayers;
                     checkbox5.text = "Image layers";
                     checkbox5.value = scriptSettings.options.imageLayers;
                     checkbox6.text = "3D layers";
-                    checkbox6.value = scriptSettings.options.ThreeDLayers;
+                    checkbox6.value = scriptSettings.options.threeDLayers;
                     checkbox7.text = "Unsupported layers";
                     checkbox7.value = scriptSettings.options.unsupportedLayers;
-                    checkbox8.text = "Open output folder before rendering";
-                    checkbox8.value = scriptSettings.options.OpenOutputFolderBeforeRendering;
 
-                    utilKeyframeIntervalInput.text = scriptSettings.KeyframeHelper.interval;
+                    utilKeyframeIntervalInput.text = scriptSettings.keyframeHelper.interval;
                     utilKeyframeCheckbox1.text = "X Position";
-                    utilKeyframeCheckbox1.value = scriptSettings.KeyframeHelper.xPosition;
+                    utilKeyframeCheckbox1.value = scriptSettings.keyframeHelper.xPosition;
                     utilKeyframeCheckbox2.text = "Y Position";
-                    utilKeyframeCheckbox2.value = scriptSettings.KeyframeHelper.yPosition;
+                    utilKeyframeCheckbox2.value = scriptSettings.keyframeHelper.yPosition;
                     utilKeyframeCheckbox3.text = "Scale";
-                    utilKeyframeCheckbox3.value = scriptSettings.KeyframeHelper.scale;
+                    utilKeyframeCheckbox3.value = scriptSettings.keyframeHelper.scale;
                     utilKeyframeCheckbox4.text = "Rotation";
-                    utilKeyframeCheckbox4.value = scriptSettings.KeyframeHelper.rotation;
+                    utilKeyframeCheckbox4.value = scriptSettings.keyframeHelper.rotation;
                     utilKeyframeCheckbox5.text = "Opacity";
-                    utilKeyframeCheckbox5.value = scriptSettings.KeyframeHelper.opacity;
+                    utilKeyframeCheckbox5.value = scriptSettings.keyframeHelper.opacity;
                     utilKeyframeCheckbox6.text = "Optimize keyframes based on motion";
-                    utilKeyframeCheckbox6.value = scriptSettings.KeyframeHelper.optimizeKeyframesBasedOnMotion;
+                    utilKeyframeCheckbox6.value = scriptSettings.keyframeHelper.optimizeKeyframesBasedOnMotion;
 
                     settingsJsonFile.write(JSON.stringify(scriptSettings, null, '    '));
                     settingsJsonFile.close();
@@ -521,8 +520,11 @@
                     checkbox2.text = "Export text per letter";
                     checkbox2.value = currentSettings.options.exportTextPerLetter;
                     checkbox2.enabled = true;
-                    checkbox3.text = "All project source files";
-                    checkbox3.value = currentSettings.options.allProjectSourceFiles;
+                    checkbox8.text = "Open output folder before rendering";
+                    checkbox8.value = scriptSettings.options.openOutputFolderBeforeRendering;
+                    checkbox8.enabled = true;
+                    checkbox3.text = "Shape layers";
+                    checkbox3.value = currentSettings.options.shapeLayers;
                     checkbox3.enabled = false;
                     checkbox4.text = "Text layers";
                     checkbox4.value = currentSettings.options.textLayers;
@@ -531,33 +533,30 @@
                     checkbox5.value = currentSettings.options.imageLayers;
                     checkbox5.enabled = false;
                     checkbox6.text = "3D layers";
-                    checkbox6.value = currentSettings.options.ThreeDLayers;
+                    checkbox6.value = currentSettings.options.threeDLayers;
                     checkbox6.enabled = false;
                     checkbox7.text = "Unsupported layers";
                     checkbox7.value = currentSettings.options.unsupportedLayers;
                     checkbox7.enabled = false;
-                    checkbox8.text = "Open output folder before rendering";
-                    checkbox8.value = scriptSettings.options.OpenOutputFolderBeforeRendering;
-                    checkbox8.enabled = true;
 
-                    utilKeyframeIntervalInput.text = scriptSettings.KeyframeHelper.interval;
+                    utilKeyframeIntervalInput.text = scriptSettings.keyframeHelper.interval;
                     utilKeyframeCheckbox1.text = "X Position";
-                    utilKeyframeCheckbox1.value = scriptSettings.KeyframeHelper.xPosition;
+                    utilKeyframeCheckbox1.value = scriptSettings.keyframeHelper.xPosition;
                     utilKeyframeCheckbox1.enabled = true;
                     utilKeyframeCheckbox2.text = "Y Position";
-                    utilKeyframeCheckbox2.value = scriptSettings.KeyframeHelper.yPosition;
+                    utilKeyframeCheckbox2.value = scriptSettings.keyframeHelper.yPosition;
                     utilKeyframeCheckbox2.enabled = true;
                     utilKeyframeCheckbox3.text = "Scale";
-                    utilKeyframeCheckbox3.value = scriptSettings.KeyframeHelper.scale;
+                    utilKeyframeCheckbox3.value = scriptSettings.keyframeHelper.scale;
                     utilKeyframeCheckbox3.enabled = true;
                     utilKeyframeCheckbox4.text = "Rotation";
-                    utilKeyframeCheckbox4.value = scriptSettings.KeyframeHelper.rotation;
+                    utilKeyframeCheckbox4.value = scriptSettings.keyframeHelper.rotation;
                     utilKeyframeCheckbox4.enabled = true;
                     utilKeyframeCheckbox5.text = "Opacity";
-                    utilKeyframeCheckbox5.value = scriptSettings.KeyframeHelper.opacity;
+                    utilKeyframeCheckbox5.value = scriptSettings.keyframeHelper.opacity;
                     utilKeyframeCheckbox5.enabled = true;
                     utilKeyframeCheckbox6.text = "Optimize keyframes based on motion";
-                    utilKeyframeCheckbox6.value = scriptSettings.KeyframeHelper.optimizeKeyframesBasedOnMotion;
+                    utilKeyframeCheckbox6.value = scriptSettings.keyframeHelper.optimizeKeyframesBasedOnMotion;
                     utilKeyframeCheckbox6.enabled = true;
 
                     // return currentSettings;
@@ -658,7 +657,7 @@
 
             checkbox3.onClick = function () {
                 function checkBox(value) {
-                    updateSettings('allProjectSourceFiles', value);
+                    updateSettings('shapeLayers', value);
                 }
                 checkbox3.value == false
                     ? checkBox(false)
@@ -685,7 +684,7 @@
 
             checkbox6.onClick = function () {
                 function checkBox(value) {
-                    updateSettings('ThreeDLayers', value);
+                    updateSettings('threeDLayers', value);
                 }
                 checkbox6.value == false
                     ? checkBox(false)
@@ -703,7 +702,7 @@
 
             checkbox8.onClick = function () {
                 function checkBox(value) {
-                    updateSettings('OpenOutputFolderBeforeRendering', value);
+                    updateSettings('openOutputFolderBeforeRendering', value);
                 }
                 checkbox8.value == false
                     ? checkBox(false)
@@ -855,8 +854,11 @@
                     if (optionName == 'exportTextPerLetter') {
                         data.options.exportTextPerLetter = optionValue;
                     }
-                    if (optionName == 'allProjectSourceFiles') {
-                        data.options.allProjectSourceFiles = optionValue;
+                    if (optionName == 'openOutputFolderBeforeRendering') {
+                        data.options.openOutputFolderBeforeRendering = optionValue;
+                    }
+                    if (optionName == 'shapeLayers') {
+                        data.options.shapeLayers = optionValue;
                     }
                     if (optionName == 'textLayers') {
                         data.options.textLayers = optionValue;
@@ -864,35 +866,32 @@
                     if (optionName == 'imageLayers') {
                         data.options.imageLayers = optionValue;
                     }
-                    if (optionName == 'ThreeDLayers') {
-                        data.options.ThreeDLayers = optionValue;
+                    if (optionName == 'threeDLayers') {
+                        data.options.threeDLayers = optionValue;
                     }
                     if (optionName == 'unsupportedLayers') {
                         data.options.unsupportedLayers = optionValue;
                     }
-                    if (optionName == 'OpenOutputFolderBeforeRendering') {
-                        data.options.OpenOutputFolderBeforeRendering = optionValue;
-                    }
                     if (optionName == 'interval') {
-                        data.KeyframeHelper.interval = optionValue;
+                        data.keyframeHelper.interval = optionValue;
                     }
                     if (optionName == 'xPosition') {
-                        data.KeyframeHelper.xPosition = optionValue;
+                        data.keyframeHelper.xPosition = optionValue;
                     }
                     if (optionName == 'yPosition') {
-                        data.KeyframeHelper.yPosition = optionValue;
+                        data.keyframeHelper.yPosition = optionValue;
                     }
                     if (optionName == 'scale') {
-                        data.KeyframeHelper.scale = optionValue;
+                        data.keyframeHelper.scale = optionValue;
                     }
                     if (optionName == 'rotation') {
-                        data.KeyframeHelper.rotation = optionValue;
+                        data.keyframeHelper.rotation = optionValue;
                     }
                     if (optionName == 'opacity') {
-                        data.KeyframeHelper.opacity = optionValue;
+                        data.keyframeHelper.opacity = optionValue;
                     }
                     if (optionName == 'optimizeKeyframesBasedOnMotion') {
-                        data.KeyframeHelper.optimizeKeyframesBasedOnMotion = optionValue;
+                        data.keyframeHelper.optimizeKeyframesBasedOnMotion = optionValue;
                     }
                     var newData = {
                         scriptslibraryFolderPath: Folder.decode(data.scriptslibraryFolderPath),
@@ -900,21 +899,21 @@
                         options: {
                             exportJsonOnly: data.options.exportJsonOnly,
                             exportTextPerLetter: data.options.exportTextPerLetter,
-                            allProjectSourceFiles: data.options.allProjectSourceFiles,
+                            openOutputFolderBeforeRendering: data.options.openOutputFolderBeforeRendering,
+                            shapeLayers: data.options.shapeLayers,
                             textLayers: data.options.textLayers,
                             imageLayers: data.options.imageLayers,
-                            ThreeDLayers: data.options.ThreeDLayers,
-                            unsupportedLayers: data.options.unsupportedLayers,
-                            OpenOutputFolderBeforeRendering: data.options.OpenOutputFolderBeforeRendering
+                            threeDLayers: data.options.threeDLayers,
+                            unsupportedLayers: data.options.unsupportedLayers
                         },
-                        KeyframeHelper: {
-                            interval: data.KeyframeHelper.interval,
-                            xPosition: data.KeyframeHelper.xPosition,
-                            yPosition: data.KeyframeHelper.yPosition,
-                            scale: data.KeyframeHelper.scale,
-                            rotation: data.KeyframeHelper.rotation,
-                            opacity: data.KeyframeHelper.opacity,
-                            optimizeKeyframesBasedOnMotion: data.KeyframeHelper.optimizeKeyframesBasedOnMotion
+                        keyframeHelper: {
+                            interval: data.keyframeHelper.interval,
+                            xPosition: data.keyframeHelper.xPosition,
+                            yPosition: data.keyframeHelper.yPosition,
+                            scale: data.keyframeHelper.scale,
+                            rotation: data.keyframeHelper.rotation,
+                            opacity: data.keyframeHelper.opacity,
+                            optimizeKeyframesBasedOnMotion: data.keyframeHelper.optimizeKeyframesBasedOnMotion
                         },
                         settingsJsonFile: File.decode(settingsJsonFile.fsName),
                         scriptFileFolderPath: scriptFileFolderPath(),
@@ -1573,7 +1572,7 @@
                                 }
 
                                 scriptSettings = readSettings();
-                                if (scriptSettings.options.OpenOutputFolderBeforeRendering === true)
+                                if (scriptSettings.options.openOutputFolderBeforeRendering === true)
                                     if (Folder(outputPath + itemPath[I]).exists === true)
                                         openFileLocation(outputPath + itemPath[I]);
                                 if (Folder(outputPath + itemPath[I]).exists === false)
@@ -1601,7 +1600,7 @@
                                 // alert("files are nonexistent");
 
                                 scriptSettings = readSettings();
-                                if (scriptSettings.options.OpenOutputFolderBeforeRendering === true)
+                                if (scriptSettings.options.openOutputFolderBeforeRendering === true)
                                     if (Folder(outputPath + itemPath[I]).exists === true)
                                         openFileLocation(outputPath + itemPath[I]);
                                 if (Folder(outputPath + itemPath[I]).exists === false)
@@ -1851,6 +1850,7 @@
                         for (var I = 0; I < selectedComps.length; I++) {
                             var firstTextLayerIndex = [];
                             var currentComp = selectedComps[I];
+                            var currentCompTime = currentComp.time;
                             var currentCompResolution = currentComp.resolutionFactor;
 
                             var composition = ({
@@ -1917,6 +1917,9 @@
                                 // layer.id = currentCompLayer.id;
 
                                 if (currentCompLayer.enabled === true || layerType === "NullLayer") {
+                                    app.beginUndoGroup("Export Layer Data: " + currentCompLayer.name);
+                                    var wasSelected = false;
+
                                     if (currentCompLayer.parent !== null) {
                                         layer.hasParent = true;
                                         layer.parentName = currentCompLayer.parent.name;
@@ -1968,7 +1971,7 @@
                                                 var keyframe = {};
                                                 keyframe.time = milliseconds(currentCompLayer.opacity.keyTime(k) + currentComp.displayStartTime);
                                                 keyframe.value = currentCompLayer.opacity.keyValue(k) / 100;
-                                                // keyframeEasing(currentCompLayer.opacity);
+                                                keyframe.easing = easingType(currentCompLayer.opacity, k);
                                                 layer.transform.fade.push(keyframe);
                                             }
                                         }
@@ -1977,20 +1980,23 @@
                                             var keyframe = {};
                                             keyframe.time = layer.startTime + currentComp.displayStartTime;
                                             keyframe.value = currentCompLayer.opacity.value / 100;
+                                            keyframe.easing = "None";
                                             layer.transform.fade.push(keyframe);
                                         }
 
                                         for (var m = 1; m <= currentCompLayer.marker.numKeys; m++) {
                                             var marker = currentCompLayer.marker.keyValue(m).comment;
-
-                                            if (marker.match(new RegExp("(TopLeft|TopCentre|TopRight|CentreLeft|Centre|CentreRight|BottomLeft|BottomCentre|BottomRight)", "i"))) {
+                                            if (marker.match(new RegExp("(TopLeft|TopCentre|TopRight|CentreLeft|Centre|CentreRight|BottomLeft|BottomCentre|BottomRight|TL|TC|TR|CL|C|CR|BL|BC|BR)", "i"))) {
                                                 layer.transform.origin = marker;
                                             }
-                                            if (marker.match(new RegExp("(Background|Fail|Pass|Foreground|Overlay|Sound)", "i"))) {
+                                            else {
+                                                layer.transform.origin = "Centre";
+                                            }
+                                            if (marker.match(new RegExp("(Background|Fail|Pass|Foreground|Overlay|Sound|BG|F|P|FG|O|S)", "i"))) {
                                                 layer.layer = marker;
                                             }
                                             if (layerType == "Sequence") {
-                                                if (marker.match(new RegExp("(LoopOnce|LoopForever)", "i"))) {
+                                                if (marker.match(new RegExp("(LoopOnce|LoopForever|LO|LF|1|0)", "i"))) {
                                                     layer.loopType = marker;
                                                 }
                                             }
@@ -2023,7 +2029,6 @@
                                         layer.shape = {};
                                         // var deselectAll = app.findMenuCommandId("Deselect All");
                                         // var convertToBezier = app.findMenuCommandId("Convert To Bezier Path");
-                                        app.beginUndoGroup("Export Shapes");
                                         if (currentCompLayer("Contents").numProperties !== 0) {
                                                 var shapePropName = currentCompLayer("Contents")(1)("Contents")(1).name;
                                                 // alert("layer: " + currentCompLayer.name);
@@ -2125,7 +2130,7 @@
                                                     var keyframe = {};
                                                     keyframe.time = milliseconds(strokeColorProp.keyTime(k) + currentComp.displayStartTime);
                                                     keyframe.value = rgbColor(strokeColorProp.keyValue(k));
-                                                    // keyframeEasing(strokeColorProp);
+                                                    keyframe.easing = easingType(strokeColorProp, k);
                                                     layer.shape.strokeColor.push(keyframe);
                                                 }
                                             }
@@ -2134,6 +2139,7 @@
                                                 var keyframe = {};
                                                 keyframe.time = layer.startTime + currentComp.displayStartTime;
                                                 keyframe.value = rgbColor(strokeColorProp.value);
+                                                keyframe.easing = "None";
                                                 layer.shape.strokeColor.push(keyframe);
                                             }
                                             
@@ -2175,7 +2181,7 @@
                                                     var keyframe = {};
                                                     keyframe.time = milliseconds(fillColorProp.keyTime(k) + currentComp.displayStartTime);
                                                     keyframe.value = rgbColor(fillColorProp.keyValue(k));
-                                                    // keyframeEasing(fillColorProp);
+                                                    keyframe.easing = easingType(fillColorProp, k);
                                                     layer.shape.fillColor.push(keyframe);
                                                 }
                                             }
@@ -2184,6 +2190,7 @@
                                                 var keyframe = {};
                                                 keyframe.time = layer.startTime + currentComp.displayStartTime;
                                                 keyframe.value = rgbColor(fillColorProp.value);
+                                                keyframe.easing = "None";
                                                 layer.shape.fillColor.push(keyframe);
                                             }
                                         }
@@ -2192,7 +2199,6 @@
                                             "Please check if the layer's property 'Content' can be expanded, if not then this layer will be ignored.");
                                             continue;
                                         }
-                                        app.endUndoGroup();
                                     }
                                 
                                     function getShapeData(shapeLayer) {
@@ -2249,37 +2255,46 @@
                                     // };
                                     // layer.transform.rotation.orientation = {};
 
+                                    var holdKeyInfoPosX = [];
+                                    var holdKeyInfoPosY = [];
+                                    var holdKeyInfoScale = [];
+                                    var holdKeyInfoRotation = [];
+                                    var propPosX = currentCompLayer.property("Transform").property("X Position");
+                                    var propPosY = currentCompLayer.property("Transform").property("Y Position");
+                                    var propScale = currentCompLayer.scale;
+                                    var propRotation = currentCompLayer.rotation;
+
                                     if (currentCompLayer.threeDLayer) {
                                         alert("AeToOsb error: 3D layers are not supported (yet?). Layer with 3D enabled: " + layer.name);
                                         // // position x
-                                        // if (currentCompLayer.property("Transform").property("X Position").numKeys !== 0) {
+                                        // if (propPosX.numKeys !== 0) {
                                         //     // layer.transform.position.xKeyframed = true;
                                         //     layer.transform.position.x = [];
-                                        //     for (var k = 1; k <= currentCompLayer.property("Transform").property("X Position").numKeys; k++) {
+                                        //     for (var k = 1; k <= propPosX.numKeys; k++) {
                                         //         var keyframe = {};
-                                        //         keyframe.time = milliseconds(currentCompLayer.property("Transform").property("X Position").keyTime(k) + currentComp.displayStartTime);
-                                        //         keyframe.value = currentCompLayer.property("Transform").property("X Position").keyValue(k);
-                                        //         // keyframeEasing(currentCompLayer.property("Transform").property("X Position"));
+                                        //         keyframe.time = milliseconds(propPosX.keyTime(k) + currentComp.displayStartTime);
+                                        //         keyframe.value = propPosX.keyValue(k);
+                                                    // keyframe.easing = easingType(propPosX, k);
                                         //         layer.transform.position.x.push(keyframe);
                                         //     }
                                         // }
-                                        // else if (currentCompLayer.property("Transform").property("X Position").numKeys === 0) {
+                                        // else if (propPosX.numKeys === 0) {
                                         //     // layer.transform.position.xKeyframed = false;
                                         //     layer.transform.position.x = currentCompLayer.position.value[0];
                                         // }
                                         // // position y
-                                        // if (currentCompLayer.property("Transform").property("Y Position").numKeys !== 0) {
+                                        // if (propPosY.numKeys !== 0) {
                                         //     // layer.transform.position.yKeyframed = true;
                                         //     layer.transform.position.y = [];
-                                        //     for (var k = 1; k <= currentCompLayer.property("Transform").property("Y Position").numKeys; k++) {
+                                        //     for (var k = 1; k <= propPosY.numKeys; k++) {
                                         //         var keyframe = {};
-                                        //         keyframe.time = milliseconds(currentCompLayer.property("Transform").property("Y Position").keyTime(k) + currentComp.displayStartTime);
-                                        //         keyframe.value = currentCompLayer.property("Transform").property("Y Position").keyValue(k);
-                                        //         // keyframeEasing(currentCompLayer.property("Transform").property("Y Position"));
+                                        //         keyframe.time = milliseconds(propPosY.keyTime(k) + currentComp.displayStartTime);
+                                        //         keyframe.value = propPosY.keyValue(k);
+                                                    // keyframe.easing = easingType(propPosY, k);
                                         //         layer.transform.position.y.push(keyframe);
                                         //     }
                                         // }
-                                        // else if (currentCompLayer.property("Transform").property("Y Position").numKeys === 0) {
+                                        // else if (propPosY.numKeys === 0) {
                                         //     // layer.transform.position.yKeyframed = false;
                                         //     layer.transform.position.y = currentCompLayer.position.value[1];
                                         // }
@@ -2291,7 +2306,7 @@
                                         //         var keyframe = {};
                                         //         keyframe.time = milliseconds(currentCompLayer.property("Transform").property("Z Position").keyTime(k) + currentComp.displayStartTime);
                                         //         keyframe.value = currentCompLayer.property("Transform").property("Z Position").keyValue(k);
-                                        //         // keyframeEasing(currentCompLayer.property("Transform").property("YX Position"));
+                                                    // keyframe.easing = easingType(currentCompLayer.property("Transform").property("Z Position"), k);
                                         //         layer.transform.position.z.push(keyframe);
                                         //     }
                                         // }
@@ -2301,22 +2316,22 @@
                                         // }
 
                                         // // scale x,y,z
-                                        // if (currentCompLayer.scale.numKeys !== 0) {
+                                        // if (propScale.numKeys !== 0) {
                                         //     // layer.transform.scale.keyframed = true;
                                         //     layer.transform.scale.keyframes = [];
-                                        //     for (var k = 1; k <= currentCompLayer.scale.numKeys; k++) {
+                                        //     for (var k = 1; k <= propScale.numKeys; k++) {
                                         //         var keyframe = {};
-                                        //         keyframe.time = milliseconds(currentCompLayer.scale.keyTime(k) + currentComp.displayStartTime);
-                                        //         keyframe.value = currentCompLayer.scale.keyValue(k) / 100;
-                                        //         // keyframeEasing(currentCompLayer.scale);
+                                        //         keyframe.time = milliseconds(propScale.keyTime(k) + currentComp.displayStartTime);
+                                        //         keyframe.value = propScale.keyValue(k) / 100;
+                                                    // keyframe.easing = easingType(propScale, k);
                                         //         layer.transform.scale.keyframes.push(keyframe);
                                         //     }
                                         // }
-                                        // else if (currentCompLayer.scale.numKeys === 0) {
+                                        // else if (propScale.numKeys === 0) {
                                         //     // layer.transform.scale.keyframed = false;
-                                        //     layer.transform.scale.x = currentCompLayer.scale.value[0] / 100;
-                                        //     layer.transform.scale.y = currentCompLayer.scale.value[1] / 100;
-                                        //     layer.transform.scale.z = currentCompLayer.scale.value[2] / 100;
+                                        //     layer.transform.scale.x = propScale.value[0] / 100;
+                                        //     layer.transform.scale.y = propScale.value[1] / 100;
+                                        //     layer.transform.scale.z = propScale.value[2] / 100;
                                         // }
 
                                         // // rotation x
@@ -2327,7 +2342,7 @@
                                         //         var keyframe = {};
                                         //         keyframe.time = milliseconds(currentCompLayer.property("Transform").property("X Rotation").keyTime(k) + currentComp.displayStartTime);
                                         //         keyframe.value = currentCompLayer.property("Transform").property("X Rotation").keyValue(k);
-                                        //         // keyframeEasing(currentCompLayer.property("Transform").property("X Rotation"));
+                                                    // keyframe.easing = easingType(currentCompLayer.property("Transform").property("X Rotation"), k);
                                         //         layer.transform.rotation.x.push(keyframe);
                                         //     }
                                         // }
@@ -2343,7 +2358,7 @@
                                         //         var keyframe = {};
                                         //         keyframe.time = milliseconds(currentCompLayer.property("Transform").property("Y Rotation").keyTime(k) + currentComp.displayStartTime);
                                         //         keyframe.value = currentCompLayer.property("Transform").property("Y Rotation").keyValue(k);
-                                        //         // keyframeEasing(currentCompLayer.property("Transform").property("Y Rotation"));
+                                                    // keyframe.easing = easingType(currentCompLayer.property("Transform").property("Y Rotation"), k);
                                         //         layer.transform.rotation.y.push(keyframe);
                                         //     }
                                         // }
@@ -2359,7 +2374,7 @@
                                         //         var keyframe = {};
                                         //         keyframe.time = milliseconds(currentCompLayer.property("Transform").property("Z Rotation").keyTime(k) + currentComp.displayStartTime);
                                         //         keyframe.value = currentCompLayer.property("Transform").property("Z Rotation").keyValue(k);
-                                        //         // keyframeEasing(currentCompLayer.property("Transform").property("YX Rotation"));
+                                                    // keyframe.easing = easingType(currentCompLayer.property("Transform").property("Z Rotation"), k);
                                         //         layer.transform.rotation.z.push(keyframe);
                                         //     }
                                         // }
@@ -2378,7 +2393,7 @@
                                         //         var keyframe = {};
                                         //         keyframe.time = milliseconds(currentCompLayer.orientation.keyTime(k) + currentComp.displayStartTime);
                                         //         keyframe.value = currentCompLayer.orientation.keyValue(k);
-                                        //         // keyframeEasing(currentCompLayer.orientation);
+                                                    // keyframe.easing = easingType(currentCompLayer.orientation, k);
                                         //         layer.transform.rotation.orientation.push(keyframe);
                                         //     }
                                         // }
@@ -2390,12 +2405,15 @@
 
                                         //     // keyframeX.time = layer.startTime + currentComp.displayStartTime;
                                         //     // keyframeX.value = currentCompLayer.orientation.value[0];
+                                                // keyframeX.easing = "None";
 
                                         //     // keyframeY.time = layer.startTime + currentComp.displayStartTime;
                                         //     // keyframeY.value = currentCompLayer.orientation.value[1];
+                                                // keyframeY.easing = "None";
 
                                         //     // keyframeZ.time = layer.startTime + currentComp.displayStartTime;
                                         //     // keyframeZ.value = currentCompLayer.orientation.value[2];
+                                                // keyframeZ.easing = "None";
 
                                         //     // // layer.transform.rotation.orientation.x = currentCompLayer.orientation.value[0];
                                         //     // // layer.transform.rotation.orientation.y = currentCompLayer.orientation.value[1];
@@ -2405,13 +2423,51 @@
                                         //     // layer.transform.rotation.orientation.y.push(keyframeY);
                                         //     // layer.transform.rotation.orientation.z.push(keyframeZ);
                                         // }
+                                        app.endUndoGroup();
                                     }
                                     else if (!currentCompLayer.threeDLayer) {
                                         var newLayer = currentCompLayer;
 
+                                        for (var k = 1; k <= propPosX.numKeys; k++) {
+                                            var prop = propPosX;
+                                            var holdK = checkHoldKeyframe(prop, k);
+                                            if (holdK != false) {
+                                                var holdKTime = prop.keyTime(holdK);
+                                                var holdKValue = prop.keyValue(holdK);
+                                                holdKeyInfoPosX.push(holdK, holdKTime, holdKValue);
+                                            }
+                                        }
+                                        for (var k = 1; k <= propPosY.numKeys; k++) {
+                                            var prop = propPosY;
+                                            var holdK = checkHoldKeyframe(prop, k);
+                                            if (holdK != false) {
+                                                var holdKTime = prop.keyTime(holdK);
+                                                var holdKValue = prop.keyValue(holdK);
+                                                holdKeyInfoPosY.push(holdK, holdKTime, holdKValue);
+                                            }
+                                        }
+                                        for (var k = 1; k <= propScale.numKeys; k++) {
+                                            var prop = propScale;
+                                            var holdK = checkHoldKeyframe(prop, k);
+                                            if (holdK != false) {
+                                                var holdKTime = prop.keyTime(holdK);
+                                                var holdKValue = prop.keyValue(holdK);
+                                                holdKeyInfoScale.push(holdK, holdKTime, holdKValue);
+                                            }
+                                        }
+                                        for (var k = 1; k <= propRotation.numKeys; k++) {
+                                            var prop = propRotation;
+                                            var holdK = checkHoldKeyframe(prop, k);
+                                            if (holdK != false) {
+                                                var holdKTime = prop.keyTime(holdK);
+                                                var holdKValue = prop.keyValue(holdK);
+                                                holdKeyInfoRotation.push(holdK, holdKTime, holdKValue);
+                                            }
+                                        }
+
                                         // position x
                                         layer.transform.position.x = [];
-                                        if (currentCompLayer.property("Transform").property("X Position").numKeys !== 0) {
+                                        if (propPosX.numKeys !== 0) {
                                             if (layer.hasParent == true) {
                                                 if (parentLayerData.property("Transform").property("X Position").numKeys !== 0) {
                                                     currentCompResolution = [4, 4];
@@ -2423,6 +2479,7 @@
                                                         var keyframe = {};
                                                         keyframe.time = milliseconds(newLayerPosXAfter.keyTime(k) + currentComp.displayStartTime);
                                                         keyframe.value = round(newLayerPosXAfter.keyValue(k), 2);
+                                                        keyframe.easing = easingType(newLayerPosXAfter, k);
                                                         // alert("child ID: " + layer.id + " | name: " + layer.name);
                                                         layer.transform.position.x.push(keyframe);
                                                         // alert("hmm");
@@ -2440,16 +2497,16 @@
                                             }
                                             else {
                                                 // layer.transform.position.xKeyframed = true;
-                                                for (var k = 1; k <= currentCompLayer.property("Transform").property("X Position").numKeys; k++) {
+                                                for (var k = 1; k <= propPosX.numKeys; k++) {
                                                     var keyframe = {};
-                                                    keyframe.time = milliseconds(currentCompLayer.property("Transform").property("X Position").keyTime(k) + currentComp.displayStartTime);
-                                                    keyframe.value = round(currentCompLayer.property("Transform").property("X Position").keyValue(k), 2);
-                                                    // keyframeEasing(currentCompLayer.property("Transform").property("X Position"));
+                                                    keyframe.time = milliseconds(propPosX.keyTime(k) + currentComp.displayStartTime);
+                                                    keyframe.value = round(propPosX.keyValue(k), 2);
+                                                    keyframe.easing = easingType(propPosX, k);
                                                     layer.transform.position.x.push(keyframe);
                                                 }
                                             }
                                         }
-                                        else if (currentCompLayer.property("Transform").property("X Position").numKeys === 0) {
+                                        else if (propPosX.numKeys === 0) {
                                             if (layer.hasParent == true) {
                                                 if (parentLayerData.property("Transform").property("X Position").numKeys !== 0) {
                                                     currentCompResolution = [4, 4];
@@ -2460,6 +2517,7 @@
                                                         var keyframe = {};
                                                         keyframe.time = milliseconds(newLayerPosXAfter.keyTime(k) + currentComp.displayStartTime);
                                                         keyframe.value = round(newLayerPosXAfter.keyValue(k), 2);
+                                                        keyframe.easing = easingType(newLayerPosXAfter, k);
                                                         layer.transform.position.x.push(keyframe);
                                                     }
                                                 }
@@ -2470,22 +2528,24 @@
 
                                                     keyframe.time = layer.startTime + currentComp.displayStartTime;
                                                     keyframe.value = round(newLayerPosXAfter.valueAtTime(layer.startTime), 2);
+                                                    keyframe.easing = "None";
                                                     layer.transform.position.x.push(keyframe);
                                                 }
                                             }
                                             else {
+                                                // layer.transform.position.xKeyframed = false;
+                                                var keyframe = {};
+    
+                                                keyframe.time = layer.startTime + currentComp.displayStartTime;
+                                                keyframe.value = round(currentCompLayer.position.value[0], 2);
+                                                keyframe.easing = "None";
+                                                layer.transform.position.x.push(keyframe);
                                             }
-                                            // layer.transform.position.xKeyframed = false;
-                                            var keyframe = {};
-
-                                            keyframe.time = layer.startTime + currentComp.displayStartTime;
-                                            keyframe.value = round(currentCompLayer.position.value[0], 2);
-                                            layer.transform.position.x.push(keyframe);
                                         }
 
                                         // position y
                                         layer.transform.position.y = [];
-                                        if (currentCompLayer.property("Transform").property("Y Position").numKeys !== 0) {
+                                        if (propPosY.numKeys !== 0) {
                                             if (layer.hasParent == true) {
                                                 if (parentLayerData.property("Transform").property("Y Position").numKeys !== 0) {
                                                     if (parentLayerData.property("Transform").property("X Position").numKeys !== 0) {
@@ -2495,6 +2555,7 @@
                                                             var keyframe = {};
                                                             keyframe.time = milliseconds(newLayerPosYAfter.keyTime(k) + currentComp.displayStartTime);
                                                             keyframe.value = round(newLayerPosYAfter.keyValue(k), 2);
+                                                            keyframe.easing = easingType(newLayerPosYAfter, k);
                                                             layer.transform.position.y.push(keyframe);
                                                         }
                                                     }
@@ -2507,6 +2568,7 @@
                                                             var keyframe = {};
                                                             keyframe.time = milliseconds(newLayerPosYAfter.keyTime(k) + currentComp.displayStartTime);
                                                             keyframe.value = round(newLayerPosYAfter.keyValue(k), 2);
+                                                            keyframe.easing = easingType(newLayerPosYAfter, k);
                                                             layer.transform.position.y.push(keyframe);
                                                         }
                                                     }
@@ -2523,16 +2585,16 @@
                                             }
                                             else {
                                                 // layer.transform.position.y.yKeyframed = true;
-                                                for (var k = 1; k <= currentCompLayer.property("Transform").property("Y Position").numKeys; k++) {
+                                                for (var k = 1; k <= propPosY.numKeys; k++) {
                                                     var keyframe = {};
-                                                    keyframe.time = milliseconds(currentCompLayer.property("Transform").property("Y Position").keyTime(k) + currentComp.displayStartTime);
-                                                    keyframe.value = round(currentCompLayer.property("Transform").property("Y Position").keyValue(k), 2);
-                                                    // keyframeEasing(currentCompLayer.property("Transform").property("YX Position"));
+                                                    keyframe.time = milliseconds(propPosY.keyTime(k) + currentComp.displayStartTime);
+                                                    keyframe.value = round(propPosY.keyValue(k), 2);
+                                                    keyframe.easing = easingType(propPosY, k);
                                                     layer.transform.position.y.push(keyframe);
                                                 }
                                             }
                                         }
-                                        else if (currentCompLayer.property("Transform").property("Y Position").numKeys === 0) {
+                                        else if (propPosY.numKeys === 0) {
                                             if (layer.hasParent == true) {
                                                 if (parentLayerData.property("Transform").property("Y Position").numKeys === 0) {
                                                     if (parentLayerData.property("Transform").property("X Position").numKeys === 0) {
@@ -2542,6 +2604,7 @@
                                                             var keyframe = {};
                                                             keyframe.time = milliseconds(newLayerPosYAfter.keyTime(k) + currentComp.displayStartTime);
                                                             keyframe.value = round(newLayerPosYAfter.keyValue(k), 2);
+                                                            keyframe.easing = easingType(newLayerPosYAfter, k);
                                                             layer.transform.position.y.push(keyframe);
                                                         }
                                                     }
@@ -2554,6 +2617,7 @@
                                                             var keyframe = {};
                                                             keyframe.time = milliseconds(newLayerPosYAfter.keyTime(k) + currentComp.displayStartTime);
                                                             keyframe.value = round(newLayerPosYAfter.keyValue(k), 2);
+                                                            keyframe.easing = easingType(newLayerPosYAfter, k);
                                                             layer.transform.position.y.push(keyframe);
                                                         }
                                                     }
@@ -2565,6 +2629,7 @@
 
                                                     keyframe.time = layer.startTime + currentComp.displayStartTime;
                                                     keyframe.value = round(newLayerPosYAfter.valueAtTime(layer.startTime), 2);
+                                                    keyframe.easing = "None";
                                                     layer.transform.position.y.push(keyframe);
                                                 }
                                             }
@@ -2574,6 +2639,7 @@
 
                                                 keyframe.time = layer.startTime + currentComp.displayStartTime;
                                                 keyframe.value = round(currentCompLayer.position.value[1], 2);
+                                                keyframe.easing = "None";
                                                 layer.transform.position.y.push(keyframe);
                                             }
                                         }
@@ -2581,68 +2647,74 @@
                                         // scale x,y
                                         layer.transform.scale.x = [];
                                         layer.transform.scale.y = [];
-                                        if (currentCompLayer.scale.numKeys !== 0) {
+                                        if (propScale.numKeys !== 0) {
                                             // layer.transform.scale.keyframed = true;
-                                            for (var k = 1; k <= currentCompLayer.scale.numKeys; k++) {
+                                            for (var k = 1; k <= propScale.numKeys; k++) {
                                                 var keyframeX = {};
                                                 var keyframeY = {};
 
-                                                var scaleTime = milliseconds(currentCompLayer.scale.keyTime(k) + currentComp.displayStartTime);
-                                                var scaleValues = currentCompLayer.scale.keyValue(k) / 100;
+                                                var scaleTime = milliseconds(propScale.keyTime(k) + currentComp.displayStartTime);
+                                                var scaleValues = propScale.keyValue(k) / 100;
 
                                                 keyframeX.time = scaleTime;
                                                 keyframeX.value = round(scaleValues[0], 2);
+                                                keyframeX.easing = easingType(propScale, k);
                                                 layer.transform.scale.x.push(keyframeX);
 
                                                 keyframeY.time = scaleTime;
                                                 keyframeY.value = round(scaleValues[1], 2);
+                                                keyframeY.easing = easingType(propScale, k);
                                                 layer.transform.scale.y.push(keyframeY);
                                             }
                                         }
-                                        else if (currentCompLayer.scale.numKeys === 0) {
+                                        else if (propScale.numKeys === 0) {
                                             // layer.transform.scale.keyframed = false;
                                             var keyframeX = {};
                                             var keyframeY = {};
 
                                             keyframeX.time = layer.startTime + currentComp.displayStartTime;
-                                            keyframeX.value = round(currentCompLayer.scale.value[0] / 100, 2);
+                                            keyframeX.value = round(propScale.value[0] / 100, 2);
+                                            keyframeX.easing = "None";
                                             layer.transform.scale.x.push(keyframeX);
 
                                             keyframeY.time = layer.startTime + currentComp.displayStartTime;
-                                            keyframeY.value = round(currentCompLayer.scale.value[1] / 100, 2);
+                                            keyframeY.value = round(propScale.value[1] / 100, 2);
+                                            keyframeY.easing = "None";
                                             layer.transform.scale.y.push(keyframeY);
                                         }
 
                                         // rotation degrees
-                                        if (currentCompLayer.rotation.numKeys !== 0) {
+                                        if (propRotation.numKeys !== 0) {
                                             // layer.transform.rotation.keyframed = true;
                                             // layer.transform.rotation.keyframes = [];
-                                            for (var k = 1; k <= currentCompLayer.rotation.numKeys; k++) {
+                                            for (var k = 1; k <= propRotation.numKeys; k++) {
                                                 layer.transform.isRotating = true;
                                                 var keyframe = {};
-                                                keyframe.time = milliseconds(currentCompLayer.rotation.keyTime(k) + currentComp.displayStartTime);
-                                                keyframe.value = currentCompLayer.rotation.keyValue(k);
-                                                // keyframeEasing(currentCompLayer.rotation);
+                                                keyframe.time = milliseconds(propRotation.keyTime(k) + currentComp.displayStartTime);
+                                                keyframe.value = propRotation.keyValue(k);
+                                                keyframe.easing = easingType(propRotation, k);
                                                 layer.transform.rotation.push(keyframe);
                                             }
-                                            for (var k = 1; k <= currentCompLayer.rotation.numKeys; k++) {
-                                                if (currentCompLayer.rotation.keyValue(k) !== 0) { layer.transform.isRotating = true; break; }
+                                            for (var k = 1; k <= propRotation.numKeys; k++) {
+                                                if (propRotation.keyValue(k) !== 0) { layer.transform.isRotating = true; break; }
                                                 else { continue; }
                                             }
                                         }
-                                        else if (currentCompLayer.rotation.numKeys === 0) {
+                                        else if (propRotation.numKeys === 0) {
                                             layer.transform.isRotating = false;
                                             // layer.transform.rotation.keyframed = false;
                                             var keyframe = {};
                                             keyframe.time = layer.startTime + currentComp.displayStartTime + currentComp.displayStartTime;
-                                            keyframe.value = currentCompLayer.rotation.value;
+                                            keyframe.value = propRotation.value;
+                                            keyframe.easing = "None";
                                             layer.transform.rotation.push(keyframe);
 
-                                            if (currentCompLayer.rotation.value !== 0) layer.transform.isRotating = true;
+                                            if (propRotation.value !== 0) layer.transform.isRotating = true;
                                         }
+                                        app.endUndoGroup();
 
-                                        var wasSelected = false;
                                         if (layerType == "Text") {
+                                            app.beginUndoGroup("Export Text Layers in: " + currentComp.name);
                                             // alert("currentCompLayer.index: " + currentCompLayer.index);
                                             // alert("firstTextLayerIndex[0]: " + firstTextLayerIndex[0]);
                                             if (currentCompLayer.index >= firstTextLayerIndex[0]) {
@@ -2679,7 +2751,7 @@
                                                                                     var keyframe = {};
                                                                                     keyframe.time = milliseconds(animator.keyTime(k) + currentComp.displayStartTime);
                                                                                     keyframe.value = round(animator.keyValue(k));
-                                                                                    // keyframeEasing(animator);
+                                                                                    keyframe.easing = easingType(animator, k);
                                                                                     layer.text.lineSpacingOffset.push(keyframe);
                                                                                 }
                                                                             }
@@ -2690,6 +2762,7 @@
                                                                                 var keyframe = {};
                                                                                 keyframe.time = layer.startTime + currentComp.displayStartTime;
                                                                                 keyframe.value = round(animator.value, 2);
+                                                                                keyframe.easing = "None";
                                                                                 layer.text.lineSpacingOffset.push(keyframe);
                                                                             }
                                                                         }
@@ -2699,7 +2772,8 @@
                                                             else if (animators.numProperties === 0) {
                                                                 layer.text.lineSpacingOffset.push({
                                                                     time: layer.startTime,
-                                                                    value: 0
+                                                                    value: 0,
+                                                                    easing: "None"
                                                                 });
                                                             }
                                                         }
@@ -2747,7 +2821,9 @@
 
                                                     if (layer.text.hasCharacters == true) {
                                                         scriptSettings = readSettings();
-
+                                                        
+                                                        app.endUndoGroup();
+                                                        
                                                         // characters
                                                         if (scriptSettings.options.exportTextPerLetter == true) {
                                                             layer.text.characters = [];
@@ -2758,10 +2834,9 @@
 
                                                             currentComp.openInViewer();
                                                             previouslySelected();
-                                                            var currentCompTime = currentComp.time;
                                                             currentComp.time = 0;
                                                             splitText(currentCompLayer, "characters");
-                                                            app.beginUndoGroup("Explode Text & Delete Exploded Text");
+                                                            app.beginUndoGroup("Separate Text (Explode): " + currentCompLayer.name);
 
                                                             for (var txtL = 1; txtL <= selectedComps[I].numLayers; txtL++) {
                                                                 if (txtL > 1 && selectedComps[I].numLayers > 1 && currentCompLayer.name != selectedComps[I].layer(txtL - 1).name) {
@@ -2780,10 +2855,6 @@
                                                                     continue;
                                                                 }
                                                             }
-                                                            if (wasSelected == false)
-                                                                currentCompLayer.selected = false;
-                                                            currentComp.time = currentCompTime;
-                                                            currentCompResolution = currentComp.resolutionFactor;
                                                             app.endUndoGroup();
 
                                                             function getTextData() {
@@ -2864,7 +2935,7 @@
                                                                             var keyframe = {};
                                                                             keyframe.time = milliseconds(explodedTextLayer.opacity.keyTime(k) + currentComp.displayStartTime);
                                                                             keyframe.value = explodedTextLayer.opacity.keyValue(k) / 100;
-                                                                            // keyframeEasing(explodedTextLayer.opacity);
+                                                                            keyframe.easing = easingType(explodedTextLayer.opacity, k);
                                                                             et.transform.fade.push(keyframe);
                                                                         }
                                                                     }
@@ -2873,6 +2944,7 @@
                                                                         var keyframe = {};
                                                                         keyframe.time = layer.startTime + currentComp.displayStartTime;
                                                                         keyframe.value = explodedTextLayer.opacity.value / 100;
+                                                                        keyframe.easing = "None";
                                                                         et.transform.fade.push(keyframe);
                                                                     }
 
@@ -2890,7 +2962,7 @@
 
                                                                         // position x
                                                                         et.transform.position.x = [];
-                                                                        if (currentCompLayer.property("Transform").property("X Position").numKeys !== 0) {
+                                                                        if (propPosX.numKeys !== 0) {
                                                                             if (lineSpacingOffsetKeyframed[0] == false) {
                                                                                 currentCompResolution = [4, 4];
                                                                                 explodedTextLayerNew = getChildPosition(explodedTextLayer, currentCompLayer, layer.transform.isRotating, layer.hasParent);
@@ -2900,6 +2972,7 @@
                                                                                     var keyframe = {};
                                                                                     keyframe.time = milliseconds(explodedTextLayerPosXAfter.keyTime(k) + currentComp.displayStartTime);
                                                                                     keyframe.value = round(explodedTextLayerPosXAfter.keyValue(k), 2);
+                                                                                    keyframe.easing = easingType(explodedTextLayerPosXAfter, k);
                                                                                     et.transform.position.x.push(keyframe);
                                                                                 }
                                                                             }
@@ -2912,6 +2985,7 @@
                                                                                     var keyframe = {};
                                                                                     keyframe.time = milliseconds(explodedTextLayerPosXAfter.keyTime(k) + currentComp.displayStartTime);
                                                                                     keyframe.value = round(explodedTextLayerPosXAfter.keyValue(k), 2);
+                                                                                    keyframe.easing = easingType(explodedTextLayerPosXAfter, k);
                                                                                     et.transform.position.x.push(keyframe);
                                                                                 }
 
@@ -3040,16 +3114,18 @@
                                                                                     var keyframe = {};
                                                                                     keyframe.time = milliseconds(explodedTextLayerPosXAfter.keyTime(k) + currentComp.displayStartTime);
                                                                                     keyframe.value = round(explodedTextLayerPosXAfter.keyValue(k), 2);
+                                                                                    keyframe.easing = easingType(explodedTextLayerPosXAfter, k);
                                                                                     et.transform.position.x.push(keyframe);
                                                                                 }
                                                                             }
                                                                         }
-                                                                        else if (currentCompLayer.property("Transform").property("X Position").numKeys === 0) {
+                                                                        else if (propPosX.numKeys === 0) {
                                                                             if (lineSpacingOffsetKeyframed[0] == false) {
                                                                                 var keyframe = {};
 
                                                                                 keyframe.time = layer.startTime + currentComp.displayStartTime;
                                                                                 keyframe.value = round(explodedTextLayerPosX.valueAtTime(layer.startTime, false), 2);
+                                                                                keyframe.easing = "None";
                                                                                 et.transform.position.x.push(keyframe);
                                                                             }
                                                                             else if (lineSpacingOffsetKeyframed[0] == true) {
@@ -3057,6 +3133,7 @@
 
                                                                                 keyframe.time = layer.startTime + currentComp.displayStartTime;
                                                                                 keyframe.value = round(explodedTextLayerPosX.valueAtTime(layer.startTime, false), 2);
+                                                                                keyframe.easing = "None";
                                                                                 et.transform.position.x.push(keyframe);
 
                                                                                 // // not finished...
@@ -3186,6 +3263,7 @@
                                                                                 explodedTextLayer.parent = null;
                                                                                 keyframe.time = layer.startTime + currentComp.displayStartTime;
                                                                                 keyframe.value = round(explodedTextLayerPosX.valueAtTime(layer.startTime, false), 2);
+                                                                                keyframe.easing = "None";
                                                                                 et.transform.position.x.push(keyframe);
                                                                             }
                                                                             else if (lineSpacingOffsetKeyframed.length == 0 && layer.transform.isRotating == true) {
@@ -3197,6 +3275,7 @@
                                                                                     var keyframe = {};
                                                                                     keyframe.time = milliseconds(explodedTextLayerPosXAfter.keyTime(k) + currentComp.displayStartTime);
                                                                                     keyframe.value = round(explodedTextLayerPosXAfter.keyValue(k), 2);
+                                                                                    keyframe.easing = easingType(explodedTextLayerPosXAfter, k);
                                                                                     et.transform.position.x.push(keyframe);
                                                                                 }
                                                                             }
@@ -3209,6 +3288,7 @@
                                                                                     var keyframe = {};
                                                                                     keyframe.time = milliseconds(explodedTextLayerPosXAfter.keyTime(k) + currentComp.displayStartTime);
                                                                                     keyframe.value = round(explodedTextLayerPosXAfter.keyValue(k), 2);
+                                                                                    keyframe.easing = easingType(explodedTextLayerPosXAfter, k);
                                                                                     et.transform.position.x.push(keyframe);
                                                                                 }
                                                                             }
@@ -3216,8 +3296,8 @@
 
                                                                         // position y
                                                                         et.transform.position.y = [];
-                                                                        if (currentCompLayer.property("Transform").property("Y Position").numKeys !== 0) {
-                                                                            if (currentCompLayer.property("Transform").property("X Position").numKeys === 0) {
+                                                                        if (propPosY.numKeys !== 0) {
+                                                                            if (propPosX.numKeys === 0) {
                                                                                 if (lineSpacingOffsetKeyframed[0] == false) {
                                                                                     currentCompResolution = [4, 4];
                                                                                     explodedTextLayerNew = getChildPosition(explodedTextLayer, currentCompLayer, layer.transform.isRotating, layer.hasParent);
@@ -3227,6 +3307,7 @@
                                                                                         var keyframe = {};
                                                                                         keyframe.time = milliseconds(explodedTextLayerPosYAfter.keyTime(k) + currentComp.displayStartTime);
                                                                                         keyframe.value = round(explodedTextLayerPosYAfter.keyValue(k), 2);
+                                                                                        keyframe.easing = easingType(explodedTextLayerPosYAfter, k);
                                                                                         et.transform.position.y.push(keyframe);
                                                                                     }
                                                                                 }
@@ -3239,6 +3320,7 @@
                                                                                         var keyframe = {};
                                                                                         keyframe.time = milliseconds(explodedTextLayerPosYAfter.keyTime(k) + currentComp.displayStartTime);
                                                                                         keyframe.value = round(explodedTextLayerPosYAfter.keyValue(k), 2);
+                                                                                        keyframe.easing = easingType(explodedTextLayerPosYAfter, k);
                                                                                         et.transform.position.y.push(keyframe);
                                                                                     }
 
@@ -3333,6 +3415,7 @@
                                                                                         var keyframe = {};
                                                                                         keyframe.time = milliseconds(explodedTextLayerPosYAfter.keyTime(k) + currentComp.displayStartTime);
                                                                                         keyframe.value = round(explodedTextLayerPosYAfter.keyValue(k), 2);
+                                                                                        keyframe.easing = easingType(explodedTextLayerPosYAfter, k);
                                                                                         et.transform.position.y.push(keyframe);
                                                                                     }
                                                                                 }
@@ -3345,6 +3428,7 @@
                                                                                         var keyframe = {};
                                                                                         keyframe.time = milliseconds(explodedTextLayerPosYAfter.keyTime(k) + currentComp.displayStartTime);
                                                                                         keyframe.value = round(explodedTextLayerPosYAfter.keyValue(k), 2);
+                                                                                        keyframe.easing = easingType(explodedTextLayerPosYAfter, k);
                                                                                         et.transform.position.y.push(keyframe);
                                                                                     }
                                                                                 }
@@ -3358,6 +3442,7 @@
                                                                                         // alert("y time: " + explodedTextLayerPosYAfter.keyTime(k));
                                                                                         keyframe.time = milliseconds(explodedTextLayerPosYAfter.keyTime(k) + currentComp.displayStartTime);
                                                                                         keyframe.value = round(explodedTextLayerPosYAfter.keyValue(k), 2);
+                                                                                        keyframe.easing = easingType(explodedTextLayerPosYAfter, k);
                                                                                         et.transform.position.y.push(keyframe);
                                                                                     }
                                                                                 }
@@ -3369,6 +3454,7 @@
                                                                                         // alert("y time: " + explodedTextLayerPosYAfter.keyTime(k));
                                                                                         keyframe.time = milliseconds(explodedTextLayerPosYAfter.keyTime(k) + currentComp.displayStartTime);
                                                                                         keyframe.value = round(explodedTextLayerPosYAfter.keyValue(k), 2);
+                                                                                        keyframe.easing = easingType(explodedTextLayerPosYAfter, k);
                                                                                         et.transform.position.y.push(keyframe);
                                                                                     }
 
@@ -3460,6 +3546,7 @@
                                                                                         // alert("y time: " + explodedTextLayerPosYAfter.keyTime(k));
                                                                                         keyframe.time = milliseconds(explodedTextLayerPosYAfter.keyTime(k) + currentComp.displayStartTime);
                                                                                         keyframe.value = round(explodedTextLayerPosYAfter.keyValue(k), 2);
+                                                                                        keyframe.easing = easingType(explodedTextLayerPosYAfter, k);
                                                                                         et.transform.position.y.push(keyframe);
                                                                                     }
                                                                                 }
@@ -3471,14 +3558,15 @@
                                                                                         // alert("y time: " + explodedTextLayerPosYAfter.keyTime(k));
                                                                                         keyframe.time = milliseconds(explodedTextLayerPosYAfter.keyTime(k) + currentComp.displayStartTime);
                                                                                         keyframe.value = round(explodedTextLayerPosYAfter.keyValue(k), 2);
+                                                                                        keyframe.easing = easingType(explodedTextLayerPosYAfter, k);
                                                                                         et.transform.position.y.push(keyframe);
                                                                                     }
                                                                                 }
                                                                             }
                                                                         }
-                                                                        else if (currentCompLayer.property("Transform").property("Y Position").numKeys === 0) {
+                                                                        else if (propPosY.numKeys === 0) {
                                                                             if (layer.transform.isRotating == true) {
-                                                                                if (currentCompLayer.property("Transform").property("X Position").numKeys === 0) {
+                                                                                if (propPosX.numKeys === 0) {
                                                                                     if (lineSpacingOffsetKeyframed[0] == false) {
                                                                                         var explodedTextLayerPosY = explodedTextLayer.property("Transform").property("Y Position");
 
@@ -3487,6 +3575,7 @@
                                                                                             // alert("y time: " + explodedTextLayerPosY.keyTime(k));
                                                                                             keyframe.time = milliseconds(explodedTextLayerPosY.keyTime(k) + currentComp.displayStartTime);
                                                                                             keyframe.value = round(explodedTextLayerPosY.keyValue(k), 2);
+                                                                                            keyframe.easing = easingType(explodedTextLayerPosY, k);
                                                                                             et.transform.position.y.push(keyframe);
                                                                                         }
                                                                                     }
@@ -3498,6 +3587,7 @@
                                                                                             // alert("y time: " + explodedTextLayerPosY.keyTime(k));
                                                                                             keyframe.time = milliseconds(explodedTextLayerPosY.keyTime(k) + currentComp.displayStartTime);
                                                                                             keyframe.value = round(explodedTextLayerPosY.keyValue(k), 2);
+                                                                                            keyframe.easing = easingType(explodedTextLayerPosY, k);
                                                                                             et.transform.position.y.push(keyframe);
                                                                                         }
 
@@ -3553,7 +3643,8 @@
                                                                                         //         else
                                                                                         //         keyframe.value = round(explodedTextLayerPosYAfter.keyValue(k), 2);
                                                                                         //     }
-
+                                                                                                
+                                                                                            // keyframe.easing = easingType(explodedTextLayerPosYAfter, k);
                                                                                         //     et.transform.position.y.push(keyframe);
                                                                                         // }
                                                                                     }
@@ -3566,6 +3657,7 @@
                                                                                             var keyframe = {};
                                                                                             keyframe.time = milliseconds(explodedTextLayerPosYAfter.keyTime(k) + currentComp.displayStartTime);
                                                                                             keyframe.value = round(explodedTextLayerPosYAfter.keyValue(k), 2);
+                                                                                            keyframe.easing = easingType(explodedTextLayerPosYAfter, k);
                                                                                             et.transform.position.y.push(keyframe);
                                                                                         }
                                                                                     }
@@ -3578,6 +3670,7 @@
                                                                                             var keyframe = {};
                                                                                             keyframe.time = milliseconds(explodedTextLayerPosYAfter.keyTime(k) + currentComp.displayStartTime);
                                                                                             keyframe.value = round(explodedTextLayerPosYAfter.keyValue(k), 2);
+                                                                                            keyframe.easing = easingType(explodedTextLayerPosYAfter, k);
                                                                                             et.transform.position.y.push(keyframe);
                                                                                         }
                                                                                     }
@@ -3590,6 +3683,7 @@
                                                                                         explodedTextLayer.parent = null;
                                                                                         keyframe.time = milliseconds(explodedTextLayerPosYAfter.keyTime(k) + currentComp.displayStartTime);
                                                                                         keyframe.value = round(explodedTextLayerPosYAfter.valueAtTime(explodedTextLayerPosYAfter.setValueAtKey(k), false), 2);
+                                                                                        keyframe.easing = easingType(explodedTextLayerPosYAfter, k);
                                                                                         et.transform.position.y.push(keyframe);
                                                                                     }
                                                                                 }
@@ -3599,6 +3693,7 @@
                                                                                 explodedTextLayer.parent = null;
                                                                                 keyframe.time = layer.startTime + currentComp.displayStartTime;
                                                                                 keyframe.value = round(explodedTextLayer.transform("Y Position").valueAtTime(layer.startTime, false), 2);
+                                                                                keyframe.easing = "None";
                                                                                 et.transform.position.y.push(keyframe);
                                                                             }
                                                                         }
@@ -3617,10 +3712,12 @@
 
                                                                                 keyframeX.time = scaleTime;
                                                                                 keyframeX.value = round(scaleValues[0], 2);
+                                                                                keyframeX.easing = easingType(explodedTextLayer.scale, k);
                                                                                 et.transform.scale.x.push(keyframeX);
 
                                                                                 keyframeY.time = scaleTime;
                                                                                 keyframeY.value = round(scaleValues[1], 2);
+                                                                                keyframeY.easing = easingType(explodedTextLayer.scale, k);
                                                                                 et.transform.scale.y.push(keyframeY);
                                                                             }
                                                                         }
@@ -3631,10 +3728,12 @@
 
                                                                             keyframeX.time = layer.startTime + currentComp.displayStartTime;
                                                                             keyframeX.value = round(explodedTextLayer.scale.value[0] / 100, 2);
+                                                                            keyframeX.easing = "None";
                                                                             et.transform.scale.x.push(keyframeX);
 
                                                                             keyframeY.time = layer.startTime + currentComp.displayStartTime;
                                                                             keyframeY.value = round(explodedTextLayer.scale.value[1] / 100, 2);
+                                                                            keyframeY.easing = "None";
                                                                             et.transform.scale.y.push(keyframeY);
                                                                         }
 
@@ -3644,6 +3743,7 @@
                                                                                 var keyframe = {};
                                                                                 keyframe.time = milliseconds(explodedTextLayer.rotation.keyTime(k) + currentComp.displayStartTime);
                                                                                 keyframe.value = explodedTextLayer.rotation.keyValue(k);
+                                                                                keyframe.easing = easingType(explodedTextLayer.rotation, k);
                                                                                 et.transform.rotation.push(keyframe);
                                                                             }
                                                                         }
@@ -3651,6 +3751,7 @@
                                                                             var keyframe = {};
                                                                             keyframe.time = layer.startTime + currentComp.displayStartTime;
                                                                             keyframe.value = explodedTextLayer.rotation.value;
+                                                                            keyframe.easing = "None";
                                                                             et.transform.rotation.push(keyframe);
                                                                         }
                                                                     }
@@ -3667,6 +3768,21 @@
                                             }
                                         }
                                     }
+                                    app.beginUndoGroup("Export Cleanup: " + currentCompLayer.name);
+                                    if (holdKeyInfoPosX.length != 0)
+                                        prop.removeKey(holdKeyInfoPosX[0]);
+                                    if (holdKeyInfoPosY.length != 0)
+                                        prop.removeKey(holdKeyInfoPosY[0]);
+                                    if (holdKeyInfoScale.length != 0)
+                                        prop.removeKey(holdKeyInfoScale[0]);
+                                    if (holdKeyInfoRotation.length != 0)
+                                        prop.removeKey(holdKeyInfoRotation[0]);
+
+                                    if (wasSelected == false)
+                                        currentCompLayer.selected = false;
+                                    currentComp.time = currentCompTime;
+                                    currentCompResolution = currentComp.resolutionFactor;
+                                    app.endUndoGroup();
                                 }
                                 else if (currentCompLayer.enabled !== true && layerType !== "NullLayer") {
                                     layer.visible = currentCompLayer.enabled;
@@ -3695,145 +3811,10 @@
                                     var duration = milliseconds(layerEnd(selectedComps[I], currentCompLayer.outPoint)) - milliseconds(layerStart(selectedComps[I], currentCompLayer.inPoint));
                                     return duration;
                                 }
-
-                                function keyframeEasing(property) {
-                                    // propertyValueType::::::::::::::::
-                                    // - COLOR = 6418
-                                    // - CUSTOM_VALUE = 6419
-                                    // - LAYER_INDEX = 6421
-                                    // - MARKER = 6420
-                                    // - MASK_INDEX = 6422
-                                    // - NO_VALUE = 6412
-                                    // - SHAPE = 6423
-                                    // - TEXT_DOCUMENT = 6424
-                                    // - ThreeD = 6414
-                                    // - ThreeD_SPATIAL = 6413
-                                    // - TwoD = 6416
-                                    // - TwoD_SPATIAL = 6415
-                                    // - OneD = 6417
-
-                                    // keyInInterpolationType & keyOutInterpolationType::::::::::::::::
-                                    // - BEZIER = 6613
-                                    // - HOLD = 6614
-                                    // - LINEAR = 6612
-
-                                    var OsbEasing;
-                                    for (var k = 1; k <= property.numKeys; k++) {
-                                        var speedIn;
-                                        var speedOut;
-                                        var influenceIn;
-                                        var influenceOut;
-                                        var keyframeSpeedArr = [];
-                                        var keyframeInfluenceArr = [];
-
-                                        if (property.propertyValueType === 6417) { // OneD Temporal
-                                            speedIn = property.keyInTemporalEase(k)[0].speed;
-                                            speedOut = property.keyOutTemporalEase(k)[0].speed;
-                                            influenceIn = property.keyInTemporalEase(k)[0].influence;
-                                            influenceOut = property.keyOutTemporalEase(k)[0].influence;
-
-                                            keyframeSpeedArr.push(speedIn);
-                                            keyframeSpeedArr.push(speedOut);
-                                            keyframeInfluenceArr.push(influenceIn);
-                                            keyframeInfluenceArr.push(influenceOut);
-
-                                            // alert("index: " + k + "\r\n" + property.keyInTemporalEase(k)[0].speed);
-
-                                            // alert("keyIndex: " + k + "\r\n" +
-                                            //     "speedIn: " + keyframeSpeedArr[0] + "\r\n" +
-                                            //     "speedOut: " + keyframeSpeedArr[1] + "\r\n" +
-                                            //     "influenceIn: " + keyframeInfluenceArr[0] + "\r\n" +
-                                            //     "influenceOut: " + keyframeInfluenceArr[1]);
-
-                                            OsbEasing = osbEasing(keyframeSpeedArr, keyframeInfluenceArr);
-                                            alert("OsbEasing: " + OsbEasing);
-                                        }
-                                    }
-                                    return OsbEasing;
-                                }
                             }
 
                             compItems.push(composition)
                             // alert("currentCompLayer.parent: " + currentCompLayer.parent);
-
-                            function osbEasing(speed, influence) {
-                                // (x1,y1,x2,y2)
-
-                                // var easingValueIn;
-                                // var easingValueOut;
-                                // var speedIn = speed[0];
-                                // var speedOut = speed[1];
-                                // var influenceIn = influence[0];
-                                // var influenceOut = influence[1];
-                                var obj = [];
-                                var easing = [];
-                                var easingArr = [];
-                                var finalEasing = null;
-
-                                var easingNone = defineEasing(speed, 0, 0) && defineEasing(influence, 0, 16.6667) && returnEasing();
-                                var easingInSine = defineEasing(speed, 0, 0) && defineEasing(influence, 16.6667, 60) && returnEasing();
-
-                                if (easingNone) {
-                                    /////////// None ///////////
-                                    ////////////////////////////
-
-                                    returnEasing();
-                                    return finalEasing;
-                                }
-                                else if (easingInSine) {
-                                    ////////// InSine //////////
-                                    ////////////////////////////
-
-                                    returnEasing();
-                                    return finalEasing;
-                                }
-
-                                // defineEasing(speed, 0, 0); // speed
-                                // defineEasing(influence, 0, 16.6667); // influence
-                                // defineEasing(speed, 0, 0); // speed
-                                // defineEasing(influence, 16.6667, 60); // influence
-                                // alert(easingArr.length)
-
-                                function defineEasing(arr, easingIn, easingOut) {
-                                    // estimateEasing();
-                                    // function estimateEasing() {
-                                    if (arr[0] == easingIn || Math.abs(arr[0] - easingIn) <= 5 || (arr[0] + easingIn) <= 5) {
-                                        easingArr.push(easingIn); // in
-                                        easing.push(easingIn); // in
-                                    }
-                                    if (arr[1] == easingOut || Math.abs(arr[1] - easingOut) <= 5 || (arr[1] + easingOut) <= 5) {
-                                        easingArr.push(easingOut); // out
-                                        easing.push(easingOut); // out
-                                    }
-                                    return true;
-                                    // }
-                                }
-
-                                function returnEasing() {
-                                    // easings
-                                    var None = (easing[0] === 0 && easing[1] === 0 && easing[2] === 0 && easing[3] === 16.6667);
-                                    var InSine = (easing[0] === 0 && easing[1] === 0 && easing[2] === 16.6667 && easing[3] === 60);
-
-                                    alert(InSine + " " + None);
-
-                                    if (None && !InSine) {
-                                        /////////// None ///////////
-                                        ////////////////////////////
-                                        finalEasing = "None";
-                                        // easingArr = obj;
-                                        // easing = obj;
-                                        return "None";
-                                    }
-                                    else if (InSine && !None) {
-                                        ////////// InSine //////////
-                                        ////////////////////////////
-                                        finalEasing = "InSine";
-                                        // easingArr = obj;
-                                        // easing = obj;
-                                        return "InSine";
-                                    }
-                                }
-                            }
                         }
                     }
                 }
@@ -4023,6 +4004,101 @@
                 textSplitting("lines");
             }
 
+            function keyframeSmoother(keyTimesBefore, frameRate, prop) {
+                if (prop.numKeys > 1) {
+                    var threshold = 2;
+                    alert(frameRate);
+                    frameRate = frameRate / 60;
+                    alert(frameRate);
+
+                    for (var k = 1; k <= prop.numKeys; k++) {
+                        var nextKey = k;
+                        var prevKey = k;
+                        var keyValue = 0;
+                        var keyValueNext = 0;
+                        var keyValuePrev = 0;
+                        // var keyTime = prop.keyTime(k);
+                        if (k > 1 && k < prop.numKeys) {
+                            if (prop.name == "Scale") {
+                                threshold = threshold / 10;
+                                try {
+                                    nextKey = k + 1;
+                                    prevKey = k - 1;
+                                    keyValue = prop.keyValue(k)[0];
+                                    keyValueY = prop.keyValue(k)[1];
+                                    keyValueNext = prop.keyValue(nextKey)[0];
+                                    keyValuePrev = prop.keyValue(prevKey)[0];
+                                    var keyValueNextY = prop.keyValue(nextKey)[1];
+                                    var keyValuePrevY = prop.keyValue(prevKey)[1];
+                                    var vX = Math.abs(keyValue - keyValueNext);
+                                    var vY = Math.abs(keyValueY - keyValueNextY);
+                                    var vX2 = Math.abs(keyValue - keyValuePrev);
+                                    var vY2 = Math.abs(keyValueY - keyValuePrevY);
+                                    
+                                    if (vX <= threshold && vY <= threshold) {
+                                        if (vX2 <= threshold && vY2 <= threshold && k > 2)
+                                        prop.removeKey(k);
+                                        if (k < prop.numKeys - 1)
+                                        prop.removeKey(nextKey);
+                                        if (vX <= (threshold * 2) && vY <= (threshold * 2)) {
+                                            for (var k2 = 1; k2 <= prop.numKeys; k2++) {
+                                                var nextKey2 = k2 + 1;
+
+                                                for (var kPrev = 1; kPrev <= keyTimesBefore.length; kPrev++) {
+                                                    var deltaTime = Math.abs((prop.keyTime(k2) + frameRate) - (prop.keyTime(k2) - frameRate));
+                                                    var deltaTime2 = Math.abs((prop.keyTime(nextKey2) + frameRate) - (prop.keyTime(nextKey2) - frameRate));
+                                                    var deltaTime3 = Math.abs(keyTimesBefore[kPrev] + frameRate - keyTimesBefore[kPrev] - frameRate);
+
+                                                    if (deltaTime != deltaTime3)
+                                                        prop.removeKey(k2);
+                                                    if (deltaTime2 != deltaTime3)
+                                                        prop.removeKey(nextKey2);
+    
+                                                    if (deltaTime != deltaTime3)
+                                                        prop.removeKey(k2);
+                                                    if (deltaTime2 != deltaTime3)
+                                                        prop.removeKey(nextKey2);
+                                                }
+
+                                                if (vX2 <= (threshold * 3) && vY2 <= (threshold * 3)) {
+                                                    for (var k3 = 1; k3 <= prop.numKeys; k3++) {
+                                                        var nextKey3 = k3 + 1;
+                                                        
+                                                        for (var kPrev = 1; kPrev <= keyTimesBefore.length; kPrev++) {
+                                                            var deltaTime = Math.abs((prop.keyTime(k3) + frameRate) - (prop.keyTime(k3) - frameRate));
+                                                            var deltaTime2 = Math.abs((prop.keyTime(nextKey3) + frameRate) - (prop.keyTime(nextKey3) - frameRate));
+                                                            var deltaTime3 = Math.abs(keyTimesBefore[kPrev] + frameRate - keyTimesBefore[kPrev] - frameRate);
+
+                                                            if (deltaTime != deltaTime3)
+                                                                prop.removeKey(k3);
+                                                            if (deltaTime2 != deltaTime3)
+                                                                prop.removeKey(nextKey3);
+                                                    
+                                                            if (deltaTime != deltaTime3)
+                                                                prop.removeKey(k3);
+                                                            if (deltaTime2 != deltaTime3)
+                                                                prop.removeKey(nextKey3);
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    else continue;
+                                }
+                                catch (e) {
+                                    continue;
+                                }
+                            }
+                        }
+                    }
+                    // var angle = MathHelper.RadiansToDegrees(Math.Atan2((verticesY[0] - verticesY[1]), (verticesX[0] - verticesX[1])) - Math.PI / 2);
+                    // var angle2 = MathHelper.RadiansToDegrees(Math.Atan2((verticesY[1] - verticesY[2]), (verticesX[1] - verticesX[2])) - Math.PI / 2);
+                    // var deltaA = Math.Abs(angle2 - angle);
+                }
+                else alert("Cannot remove unnecessary keyframes for the property " + prop.name + " because it doesn't have more than 1 keyframe.");
+            }
+
             function removeUnnecessaryKeys(pos) {
                 // only for position x & y combined
                 var threshold = 5;
@@ -4085,6 +4161,9 @@
                     var props = [];
                     for (var l = 1; l <= app.project.activeItem.numLayers; l++) {
                         var layer = app.project.activeItem.layer(l);
+                        var frameRate = layer.containingComp.frameRate;
+                        var deselectAll = app.findMenuCommandId("Deselect All");
+                        var convertToKeyframes = app.findMenuCommandId("Convert Expression to Keyframes");
 
                         var p = layer.property("Transform").property("Position");
                         var x = layer.property("Transform").property("X Position");
@@ -4100,15 +4179,15 @@
                             if (l == 1) app.beginUndoGroup("Keyframe Helper - Generate Keyframes");
 
                             var alreadySeparated = false;
-                            var interval = Math.floor(scriptSettings.KeyframeHelper.interval) / 1000;
+                            var interval = Math.floor(scriptSettings.keyframeHelper.interval) / 1000;
 
                             if (interval > layerEnd(app.project.activeItem, layer.outPoint) && l == 1) {
-                                alert("AeToOsb error: " + scriptSettings.KeyframeHelper.interval + " ms exceeds the composition duration, please reduce the number so it's under " + (app.project.activeItem.duration * 1000) + ".");
+                                alert("AeToOsb error: " + scriptSettings.keyframeHelper.interval + " ms exceeds the composition duration, please reduce the number so it's under " + (app.project.activeItem.duration * 1000) + ".");
                             }
                             else if (interval <= layerEnd(app.project.activeItem, layer.outPoint)) {
                                 if (layer.selected == true) {
                                     for (var t = layerStart(app.project.activeItem, layer.inPoint); t <= layerEnd(app.project.activeItem, layer.outPoint); t += interval) {
-                                        if (scriptSettings.KeyframeHelper.xPosition == true) {
+                                        if (scriptSettings.keyframeHelper.xPosition == true) {
                                             if (p.dimensionsSeparated == true) alreadySeparated = true;
                                             if (alreadySeparated != true) p.dimensionsSeparated == true;
                                             x.addKey(t);
@@ -4116,7 +4195,7 @@
                                             if (t == layerStart(app.project.activeItem, layer.inPoint))
                                                 props.push(x);
                                         }
-                                        if (scriptSettings.KeyframeHelper.yPosition == true) {
+                                        if (scriptSettings.keyframeHelper.yPosition == true) {
                                             if (p.dimensionsSeparated == true) alreadySeparated = true;
                                             if (alreadySeparated != true) p.dimensionsSeparated == true;
                                             y.addKey(t);
@@ -4124,28 +4203,45 @@
                                             if (t == layerStart(app.project.activeItem, layer.inPoint))
                                                 props.push(y);
                                         }
-                                        if (scriptSettings.KeyframeHelper.scale == true) {
+                                        if (scriptSettings.keyframeHelper.scale == true) {
                                             if (s.dimensionsSeparated == true) alreadySeparated = true;
                                             if (alreadySeparated != true) s.dimensionsSeparated == true;
                                             s.addKey(t);
                                         }
-                                        if (scriptSettings.KeyframeHelper.rotation == true) {
+                                        if (scriptSettings.keyframeHelper.rotation == true) {
                                             if (r.dimensionsSeparated == true) alreadySeparated = true;
                                             if (alreadySeparated != true) r.dimensionsSeparated == true;
                                             r.addKey(t);
                                         }
-                                        if (scriptSettings.KeyframeHelper.opacity == true) {
+                                        if (scriptSettings.keyframeHelper.opacity == true) {
                                             if (o.dimensionsSeparated == true) alreadySeparated = true;
                                             if (alreadySeparated != true) o.dimensionsSeparated == true;
                                             o.addKey(t);
                                         }
                                     }
+                                    // if (scriptSettings.keyframeHelper.scale == true) {
+                                    //     if (s.dimensionsSeparated == true) alreadySeparated = true;
+                                    //     if (alreadySeparated != true) s.dimensionsSeparated == true;
+                                    //     if (s.canSetExpression == true) {
+                                    //         var keyTimesBefore = [];
+                                    //         for (var key = 1; key <= s.numKeys; key++)
+                                    //             keyTimesBefore.push(s.keyTime(key));
+
+                                    //         if (s.expression == '')
+                                    //             s.expression = 'transform.scale';
+                                    //         app.executeCommand(deselectAll);
+                                    //         s.selected = true;
+                                    //         app.executeCommand(convertToKeyframes);
+                                    //         keyframeSmoother(keyTimesBefore, frameRate, s);
+                                    //     }
+                                    //     else alert("AeToOsb error: Cannot set expression for the property: " + s.name + ".");
+                                    // }
                                 }
                             }
                             if (l == app.project.activeItem.numLayers) app.endUndoGroup();
                         }
                     }
-                    if (scriptSettings.KeyframeHelper.optimizeKeyframesBasedOnMotion == true) {
+                    if (scriptSettings.keyframeHelper.optimizeKeyframesBasedOnMotion == true) {
                         if (props.length == 2) {
                             app.beginUndoGroup("Remove Unnecessary Keyframes");
                             removeUnnecessaryKeys(props);
@@ -4260,14 +4356,14 @@
                     if (statement[3] !== "Audio") {
                         if (statement[0] === null || statement[1] === null) {
                             if (statement[0] === null) {
-                                alert("AeToOsb error: The layer '" + layer.name + "' doesn't have any marker with an OsbOrigin value." + "\r\n" + "\r\n" + "Layer '" + layer.name + "' in composition '" + layer.containingComp.name + "'" + "\r\n" + "\r\n" + "To fix this; please add a marker on the layer. The comment should be one of the following origins:" + "\r\n" + "\r\n" + "TopLeft, TopCentre, TopRight, CentreLeft, Centre, CentreRight, BottomLeft, BottomCentre, BottomRight");
+                                // alert("AeToOsb error: The layer '" + layer.name + "' doesn't have any marker with an OsbOrigin value." + "\r\n" + "\r\n" + "Layer '" + layer.name + "' in composition '" + layer.containingComp.name + "'" + "\r\n" + "\r\n" + "To fix this; please add a marker on the layer. The comment should be one of the following origins:" + "\r\n" + "\r\n" + "TopLeft, TopCentre, TopRight, CentreLeft, Centre, CentreRight, BottomLeft, BottomCentre, BottomRight" + "\r\n" + "\r\n" + "Abbreviations:" + "\r\n" + "TL, TC, TR, CL, C, CR, BL, BC, BR");
                             }
                             if (statement[1] === null) {
-                                alert("AeToOsb error: The layer '" + layer.name + "' doesn't have any marker with an OsbLayer value." + "\r\n" + "\r\n" + "Layer '" + layer.name + "' in composition '" + layer.containingComp.name + "'" + "\r\n" + "\r\n" + "To fix this; please add a marker on the layer. The comment should be one of the following layers:" + "\r\n" + "\r\n" + "Background, Fail, Pass, Foreground, Overlay, Sound");
+                                alert("AeToOsb error: The layer '" + layer.name + "' doesn't have any marker with an OsbLayer value." + "\r\n" + "\r\n" + "Layer '" + layer.name + "' in composition '" + layer.containingComp.name + "'" + "\r\n" + "\r\n" + "To fix this; please add a marker on the layer. The comment should be one of the following layers:" + "\r\n" + "\r\n" + "Background, Fail, Pass, Foreground, Overlay, Sound" + "\r\n" + "\r\n" + "Abbreviations:" + "\r\n" + "BG, F, P, FG, O, S");
                             }
                             if (statement[3] == "Sequence") {
                                 if (statement[2] === null) {
-                                    alert("AeToOsb error: The layer '" + layer.name + "' doesn't have any marker with an OsbLoopType value." + "\r\n" + "\r\n" + "Layer '" + layer.name + "' in composition '" + layer.containingComp.name + "'" + "\r\n" + "\r\n" + "To fix this; please add a marker on the layer. The comment should be one of the following layers:" + "\r\n" + "\r\n" + "LoopOnce, LoopForever");
+                                    alert("AeToOsb error: The layer '" + layer.name + "' doesn't have any marker with an OsbLoopType value." + "\r\n" + "\r\n" + "Layer '" + layer.name + "' in composition '" + layer.containingComp.name + "'" + "\r\n" + "\r\n" + "To fix this; please add a marker on the layer. The comment should be one of the following layers:" + "\r\n" + "\r\n" + "LoopOnce, LoopForever" + "\r\n" + "\r\n" + "Abbreviations:" + "\r\n" + "LO, LF, 1, 0");
                                 }
                             }
                             alert(ujkdsfs);
@@ -4395,7 +4491,7 @@
                         var positionValues = [];
                         var keyframeTimes = [];
 
-                        var timeStep = scriptSettings.KeyframeHelper.interval / 1000;
+                        var timeStep = scriptSettings.keyframeHelper.interval / 1000;
                         var start = layerStart(layer.containingComp, layer.inPoint);
                         var end = layerEnd(layer.containingComp, layer.outPoint);
 
@@ -4480,7 +4576,7 @@
                         var positionValues = [];
                         var keyframeTimes = [];
 
-                        var timeStep = scriptSettings.KeyframeHelper.interval / 1000;
+                        var timeStep = scriptSettings.keyframeHelper.interval / 1000;
                         var start = layerStart(layer.containingComp, layer.inPoint);
                         var end = layerEnd(layer.containingComp, layer.outPoint);
 
@@ -4544,7 +4640,7 @@
                         var keyframeTimes = [];
 
                         // var timeStep = (1.0 / oldLayer.containingComp.frameRate) * 2;
-                        var timeStep = scriptSettings.KeyframeHelper.interval / 1000;
+                        var timeStep = scriptSettings.keyframeHelper.interval / 1000;
                         var start = layerStart(layer.containingComp, layer.inPoint);
                         var end = layerEnd(layer.containingComp, layer.outPoint);
 
@@ -4608,7 +4704,7 @@
                 var rotationValueArray = [];
                 var keyframeTimes = [];
 
-                var timeStep = scriptSettings.KeyframeHelper.interval / 1000;
+                var timeStep = scriptSettings.keyframeHelper.interval / 1000;
                 var start = layerStart(layer.containingComp, layer.inPoint);
                 var end = layerEnd(layer.containingComp, layer.outPoint);
 
@@ -4639,7 +4735,7 @@
                 var scaleValueArray = [];
                 var keyframeTimes = [];
 
-                var timeStep = scriptSettings.KeyframeHelper.interval / 1000;
+                var timeStep = scriptSettings.keyframeHelper.interval / 1000;
                 var start = layerStart(layer.containingComp, layer.inPoint);
                 var end = layerEnd(layer.containingComp, layer.outPoint);
 

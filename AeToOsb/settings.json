@@ -4,13 +4,14 @@
     "options": {
         "exportJsonOnly": false,
         "exportTextPerLetter": true,
-        "allProjectSourceFiles": false,
+        "openOutputFolderBeforeRendering": true,
+        "shapeLayers": true,
         "textLayers": true,
         "imageLayers": true,
-        "ThreeDLayers": false,
-        "OpenOutputFolderBeforeRendering": true
+        "threeDLayers": false,
+        "unsupportedLayers": false
     },
-    "KeyframeHelper": {
+    "keyframeHelper": {
         "interval": "200",
         "xPosition": true,
         "yPosition": true,
@@ -21,5 +22,5 @@
     "settingsJsonFile": "",
     "scriptFileFolderPath": "",
     "exportedComps": null,
-    "exportedCompsID": null
+    "exportedCompNames": null
 }

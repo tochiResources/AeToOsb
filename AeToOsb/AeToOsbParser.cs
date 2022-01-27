@@ -166,6 +166,9 @@ namespace AeToOsbParser
 
         [JsonProperty("value")]
         public double Value { get; set; }
+
+        [JsonProperty("easing")]
+        public string Easing { get; set; }
     }
 
     public partial class Characters
@@ -352,6 +355,9 @@ namespace AeToOsbParser
 
         [JsonProperty("value")]
         public string Value { get; set; }
+
+        [JsonProperty("easing")]
+        public string Easing { get; set; }
     }
 
     public partial class FillColor
@@ -361,6 +367,9 @@ namespace AeToOsbParser
 
         [JsonProperty("value")]
         public string Value { get; set; }
+
+        [JsonProperty("easing")]
+        public string Easing { get; set; }
     }
 
     public partial class Fade
@@ -370,6 +379,9 @@ namespace AeToOsbParser
 
         [JsonProperty("value")]
         public double Value { get; set; }
+
+        [JsonProperty("easing")]
+        public string Easing { get; set; }
     }
 
     public partial class Rotation
@@ -379,6 +391,9 @@ namespace AeToOsbParser
 
         [JsonProperty("value")]
         public double Value { get; set; }
+
+        [JsonProperty("easing")]
+        public string Easing { get; set; }
     }
 
     public partial class Scale
@@ -406,6 +421,9 @@ namespace AeToOsbParser
 
         [JsonProperty("value")]
         public double Value { get; set; }
+
+        [JsonProperty("easing")]
+        public string Easing { get; set; }
     }
 
     public partial class Y
@@ -415,6 +433,9 @@ namespace AeToOsbParser
 
         [JsonProperty("value")]
         public double Value { get; set; }
+
+        [JsonProperty("easing")]
+        public string Easing { get; set; }
     }
 
     public partial class AeStoryboard
