@@ -5,6 +5,5 @@ Get started here! https://github.com/T0chi/AeToOsb/wiki/Getting-Started
 
 Check the Todo List to see upcoming features: https://github.com/T0chi/AeToOsb/wiki#todo-list
 
-![After Effects](https://i.imgur.com/hv3egej.png)
-
-![Storybrew](https://i.imgur.com/QlUpiLx.jpeg)
+![easings1](https://i.imgur.com/fnTvguD.gif)
+![easings2](https://i.imgur.com/xdZoXWc.gif)
