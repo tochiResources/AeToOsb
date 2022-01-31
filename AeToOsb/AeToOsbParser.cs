@@ -95,6 +95,9 @@ namespace AeToOsbParser
         [JsonProperty("shape")]
         public Shape Shape { get; set; }
 
+        [JsonProperty("solid")]
+        public Solid Solid { get; set; }
+
         [JsonProperty("text", NullValueHandling = NullValueHandling.Ignore)]
         public Text Text { get; set; }
 
@@ -238,6 +241,15 @@ namespace AeToOsbParser
 
         [JsonProperty("isRotating", NullValueHandling = NullValueHandling.Ignore)]
         public bool IsRotating { get; set; }
+    }
+    
+    public partial class Solid
+    {
+        [JsonProperty("bitmap")]
+        public Bitmap Bitmap { get; set; }
+
+        [JsonProperty("color")]
+        public string Color { get; set; }
     }
 
     public partial class Shape

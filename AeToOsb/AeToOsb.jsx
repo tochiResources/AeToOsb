@@ -519,7 +519,7 @@
                     checkbox1.enabled = false;
                     checkbox2.text = "Export text per letter";
                     checkbox2.value = currentSettings.options.exportTextPerLetter;
-                    checkbox2.enabled = true;
+                    checkbox2.enabled = false;
                     checkbox8.text = "Open output folder before rendering";
                     checkbox8.value = scriptSettings.options.openOutputFolderBeforeRendering;
                     checkbox8.enabled = true;
@@ -972,7 +972,7 @@
                 var AeToOsbFile = new File(docuPath + "/AeToOsb.cs");
                 var AeToOsbParserFile = new File(docuPath + "/AeToOsbParser.cs");
                 var AeToOsbSettingsFile = new File(docuPath + "/AeToOsbSettings.cs");
-                var DeleteBackgroundFile = new File(docuPath + "/DeleteBackground.cs");
+                // var DeleteBackgroundFile = new File(docuPath + "/DeleteBackground.cs");
                 // alert(scriptslibraryFolderFileObj.fsName);
                 
                 decodedName2 = File.decode(_AeToOsbFolderFileObj.fsName);
@@ -1014,10 +1014,10 @@
                 if (!decodedName.exists)
                     AeToOsbSettingsFile.copy(decodedName);
 
-                scriptslibraryFolderFileObj = new File(scriptSettings.scriptslibraryFolderPath.slice(0, -15) + "\\DeleteBackground.cs");
-                decodedName = File.decode(scriptslibraryFolderFileObj.fsName.replaceAll);
-                if (!decodedName.exists)
-                    DeleteBackgroundFile.copy(decodedName);
+                // scriptslibraryFolderFileObj = new File(scriptSettings.scriptslibraryFolderPath.slice(0, -15) + "\\DeleteBackground.cs");
+                // decodedName = File.decode(scriptslibraryFolderFileObj.fsName.replaceAll);
+                // if (!decodedName.exists)
+                //     DeleteBackgroundFile.copy(decodedName);
             }
 
             function exportedJsonName() {
@@ -1181,7 +1181,7 @@
 
                                         if (itemName === undefined) {
                                             if (app.project.item(I).layer(l).enabled) {
-                                                if (layerTypeSplit(getLayerType(app.project.item(I).layer(l))).match(/^(Composition|Adjustment|Light|Solid|Placeholder|Video|3D|Vector|Script|JSON|mgJSON|CSV|TXT)$/)) {
+                                                if (layerTypeSplit(getLayerType(app.project.item(I).layer(l))).match(/^(Composition|Adjustment|Light|Placeholder|Video|3D|Vector|Script|JSON|mgJSON|CSV|TXT)$/)) {
                                                     compUnsupportedIDs.push(getLayerType(app.project.item(I).layer(l)).substr(0, getLayerType(app.project.item(I).layer(l)).indexOf('.')));
                                                     compUnsupportedComps.push(app.project.item(I));
                                                     compUnsupportedNames.push(app.project.item(I).name);
@@ -1191,7 +1191,7 @@
                                         }
                                         else if (app.project.item(I).name !== itemName && app.project.item(I).name !== itemName.slice(0, -8)) {
                                             if (app.project.item(I).layer(l).enabled) {
-                                                if (layerTypeSplit(getLayerType(app.project.item(I).layer(l))).match(/^(Composition|Adjustment|Light|Solid|Placeholder|Video|3D|Vector|Script|JSON|mgJSON|CSV|TXT)$/)) {
+                                                if (layerTypeSplit(getLayerType(app.project.item(I).layer(l))).match(/^(Composition|Adjustment|Light|Placeholder|Video|3D|Vector|Script|JSON|mgJSON|CSV|TXT)$/)) {
                                                     compUnsupportedIDs.push(getLayerType(app.project.item(I).layer(l)).substr(0, getLayerType(app.project.item(I).layer(l)).indexOf('.')));
                                                     compUnsupportedComps.push(app.project.item(I));
                                                     compUnsupportedNames.push(app.project.item(I).name);
@@ -1884,7 +1884,7 @@
                                 layer.index = currentCompLayer.index;
                                 layer.index = currentCompLayer.index;
                                 if (layerType == "Sequence") layer.autoGen = false;
-                                if (layerType !== "Text" && layerType !== "Shape" && layerType !== "NullLayer" && layerType !== "Composition")
+                                if (layerType !== "Text" && layerType !== "Shape" && layerType !== "NullLayer" && layerType !== "Composition" && layerType !== "Solid")
                                 layer.name = currentCompLayer.source.mainSource.file.name;
                                 
                                 layer.layerName = currentCompLayer.name;
@@ -2023,6 +2023,15 @@
                                                 parentLayerData.property("Transform").property("Position").dimensionsSeparated = true;
                                             }
                                         }
+                                    }
+
+                                    if (layerType == "Solid")
+                                    {
+                                        layer.solid = {};
+                                        layer.solid.bitmap = {};
+                                        layer.solid.color = rgbColor(currentCompLayer.source.mainSource.color);
+                                        layer.solid.bitmap.width = currentCompLayer.source.width;
+                                        layer.solid.bitmap.height = currentCompLayer.source.height;
                                     }
                                     
                                     if (layerType == "Shape") {
@@ -3955,7 +3964,7 @@
                                         var visibility = app.project.item(I).layer(l).enabled;
                                         var layerType = layerTypeSplit(getLayerType(app.project.item(I).layer(l)));
 
-                                        if (layerType.match(/^(Composition|Adjustment|Light|Solid|Placeholder|Video|3D|Vector|Script|JSON|mgJSON|CSV|TXT)$/)) {
+                                        if (layerType.match(/^(Composition|Adjustment|Light|Placeholder|Video|3D|Vector|Script|JSON|mgJSON|CSV|TXT)$/)) {
                                             if (visibility == true) {
                                                 return true;
                                             }
@@ -3963,7 +3972,7 @@
                                                 return false;
                                             }
                                         }
-                                        else if (layerType.match(/^(Image|Text|Audio|Null|Camera|Sequence|Shape)$/)) {
+                                        else if (layerType.match(/^(Image|Text|Audio|Null|Solid|Camera|Sequence|Shape)$/)) {
                                             return false;
                                         }
                                     }

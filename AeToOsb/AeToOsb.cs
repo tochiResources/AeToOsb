@@ -24,8 +24,8 @@ namespace StorybrewScripts
 {
     public class AeToOsb : StoryboardObjectGenerator
     {
-        // [Configurable]
-        // public string pathSettings = ".../AeToOsb/settings.json";
+        [Configurable]
+        public bool deleteBeatmapBG = true;
 
         [Configurable]
         public string sbFolderName = "sb";
@@ -55,7 +55,7 @@ namespace StorybrewScripts
         public int samplesVolume = 80;
 
         [Configurable]
-        public string textOutputFolder = "sb/text";
+        public string textOutputFolder = "text";
 
         [Configurable]
         public bool enableGlow = false;
@@ -80,6 +80,7 @@ namespace StorybrewScripts
         private int compDuration;
         private double downScale;
         private float frameDuration;
+        private string aeToOsbOutput;
 
         // sprite parameters
         private int spriteStart;
@@ -111,10 +112,13 @@ namespace StorybrewScripts
 
         // sprite parameters
         private OsbSprite sprite;
+        private OsbSprite dummySprite;
+        private OsbSprite dummySprite2;
         private OsbSprite spriteStroke;
         private List<OsbSprite> spriteLibrary;
         private List<OsbSprite> seqLibrary;
         private List<OsbSprite> shapeLibrary;
+        private List<OsbSprite> solidLibrary;
         private List<OsbSprite> nullLibrary;
         private OsbSprite nullItem;
         private int spriteIndex;
@@ -160,9 +164,12 @@ namespace StorybrewScripts
         private int characterIndex;
         private Transform charaTransform;
 
+        // solid parameters
+        private Solid solid;
+
         // shape parameters
-        private string saveFullPath;
-        private string saveFullPath2;
+        private string shapeSaveFullPath;
+        private string shapeSaveFullPath2;
         private Shape shape;
         public List<VerticesPosition> verticesPosition;
         public List<InTangent> inTangent;
@@ -189,6 +196,20 @@ namespace StorybrewScripts
         public float shapePosOffsetX;
         public float shapePosOffsetY;
 
+        public PointF rectPos;
+        public PointF rectPos2;
+        public SizeF rectSize;
+        public SizeF rectSize2;
+        public RectangleF rectangle;
+        public RectangleF rectangle2;
+
+        public PointF ellipsePos;
+        public PointF ellipsePos2;
+        public SizeF ellipseSize;
+        public SizeF ellipseSize2;
+        public RectangleF ellipse;
+        public RectangleF ellipse2;
+
         // rectangle parameters
         // ellipse parameter
 
@@ -208,6 +229,9 @@ namespace StorybrewScripts
                 "--- JSON file path ---" + "\r\n" + pathOutput + "\r\n" + "\r\n"
             );
 
+            // delete beatmap main background
+            DeleteBG();
+
             // the composition(s)
             Storyboard(true);
 
@@ -221,23 +245,34 @@ namespace StorybrewScripts
             Log("--- Nulls ---" + "\r\n" + nullLibrary.Count + "\r\n" + "\r\n");
 
             Log("--- " + shapeLibrary.Count + " shapes were generated ---");
-            for (var s = 0; s < shapeLibrary.Count; s++) {
+            for (var s = 0; s < shapeLibrary.Count; s++)
+            {
                 var n = s + 1;
-                Log("- " + n +  ": " + shapeLibrary[s].TexturePath);
+                Log("- " + n + ": " + shapeLibrary[s].TexturePath);
+            }
+            Log("\r\n" + "\r\n");
+
+            Log("--- " + solidLibrary.Count + " solids were generated ---");
+            for (var s = 0; s < solidLibrary.Count; s++)
+            {
+                var n = s + 1;
+                Log("- " + n + ": " + solidLibrary[s].TexturePath);
             }
             Log("\r\n" + "\r\n");
 
             Log("--- " + seqLibrary.Count + " sequences were generated ---");
-            for (var s = 0; s < seqLibrary.Count; s++) {
+            for (var s = 0; s < seqLibrary.Count; s++)
+            {
                 var n = s + 1;
-                Log("- " + n +  ": " + seqLibrary[s].TexturePath);
+                Log("- " + n + ": " + seqLibrary[s].TexturePath);
             }
             Log("\r\n" + "\r\n");
 
             Log("--- " + spriteLibrary.Count + " sprites were generated ---");
-            for (var s = 0; s < spriteLibrary.Count; s++) {
+            for (var s = 0; s < spriteLibrary.Count; s++)
+            {
                 var n = s + 1;
-                Log("- " + n +  ": " + spriteLibrary[s].TexturePath);
+                Log("- " + n + ": " + spriteLibrary[s].TexturePath);
             }
             Log("\r\n" + "\r\n");
         }
@@ -247,6 +282,7 @@ namespace StorybrewScripts
             seqLibrary = new List<OsbSprite>();
             nullLibrary = new List<OsbSprite>();
             shapeLibrary = new List<OsbSprite>();
+            solidLibrary = new List<OsbSprite>();
             spriteLibrary = new List<OsbSprite>();
             var aeStoryboard = AeStoryboard.FromJson(File.ReadAllText(pathOutput));
             if (returnSprites == true)
@@ -261,6 +297,17 @@ namespace StorybrewScripts
                     compStart = storyboard.StartTime;
                     compEnd = storyboard.EndTime;
                     compDuration = storyboard.Duration;
+
+                    aeToOsbOutput = sbFolderName + "/AeToOsb";
+                    if (!Directory.Exists(aeToOsbOutput))
+                        Directory.CreateDirectory(aeToOsbOutput);
+
+                    aeToOsbOutput = aeToOsbOutput + "/" + compName;
+                    if (!Directory.Exists(aeToOsbOutput))
+                        Directory.CreateDirectory(aeToOsbOutput);
+
+                    List<string> allShapes = new List<string>();
+                    List<string> allShapesB = new List<string>();
 
                     // storyboard sprites (layers)
                     foreach (var compLayer in storyboard.Layers)
@@ -319,10 +366,11 @@ namespace StorybrewScripts
                                 // characters
                                 if (hasCharacters)
                                 {
-                                    if (aeToOsbSettings.Options != null && aeToOsbSettings.Options.ExportTextPerLetter == true) {
+                                    if (aeToOsbSettings.Options != null && aeToOsbSettings.Options.ExportTextPerLetter == true)
+                                    {
                                         fontName = spriteFontFamily;
                                         fontScale = (int)(spriteFontSize * 1.5f);
-                                        font = FontGenerator(textOutputFolder + "/" + compName + "/characters");
+                                        font = FontGenerator(aeToOsbOutput + "/" + textOutputFolder + "/characters");
                                         fontScaleShift = 1f;
 
                                         characters = spriteTextProps.Characters;
@@ -396,7 +444,8 @@ namespace StorybrewScripts
 
                                                     characterTexture = font.GetTexture(text.ToString());
 
-                                                    if (spriteTextSpacingOffset.Count != 0) {
+                                                    if (spriteTextSpacingOffset.Count != 0)
+                                                    {
                                                         List<int> letterSpacing = new List<int>();
                                                         int startKey = lineSpacingOffset()["startTime"]; letterSpacing.Add(startKey);
                                                         int startValue = lineSpacingOffset()["startValue"]; letterSpacing.Add(startValue);
@@ -406,6 +455,11 @@ namespace StorybrewScripts
                                                     texture = font.GetTexture(text);
                                                     if (!texture.IsEmpty)
                                                     {
+                                                        var textLength = text.Length;
+                                                        if (textLength > 10) textLength = 8;
+                                                        string textLayerName = text.Substring(0, textLength);
+                                                        if (textLength > 10) textLayerName = textLayerName + "...";
+
                                                         sprite = new OsbSprite();
                                                         sprite = GetLayer(spriteType + ": " + spriteLayer + ": " + spriteIndex).CreateSprite(texture.Path, origin);
 
@@ -421,7 +475,7 @@ namespace StorybrewScripts
                                                         rotation(spriteTransform.Rotation, sprite, new OsbSprite());
                                                         // additive
                                                         if (spriteAdditive)
-                                                        additive(sprite, spriteStart, spriteEnd);
+                                                            additive(sprite, spriteStart, spriteEnd);
 
                                                         // Log("Position: " + sprite.PositionAt(5320) + "   ||   lineSpacingOffset: " + letterSpacing[0] + ", " + letterSpacing[1] + ", " + letterSpacing[2] + ", " + letterSpacing[3]);
                                                         // letterSpacing.Clear();
@@ -483,26 +537,28 @@ namespace StorybrewScripts
                                 sprite = new OsbSprite();
                                 spriteStroke = new OsbSprite();
 
-                                if (spriteType == "Sequence") {
+                                if (spriteType == "Sequence")
+                                {
                                     if (string.Equals(sequenceLoopType, "LoopOnce", StringComparison.OrdinalIgnoreCase))
-                                    spriteLoopType = OsbLoopType.LoopOnce;
+                                        spriteLoopType = OsbLoopType.LoopOnce;
                                     else if (string.Equals(sequenceLoopType, "LO", StringComparison.OrdinalIgnoreCase))
-                                    spriteLoopType = OsbLoopType.LoopOnce;
+                                        spriteLoopType = OsbLoopType.LoopOnce;
                                     else if (string.Equals(sequenceLoopType, "1", StringComparison.OrdinalIgnoreCase))
-                                    spriteLoopType = OsbLoopType.LoopOnce;
+                                        spriteLoopType = OsbLoopType.LoopOnce;
                                     else if (string.Equals(sequenceLoopType, "LoopForever", StringComparison.OrdinalIgnoreCase))
-                                    spriteLoopType = OsbLoopType.LoopForever;
+                                        spriteLoopType = OsbLoopType.LoopForever;
                                     else if (string.Equals(sequenceLoopType, "LF", StringComparison.OrdinalIgnoreCase))
-                                    spriteLoopType = OsbLoopType.LoopForever;
+                                        spriteLoopType = OsbLoopType.LoopForever;
                                     else if (string.Equals(sequenceLoopType, "0", StringComparison.OrdinalIgnoreCase))
-                                    spriteLoopType = OsbLoopType.LoopForever;
+                                        spriteLoopType = OsbLoopType.LoopForever;
                                     else spriteLoopType = OsbLoopType.LoopOnce;
 
                                     string sequencePath = "";
                                     int sequenceEntries = 0;
                                     string seqPath = "";
-                                    if (autoGen || (!layerName.Contains("{") && !layerName.Contains("}"))) {
-                                        var destinationPath = MapsetPath + "/" + sbFolderName + "/AeAnimations/" + layerName;
+                                    if (autoGen || (!layerName.Contains("{") && !layerName.Contains("}")))
+                                    {
+                                        var destinationPath = MapsetPath + "/" + aeToOsbOutput + "/AeAnimations/" + layerName;
                                         sequencePath = aeToOsbSettings.ScriptslibraryFolderPath.Replace("scriptslibrary", "assetlibrary\\_AeToOsb\\AeAnimations\\" + layerName);
                                         sequenceEntries = Directory.GetFiles(sequencePath).Length;
 
@@ -510,7 +566,7 @@ namespace StorybrewScripts
                                         var destinationDir = new DirectoryInfo(destinationPath);
 
                                         if (!destinationDir.Exists)
-                                        Directory.CreateDirectory(destinationPath);
+                                            Directory.CreateDirectory(destinationPath);
 
                                         foreach (var file in sourceDir.GetFiles())
                                         {
@@ -519,7 +575,7 @@ namespace StorybrewScripts
                                                 string filePath = Path.Combine(destinationPath, file.Name);
 
                                                 if (!FileExists(filePath))
-                                                file.CopyTo(filePath);
+                                                    file.CopyTo(filePath);
                                                 else continue;
                                             }
                                             else continue;
@@ -532,18 +588,19 @@ namespace StorybrewScripts
                                             var oldFileFullName = newFile.FullName.Replace(newFile.Name, file.Name);
                                             sequenceFileName = layerFileName;
 
-                                            if (!newFile.Exists) {
+                                            if (!newFile.Exists)
+                                            {
                                                 var seqUnderscore = layerFileName.LastIndexOf('_');
                                                 var seqFrame = layerFileName.Substring(seqUnderscore);
                                                 if (!newFile.FullName.Contains("(aeosb)"))
                                                 {
                                                     if (!File.Exists(newFile.FullName.Replace(seqFrame, "(aeosb)")))
-                                                    File.Move(oldFileFullName, newFile.FullName.Replace(seqFrame, "(aeosb)"));
+                                                        File.Move(oldFileFullName, newFile.FullName.Replace(seqFrame, "(aeosb)"));
                                                 }
                                                 else
                                                 {
                                                     if (!File.Exists(newFile.FullName.Replace(seqFrame, "")))
-                                                    File.Move(oldFileFullName, newFile.FullName.Replace(seqFrame, ""));
+                                                        File.Move(oldFileFullName, newFile.FullName.Replace(seqFrame, ""));
                                                 }
                                             }
                                             else if (File.Exists(oldFileFullName))
@@ -556,17 +613,19 @@ namespace StorybrewScripts
                                         {
                                             var seqUnderscore = sequenceFileName.LastIndexOf('_');
                                             var seqFrame = sequenceFileName.Substring(seqUnderscore);
-                                            seqPath = sbFolderName + "/AeAnimations/" + layerName + "/" + sequenceFileName.Replace(seqFrame, "(aeosb)_.png");
+                                            seqPath = aeToOsbOutput + "/AeAnimations/" + layerName + "/" + sequenceFileName.Replace(seqFrame, "(aeosb)_.png");
                                         }
-                                        else seqPath = sbFolderName + "/AeAnimations/" + layerName + "/" + sequenceFileName;
+                                        else seqPath = aeToOsbOutput + "/AeAnimations/" + layerName + "/" + sequenceFileName;
                                         Log("seqPath: " + seqPath);
-                                        
-                                        foreach (var file in destinationDir.GetFiles()) {
+
+                                        foreach (var file in destinationDir.GetFiles())
+                                        {
                                             if (!file.FullName.Contains("(aeosb)"))
-                                            File.Delete(file.FullName);
+                                                File.Delete(file.FullName);
                                         }
                                     }
-                                    else if (!autoGen || (layerName.Contains("{") && layerName.Contains("}"))) {
+                                    else if (!autoGen || (layerName.Contains("{") && layerName.Contains("}")))
+                                    {
                                         var sbIndex = sequenceFilePath.IndexOf(sbFolderName);
                                         var sbLastIndex = sequenceFilePath.LastIndexOf('\\');
                                         var sequencePathRemove = sequenceFilePath.Substring(sbLastIndex);
@@ -580,7 +639,8 @@ namespace StorybrewScripts
 
                                     sprite = GetLayer(spriteType + ": " + spriteLayer + ": " + spriteIndex).CreateAnimation(seqPath, sequenceEntries, frameDuration, spriteLoopType, origin);
                                 }
-                                else if (spriteType == "Shape") {
+                                else if (spriteType == "Shape")
+                                {
                                     shape = compLayer.Shape;
 
                                     shapeType = shape.Type;
@@ -614,47 +674,58 @@ namespace StorybrewScripts
 
                                     if (shapeHasStroke && shapeHasFill)
                                     {
-                                        GenerateShape(true, true);
+                                        ShapeGenerator(compName, true, true, allShapes, allShapesB);
                                         var strokeName = strokePath;
 
                                         if (!strokeName.Contains("(s)"))
-                                        strokeName = strokeName.Replace(".png", "(s).png");
+                                            strokeName = strokeName.Replace(".png", "(s).png");
 
                                         if (shapeFillComposite == "Below")
                                         {
                                             if (shapeType != "Path")
-                                            spriteStroke = GetLayer(spriteType + ": " + spriteLayer + ": " + spriteIndex).CreateSprite(strokeName, origin);
-                                            sprite = GetLayer(spriteType + ": " + spriteLayer + ": " + spriteIndex).CreateSprite(fillPath, origin);
+                                            {
+                                                spriteStroke = GetLayer(spriteType + ": " + shapeType + ": " + spriteIndex).CreateSprite(strokeName, origin);
+                                                sprite = GetLayer(spriteType + ": " + shapeType + ": " + spriteIndex).CreateSprite(fillPath, origin);
+                                            }
                                         }
                                         else if (shapeFillComposite == "Above")
                                         {
                                             if (shapeType != "Path")
-                                            spriteStroke = GetLayer(spriteType + ": " + spriteLayer + ": " + spriteIndex).CreateSprite(strokeName, origin);
-                                            sprite = GetLayer(spriteType + ": " + spriteLayer + ": " + spriteIndex).CreateSprite(fillPath, origin);
+                                            {
+                                                spriteStroke = GetLayer(spriteType + ": " + shapeType + ": " + spriteIndex).CreateSprite(strokeName, origin);
+                                                sprite = GetLayer(spriteType + ": " + shapeType + ": " + spriteIndex).CreateSprite(fillPath, origin);
+                                            }
                                         }
                                         else
                                         {
                                             if (shapeType != "Path")
-                                            spriteStroke = GetLayer(spriteType + ": " + spriteLayer + ": " + spriteIndex).CreateSprite(strokeName, origin);
-                                            sprite = GetLayer(spriteType + ": " + spriteLayer + ": " + spriteIndex).CreateSprite(fillPath, origin);
+                                            {
+                                                spriteStroke = GetLayer(spriteType + ": " + shapeType + ": " + spriteIndex).CreateSprite(strokeName, origin);
+                                                sprite = GetLayer(spriteType + ": " + shapeType + ": " + spriteIndex).CreateSprite(fillPath, origin);
+                                            }
                                         }
                                     }
                                     else if (shapeHasStroke && !shapeHasFill)
                                     {
-                                        GenerateShape(true, false);
+                                        ShapeGenerator(compName, true, false, allShapes, allShapesB);
                                         var strokeName = strokePath;
 
                                         if (!strokeName.Contains("(s)"))
-                                        strokeName = strokeName.Replace(".png", "(s).png");
+                                            strokeName = strokeName.Replace(".png", "(s).png");
 
                                         if (shapeType != "Path")
-                                        sprite = GetLayer(spriteType + ": " + spriteLayer + ": " + spriteIndex).CreateSprite(strokeName, origin);
-                                        else sprite = GetLayer(spriteType + ": " + spriteLayer + ": " + spriteIndex).CreateSprite(fillPath, origin);
+                                        {
+                                            sprite = GetLayer(spriteType + ": " + shapeType + ": " + spriteIndex).CreateSprite(strokeName, origin);
+                                        }
+                                        else
+                                        {
+                                            sprite = GetLayer(spriteType + ": " + shapeType + ": " + spriteIndex).CreateSprite(fillPath, origin);
+                                        }
                                     }
                                     else if (!shapeHasStroke && shapeHasFill)
                                     {
-                                        GenerateShape(false, true);
-                                        sprite = GetLayer(spriteType + ": " + spriteLayer + ": " + spriteIndex).CreateSprite(fillPath, origin);
+                                        ShapeGenerator(compName, false, true, allShapes, allShapesB);
+                                        sprite = GetLayer(spriteType + ": " + shapeType + ": " + spriteIndex).CreateSprite(fillPath, origin);
                                     }
                                     else continue;
 
@@ -664,8 +735,8 @@ namespace StorybrewScripts
                                         if (projectPath.Contains("/"))
                                             projectPath = projectPath.Replace("/", @"\");
 
-                                        var strokeSpritePath = MapsetPath + "/" + sbFolderName + "/shapes/" + layerName + "(s).png";
-                                        var strokeProjectPath = projectPath + @"\assetlibrary\_AeToOsb\shapes\" + layerName + "(s).png";
+                                        var strokeSpritePath = MapsetPath + "/" + aeToOsbOutput + "/shapes/" + layerName + "(s).png";
+                                        var strokeProjectPath = projectPath + @"\assetlibrary\_AeToOsb\compositions\" + compName + "\\shapes\\" + layerName + "(s).png";
 
                                         if (strokeSpritePath.Contains("/"))
                                             strokeSpritePath = strokeSpritePath.Replace("/", @"\");
@@ -679,8 +750,24 @@ namespace StorybrewScripts
                                             File.Delete(strokeSpritePath);
                                     }
                                 }
-                                else if (spriteType != "Sequence" && spriteType != "Shape")
-                                sprite = GetLayer(spriteType + ": " + spriteLayer + ": " + spriteIndex).CreateSprite(sbFolderName + "/" + layerFileName, origin);
+                                else if (spriteType == "Solid")
+                                {
+                                    solid = compLayer.Solid;
+                                    var solidSBSpriteFile = MapsetPath + "/" + sbFolderName + "/AeToOsb/p.png";
+                                    var solidSpriteFile = ProjectPath + "/assetlibrary/_AeToOsb/p.png";
+
+                                    // move sprite to sb folder
+                                    if (!File.Exists(solidSBSpriteFile.Replace("/", @"\")))
+                                    {
+                                        if (File.Exists(solidSpriteFile.Replace("/", @"\")))
+                                            File.Copy(solidSpriteFile.Replace("/", @"\"), solidSBSpriteFile);
+                                        else Log("Cannot find file 'p.png' in .../assetlibrary/_AeToOsb/");
+                                    }
+
+                                    sprite = GetLayer(spriteType + ": " + layerName + ": " + spriteIndex).CreateSprite(sbFolderName + "/AeToOsb/p.png", origin);
+                                }
+                                else if (spriteType != "Sequence" && spriteType != "Shape" && spriteType != "Solid")
+                                    sprite = GetLayer(spriteType + ": " + layerFileName + ": " + spriteIndex).CreateSprite(sbFolderName + "/" + layerFileName, origin);
 
                                 // fade
                                 fade(spriteTransform.Fade, sprite, spriteStroke);
@@ -692,6 +779,9 @@ namespace StorybrewScripts
                                 scale(spriteTransform.Scale, sprite, spriteStroke);
                                 // rotation
                                 rotation(spriteTransform.Rotation, sprite, spriteStroke);
+                                // color solid
+                                if (spriteType == "Solid")
+                                    colorSolid(solid.Color, sprite);
                                 // color shape
                                 if (spriteType == "Shape")
                                 {
@@ -708,17 +798,19 @@ namespace StorybrewScripts
                                 }
                                 // additive
                                 if (spriteAdditive)
-                                additive(sprite, spriteStart, spriteEnd);
+                                    additive(sprite, spriteStart, spriteEnd);
 
-                                if (spriteType != "NullLayer" && spriteType != "Sequence" && spriteType != "Shape")
+                                if (spriteType != "NullLayer" && spriteType != "Sequence" && spriteType != "Shape" && spriteType != "Solid")
                                     spriteLibrary.Add(sprite);
                                 if (spriteType == "NullLayer") nullLibrary.Add(sprite);
                                 if (spriteType == "Sequence") seqLibrary.Add(sprite);
                                 if (spriteType == "Shape") shapeLibrary.Add(sprite);
+                                if (spriteType == "Solid") solidLibrary.Add(sprite);
                             }
                             else if (spriteType == "Text" && spriteType != "Audio")
                             {
-                                if (aeToOsbSettings.Options != null && aeToOsbSettings.Options.ExportTextPerLetter == false) {
+                                if (aeToOsbSettings.Options != null && aeToOsbSettings.Options.ExportTextPerLetter == false)
+                                {
                                     // texture generation
                                     fontName = spriteFontFamily;
                                     fontScale = (int)(spriteFontSize * 1.5f);
@@ -751,15 +843,20 @@ namespace StorybrewScripts
                                     // shadowColor = CommandColor.FromHtml(spriteTextShadowColor);
 
                                     text = spriteText;
-                                    font = FontGenerator(textOutputFolder + "/" + compName);
+                                    font = FontGenerator(aeToOsbOutput + "/" + textOutputFolder);
 
                                     sentenceTexture = font.GetTexture(text.ToString());
 
                                     texture = font.GetTexture(text);
                                     if (!texture.IsEmpty)
                                     {
+                                        var textLength = text.Length;
+                                        if (textLength > 10) textLength = 8;
+                                        string textLayerName = text.Substring(0, textLength);
+                                        if (textLength > 10) textLayerName = textLayerName + "...";
+
                                         sprite = new OsbSprite();
-                                        sprite = GetLayer(spriteType + ": " + spriteLayer + ": " + spriteIndex).CreateSprite(texture.Path, origin);
+                                        sprite = GetLayer(spriteType + ": " + textLayerName + ": " + spriteIndex).CreateSprite(texture.Path, origin);
 
                                         // fade
                                         fade(spriteTransform.Fade, sprite, new OsbSprite());
@@ -773,7 +870,7 @@ namespace StorybrewScripts
                                         rotation(spriteTransform.Rotation, sprite, new OsbSprite());
                                         // additive
                                         if (spriteAdditive)
-                                        additive(sprite, spriteStart, spriteEnd);
+                                            additive(sprite, spriteStart, spriteEnd);
 
                                         if (spriteType != "NullLayer") spriteLibrary.Add(sprite);
 
@@ -788,6 +885,48 @@ namespace StorybrewScripts
                                 }
                             }
                         }
+                    }
+                    // delete unused shapes
+                    string projectPath_ = ProjectPath;
+                    string shapeSBFolderPath = MapsetPath + "/" + aeToOsbOutput + "/shapes";
+
+                    if (projectPath_.Contains("/"))
+                        projectPath_ = projectPath_.Replace("/", @"\");
+                    if (shapeSBFolderPath.Contains("/"))
+                        shapeSBFolderPath = shapeSBFolderPath.Replace("/", @"\");
+
+                    var shapesFolderPath = projectPath_ + @"\assetlibrary\_AeToOsb\compositions\" + compName + "\\shapes";
+
+                    for (var s = 0; s < allShapes.Count; s++)
+                    {
+                        if (s != 0)
+                        {
+                            if (File.Exists(allShapes[s]) && !isFileInUse(new FileInfo(allShapes[s])))
+                                File.Delete(allShapes[s]);
+                        }
+                    }
+                    for (var s = 0; s < allShapesB.Count; s++)
+                    {
+                        if (s != 0)
+                        {
+                            if (File.Exists(allShapesB[s]) && !isFileInUse(new FileInfo(allShapesB[s])))
+                                File.Delete(allShapesB[s]);
+                        }
+                    }
+
+                    foreach (var file in Directory.GetFiles(shapeSBFolderPath))
+                    {
+                        if (File.Exists(file) && !isFileInUse(new FileInfo(file)))
+                            File.Delete(file);
+                    }
+
+                    foreach (var file in Directory.GetFiles(shapesFolderPath))
+                    {
+                        var fileInfo = new FileInfo(file);
+                        string newFileName = Path.Combine(shapeSBFolderPath, fileInfo.Name);
+
+                        if (File.Exists(file) && !File.Exists(newFileName))
+                            File.Copy(file, newFileName);
                     }
                 }
                 if (spriteType == "NullLayer") sprite = nullItem;
@@ -915,8 +1054,10 @@ namespace StorybrewScripts
 
                             return letterSpacing;
                         }
-                        else {
-                            if (key2 < keys.Count) {
+                        else
+                        {
+                            if (key2 < keys.Count)
+                            {
                                 // Log("1value1: " + key1 + " | value2: " + key2);
                                 letterSpacing.Add("startTime", keys[key1].Time);
                                 letterSpacing.Add("startValue", (int)keys[key1].Value);
@@ -925,7 +1066,7 @@ namespace StorybrewScripts
 
                                 return letterSpacing;
                             }
-                            // sprite.Fade(getEasing(keys[key1].Easing), keys[key1].Time, keys[key2].Time + frameDuration, keys[key1].Value, keys[key2].Value);
+                            // sprite.Fade(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time, keys[key2].Time + frameDuration, keys[key1].Value, keys[key2].Value);
                         }
                     }
                 }
@@ -955,24 +1096,25 @@ namespace StorybrewScripts
                         if (key1 == 0 && key1 < key2 && keys.Count % 2 == 0)
                         {
                             // Log("1value1: " + key1 + " | value2: " + key2);
-                            sprite.Fade(getEasing(keys[key1].Easing), keys[key1].Time, keys[key2].Time + frameDuration, keys[key1].Value, keys[key2].Value);
-                            if (shapeHasStroke && shapeHasFill && shapeType != "Path")
-                                spriteStroke.Fade(getEasing(keys[key1].Easing), keys[key1].Time, keys[key2].Time + frameDuration, keys[key1].Value, keys[key2].Value);
+                            sprite.Fade(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time, keys[key2].Time + frameDuration, keys[key1].Value, keys[key2].Value);
+                            if (shapeHasStroke && shapeHasFill && shapeType != "Path" && spriteType == "Shape")
+                                spriteStroke.Fade(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time, keys[key2].Time + frameDuration, keys[key1].Value, keys[key2].Value);
                         }
                         else if (key2 > 1 && key2 + 1 < keys.Count && keys.Count % 2 == 0)
                         {
                             key1 = key1 + 1; key2 = key2 + 1;
-                            sprite.Fade(getEasing(keys[key1].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, keys[key1].Value, keys[key2].Value);
-                            if (shapeHasStroke && shapeHasFill && shapeType != "Path")
-                                spriteStroke.Fade(getEasing(keys[key1].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, keys[key1].Value, keys[key2].Value);
+                            sprite.Fade(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, keys[key1].Value, keys[key2].Value);
+                            if (shapeHasStroke && shapeHasFill && shapeType != "Path" && spriteType == "Shape")
+                                spriteStroke.Fade(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, keys[key1].Value, keys[key2].Value);
                             // Log("2value1: " + key1 + " | value2: " + key2);
                         }
-                        else {
+                        else
+                        {
                             if (key2 < keys.Count)
                             {
-                                sprite.Fade(getEasing(keys[key1].Easing), keys[key1].Time, keys[key2].Time + frameDuration, keys[key1].Value, keys[key2].Value);
-                                if (shapeHasStroke && shapeHasFill && shapeType != "Path")
-                                    spriteStroke.Fade(getEasing(keys[key1].Easing), keys[key1].Time, keys[key2].Time + frameDuration, keys[key1].Value, keys[key2].Value);
+                                sprite.Fade(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, keys[key1].Value, keys[key2].Value);
+                                if (shapeHasStroke && shapeHasFill && shapeType != "Path" && spriteType == "Shape")
+                                    spriteStroke.Fade(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, keys[key1].Value, keys[key2].Value);
                             }
                         }
                     }
@@ -982,8 +1124,8 @@ namespace StorybrewScripts
                     foreach (var keyframe in transform)
                     {
                         sprite.Fade(keyframe.Time, spriteEnd, keyframe.Value, keyframe.Value);
-                        if (shapeHasStroke && shapeHasFill && shapeType != "Path")
-                                spriteStroke.Fade(keyframe.Time, spriteEnd, keyframe.Value, keyframe.Value);
+                        if (shapeHasStroke && shapeHasFill && shapeType != "Path" && spriteType == "Shape")
+                            spriteStroke.Fade(keyframe.Time, spriteEnd, keyframe.Value, keyframe.Value);
                     }
                 }
             }
@@ -1016,13 +1158,13 @@ namespace StorybrewScripts
                             }
 
                             if (spriteType == "Text")
-                            sprite.MoveX(getEasing(keys[key1].Easing), keys[key1].Time, keys[key2].Time + frameDuration, (keys[key1].Value * downScale) + offsetEverything.X + offsetText.X, (keys[key2].Value * downScale) + offsetEverything.X + offsetText.X);
+                                sprite.MoveX(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time, keys[key2].Time + frameDuration, (keys[key1].Value * downScale) + offsetEverything.X + offsetText.X, (keys[key2].Value * downScale) + offsetEverything.X + offsetText.X);
                             if (spriteType != "Text")
-                            sprite.MoveX(getEasing(keys[key1].Easing), keys[key1].Time, keys[key2].Time + frameDuration, (k1 * downScale) + offsetEverything.X + shapeOffsetX, (k2 * downScale) + offsetEverything.X + shapeOffsetX);
+                                sprite.MoveX(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time, keys[key2].Time + frameDuration, (k1 * downScale) + offsetEverything.X + shapeOffsetX, (k2 * downScale) + offsetEverything.X + shapeOffsetX);
 
-                            if (shapeHasStroke && shapeHasFill && shapeType != "Path")
+                            if (shapeHasStroke && shapeHasFill && shapeType != "Path" && spriteType == "Shape")
                                 if (spriteType != "Text")
-                                    spriteStroke.MoveX(getEasing(keys[key1].Easing), keys[key1].Time, keys[key2].Time + frameDuration, (k1 * downScale) + offsetEverything.X + shapeOffsetX, (k2 * downScale) + offsetEverything.X + shapeOffsetX);
+                                    spriteStroke.MoveX(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time, keys[key2].Time + frameDuration, (k1 * downScale) + offsetEverything.X + shapeOffsetX, (k2 * downScale) + offsetEverything.X + shapeOffsetX);
                         }
                         else if (key2 > 1 && key2 + 1 < keys.Count && keys.Count % 2 == 0)
                         {
@@ -1037,17 +1179,19 @@ namespace StorybrewScripts
 
                             // key1 = key1 + 1; key2 = key2 + 1;
                             if (spriteType == "Text")
-                            sprite.MoveX(getEasing(keys[key1].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, (keys[key1].Value * downScale) + offsetEverything.X + offsetText.X, (keys[key2].Value * downScale) + offsetEverything.X + offsetText.X);
+                                sprite.MoveX(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, (keys[key1].Value * downScale) + offsetEverything.X + offsetText.X, (keys[key2].Value * downScale) + offsetEverything.X + offsetText.X);
                             if (spriteType != "Text")
-                            sprite.MoveX(getEasing(keys[key1].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, (k1 * downScale) + offsetEverything.X + shapeOffsetX, (k2 * downScale) + offsetEverything.X + shapeOffsetX);
+                                sprite.MoveX(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, (k1 * downScale) + offsetEverything.X + shapeOffsetX, (k2 * downScale) + offsetEverything.X + shapeOffsetX);
 
-                            if (shapeHasStroke && shapeHasFill && shapeType != "Path")
+                            if (shapeHasStroke && shapeHasFill && shapeType != "Path" && spriteType == "Shape")
                                 if (spriteType != "Text")
-                                    spriteStroke.MoveX(getEasing(keys[key1].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, (k1 * downScale) + offsetEverything.X + shapeOffsetX, (k2 * downScale) + offsetEverything.X + shapeOffsetX);
+                                    spriteStroke.MoveX(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, (k1 * downScale) + offsetEverything.X + shapeOffsetX, (k2 * downScale) + offsetEverything.X + shapeOffsetX);
                             // Log("2value1: " + key1 + " | value2: " + key2);
                         }
-                        else {
-                            if (key2 < keys.Count) {
+                        else
+                        {
+                            if (key2 < keys.Count)
+                            {
                                 k1 = (float)keys[key1].Value;
                                 k2 = (float)keys[key2].Value;
 
@@ -1058,13 +1202,13 @@ namespace StorybrewScripts
                                 }
 
                                 if (spriteType == "Text")
-                                sprite.MoveX(getEasing(keys[key1].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, (keys[key1].Value * downScale) + offsetEverything.X + offsetText.X, (keys[key2].Value * downScale) + offsetEverything.X + offsetText.X);
+                                    sprite.MoveX(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, (keys[key1].Value * downScale) + offsetEverything.X + offsetText.X, (keys[key2].Value * downScale) + offsetEverything.X + offsetText.X);
                                 if (spriteType != "Text")
-                                sprite.MoveX(getEasing(keys[key1].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, (k1 * downScale) + offsetEverything.X + shapeOffsetX, (k2 * downScale) + offsetEverything.X + shapeOffsetX);
+                                    sprite.MoveX(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, (k1 * downScale) + offsetEverything.X + shapeOffsetX, (k2 * downScale) + offsetEverything.X + shapeOffsetX);
 
-                                if (shapeHasStroke && shapeHasFill && shapeType != "Path")
+                                if (shapeHasStroke && shapeHasFill && shapeType != "Path" && spriteType == "Shape")
                                     if (spriteType != "Text")
-                                        spriteStroke.MoveX(getEasing(keys[key1].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, (k1 * downScale) + offsetEverything.X + shapeOffsetX, (k2 * downScale) + offsetEverything.X + shapeOffsetX);
+                                        spriteStroke.MoveX(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, (k1 * downScale) + offsetEverything.X + shapeOffsetX, (k2 * downScale) + offsetEverything.X + shapeOffsetX);
                             }
                         }
                     }
@@ -1079,13 +1223,13 @@ namespace StorybrewScripts
                             k1 = k1 + shapePosOffsetX;
 
                         if (spriteType == "Text")
-                        sprite.MoveX(keyframe.Time, (k1 * downScale) + offsetEverything.X + offsetText.X);
+                            sprite.MoveX(keyframe.Time, (k1 * downScale) + offsetEverything.X + offsetText.X);
                         if (spriteType != "Text")
-                        sprite.MoveX(keyframe.Time, (k1 * downScale) + offsetEverything.X + shapeOffsetX);
+                            sprite.MoveX(keyframe.Time, (k1 * downScale) + offsetEverything.X + shapeOffsetX);
 
-                        if (shapeHasStroke && shapeHasFill && shapeType != "Path")
-                                if (spriteType != "Text")
-                                    spriteStroke.MoveX(keyframe.Time, (k1 * downScale) + offsetEverything.X + shapeOffsetX);
+                        if (shapeHasStroke && shapeHasFill && shapeType != "Path" && spriteType == "Shape")
+                            if (spriteType != "Text")
+                                spriteStroke.MoveX(keyframe.Time, (k1 * downScale) + offsetEverything.X + shapeOffsetX);
                     }
                 }
             }
@@ -1104,7 +1248,7 @@ namespace StorybrewScripts
                 float letterHeightOffset = 0;
 
                 if (aeToOsbSettings.Options != null && aeToOsbSettings.Options.ExportTextPerLetter == true && hasCharacters == true)
-                letterHeightOffset = -30;
+                    letterHeightOffset = -30;
 
                 if (transform.Y.Count > 1)
                 {
@@ -1124,13 +1268,13 @@ namespace StorybrewScripts
                             }
 
                             if (spriteType == "Text")
-                            sprite.MoveY(getEasing(keys[key1].Easing), keys[key1].Time, keys[key2].Time + frameDuration, (keys[key1].Value * downScale) + offsetEverything.Y + offsetText.Y + letterHeightOffset, (keys[key2].Value * downScale) + offsetEverything.Y + offsetText.Y + letterHeightOffset);
+                                sprite.MoveY(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time, keys[key2].Time + frameDuration, (keys[key1].Value * downScale) + offsetEverything.Y + offsetText.Y + letterHeightOffset, (keys[key2].Value * downScale) + offsetEverything.Y + offsetText.Y + letterHeightOffset);
                             if (spriteType != "Text")
-                            sprite.MoveY(getEasing(keys[key1].Easing), keys[key1].Time, keys[key2].Time + frameDuration, (k1 * downScale) + offsetEverything.Y + shapeOffsetY + shapeOffsetY, (k2 * downScale) + offsetEverything.Y + shapeOffsetY + shapeOffsetY);
+                                sprite.MoveY(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time, keys[key2].Time + frameDuration, (k1 * downScale) + offsetEverything.Y + shapeOffsetY + shapeOffsetY, (k2 * downScale) + offsetEverything.Y + shapeOffsetY + shapeOffsetY);
 
-                            if (shapeHasStroke && shapeHasFill && shapeType != "Path")
+                            if (shapeHasStroke && shapeHasFill && shapeType != "Path" && spriteType == "Shape")
                                 if (spriteType != "Text")
-                                    spriteStroke.MoveY(getEasing(keys[key1].Easing), keys[key1].Time, keys[key2].Time + frameDuration, (k1 * downScale) + offsetEverything.Y + shapeOffsetY + shapeOffsetY, (k2 * downScale) + offsetEverything.Y + shapeOffsetY + shapeOffsetY);
+                                    spriteStroke.MoveY(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time, keys[key2].Time + frameDuration, (k1 * downScale) + offsetEverything.Y + shapeOffsetY + shapeOffsetY, (k2 * downScale) + offsetEverything.Y + shapeOffsetY + shapeOffsetY);
                         }
                         else if (key2 > 1 && key2 + 1 < keys.Count && keys.Count % 2 == 0)
                         {
@@ -1145,17 +1289,19 @@ namespace StorybrewScripts
 
                             // key1 = key1 + 1; key2 = key2 + 1;
                             if (spriteType == "Text")
-                            sprite.MoveY(getEasing(keys[key1].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, (keys[key1].Value * downScale) + offsetEverything.Y + offsetText.Y + letterHeightOffset, (keys[key2].Value * downScale) + offsetEverything.Y + offsetText.Y + letterHeightOffset);
+                                sprite.MoveY(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, (keys[key1].Value * downScale) + offsetEverything.Y + offsetText.Y + letterHeightOffset, (keys[key2].Value * downScale) + offsetEverything.Y + offsetText.Y + letterHeightOffset);
                             if (spriteType != "Text")
-                            sprite.MoveY(getEasing(keys[key1].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, (k1 * downScale) + offsetEverything.Y + shapeOffsetY + shapeOffsetY, (k2 * downScale) + offsetEverything.Y + shapeOffsetY + shapeOffsetY);
+                                sprite.MoveY(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, (k1 * downScale) + offsetEverything.Y + shapeOffsetY + shapeOffsetY, (k2 * downScale) + offsetEverything.Y + shapeOffsetY + shapeOffsetY);
 
-                            if (shapeHasStroke && shapeHasFill && shapeType != "Path")
+                            if (shapeHasStroke && shapeHasFill && shapeType != "Path" && spriteType == "Shape")
                                 if (spriteType != "Text")
-                                    spriteStroke.MoveY(getEasing(keys[key1].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, (k1 * downScale) + offsetEverything.Y + shapeOffsetY + shapeOffsetY, (k2 * downScale) + offsetEverything.Y + shapeOffsetY + shapeOffsetY);
+                                    spriteStroke.MoveY(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, (k1 * downScale) + offsetEverything.Y + shapeOffsetY + shapeOffsetY, (k2 * downScale) + offsetEverything.Y + shapeOffsetY + shapeOffsetY);
                             // Log("2value1: " + key1 + " | value2: " + key2);
                         }
-                        else {
-                            if (key2 < keys.Count) {
+                        else
+                        {
+                            if (key2 < keys.Count)
+                            {
                                 k1 = (float)keys[key1].Value;
                                 k2 = (float)keys[key2].Value;
 
@@ -1166,13 +1312,13 @@ namespace StorybrewScripts
                                 }
 
                                 if (spriteType == "Text")
-                                sprite.MoveY(getEasing(keys[key1].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, (keys[key1].Value * downScale) + offsetEverything.Y + offsetText.Y + letterHeightOffset, (keys[key2].Value * downScale) + offsetEverything.Y + offsetText.Y + letterHeightOffset);
+                                    sprite.MoveY(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, (keys[key1].Value * downScale) + offsetEverything.Y + offsetText.Y + letterHeightOffset, (keys[key2].Value * downScale) + offsetEverything.Y + offsetText.Y + letterHeightOffset);
                                 if (spriteType != "Text")
-                                sprite.MoveY(getEasing(keys[key1].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, (k1 * downScale) + offsetEverything.Y + shapeOffsetY + shapeOffsetY, (k2 * downScale) + offsetEverything.Y + shapeOffsetY + shapeOffsetY);
+                                    sprite.MoveY(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, (k1 * downScale) + offsetEverything.Y + shapeOffsetY + shapeOffsetY, (k2 * downScale) + offsetEverything.Y + shapeOffsetY + shapeOffsetY);
 
-                                if (shapeHasStroke && shapeHasFill && shapeType != "Path")
-                                if (spriteType != "Text")
-                                    spriteStroke.MoveY(getEasing(keys[key1].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, (k1 * downScale) + offsetEverything.Y + shapeOffsetY + shapeOffsetY, (k2 * downScale) + offsetEverything.Y + shapeOffsetY + shapeOffsetY);
+                                if (shapeHasStroke && shapeHasFill && shapeType != "Path" && spriteType == "Shape")
+                                    if (spriteType != "Text")
+                                        spriteStroke.MoveY(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, (k1 * downScale) + offsetEverything.Y + shapeOffsetY + shapeOffsetY, (k2 * downScale) + offsetEverything.Y + shapeOffsetY + shapeOffsetY);
                             }
                         }
                     }
@@ -1187,13 +1333,13 @@ namespace StorybrewScripts
                             k1 = k1 + shapePosOffsetY;
 
                         if (spriteType == "Text")
-                        sprite.MoveY(keyframe.Time, (k1 * downScale) + offsetEverything.Y + offsetText.Y + letterHeightOffset);
+                            sprite.MoveY(keyframe.Time, (k1 * downScale) + offsetEverything.Y + offsetText.Y + letterHeightOffset);
                         if (spriteType != "Text")
-                        sprite.MoveY(keyframe.Time, (k1 * downScale) + offsetEverything.Y + shapeOffsetY + shapeOffsetY);
+                            sprite.MoveY(keyframe.Time, (k1 * downScale) + offsetEverything.Y + shapeOffsetY + shapeOffsetY);
 
-                        if (shapeHasStroke && shapeHasFill && shapeType != "Path")
-                                if (spriteType != "Text")
-                                    spriteStroke.MoveY(keyframe.Time, (k1 * downScale) + offsetEverything.Y + shapeOffsetY + shapeOffsetY);
+                        if (shapeHasStroke && shapeHasFill && shapeType != "Path" && spriteType == "Shape")
+                            if (spriteType != "Text")
+                                spriteStroke.MoveY(keyframe.Time, (k1 * downScale) + offsetEverything.Y + shapeOffsetY + shapeOffsetY);
                     }
                 }
             }
@@ -1201,11 +1347,18 @@ namespace StorybrewScripts
 
         public void scale(Scale transform, OsbSprite sprite, OsbSprite spriteStroke)
         {
+            Vector2 solidSize = new Vector2(0, 0);
+            if (spriteType == "Solid")
+            {
+                solidSize = new Vector2(solid.Bitmap.Width * (float)downScale, solid.Bitmap.Height * (float)downScale);
+            }
+            Log("solidSize: " + solidSize);
+
             // scale
             if (transform != null)
             {
                 float fillScaleShift = 0;
-                if (shapeHasFill && spriteType == "Shape" && shapeType != "Path") fillScaleShift = 0.0001f;
+                if (shapeHasFill && spriteType == "Shape" && shapeType != "Path" && spriteType == "Shape") fillScaleShift = 0.0001f;
                 if (transform.X.Count > 1)
                 {
                     var keysX = transform.X;
@@ -1216,61 +1369,63 @@ namespace StorybrewScripts
                         {
                             // Log("1value1: " + key1 + " | value2: " + key2);
                             if (spriteType == "Text")
-                                sprite.ScaleVec(getEasing(keysX[key1].Easing), keysX[key1].Time, keysX[key2].Time + frameDuration,
+                                sprite.ScaleVec(getEasing(keysX[key1].Easing, keysX[key2].Easing), keysX[key1].Time, keysX[key2].Time + frameDuration,
                                     new Vector2((float)(keysX[key1].Value * downScale) * fontScaleShift, (float)(keysY[key1].Value * downScale) * fontScaleShift),
                                     new Vector2((float)(keysX[key2].Value * downScale) * fontScaleShift, (float)(keysY[key2].Value * downScale) * fontScaleShift));
                             if (spriteType != "Text")
-                                sprite.ScaleVec(getEasing(keysX[key1].Easing), keysX[key1].Time, keysX[key2].Time + frameDuration,
-                                    new Vector2((float)(keysX[key1].Value * downScale) + fillScaleShift, (float)(keysY[key1].Value * downScale) + fillScaleShift),
-                                    new Vector2((float)(keysX[key2].Value * downScale) + fillScaleShift, (float)(keysY[key2].Value * downScale) + fillScaleShift));
+                                sprite.ScaleVec(getEasing(keysX[key1].Easing, keysX[key2].Easing), keysX[key1].Time, keysX[key2].Time + frameDuration,
+                                    new Vector2((float)(keysX[key1].Value * downScale) + fillScaleShift + solidSize.X, (float)(keysY[key1].Value * downScale) + fillScaleShift + solidSize.Y),
+                                    new Vector2((float)(keysX[key2].Value * downScale) + fillScaleShift + solidSize.X, (float)(keysY[key2].Value * downScale) + fillScaleShift + solidSize.Y));
 
-                                if (shapeHasStroke && shapeHasFill && shapeType != "Path")
-                                    if (spriteType != "Text")
-                                        spriteStroke.ScaleVec(getEasing(keysX[key1].Easing), keysX[key1].Time, keysX[key2].Time + frameDuration,
-                                            new Vector2((float)(keysX[key1].Value * downScale), (float)(keysY[key1].Value * downScale)),
-                                            new Vector2((float)(keysX[key2].Value * downScale), (float)(keysY[key2].Value * downScale)));
+                            if (shapeHasStroke && shapeHasFill && shapeType != "Path" && spriteType == "Shape")
+                                if (spriteType != "Text")
+                                    spriteStroke.ScaleVec(getEasing(keysX[key1].Easing, keysX[key2].Easing), keysX[key1].Time, keysX[key2].Time + frameDuration,
+                                        new Vector2((float)((solidSize.X * keysX[key1].Value) * downScale), (float)((solidSize.Y * keysY[key1].Value) * downScale)),
+                                        new Vector2((float)((solidSize.X * keysX[key2].Value) * downScale), (float)((solidSize.Y * keysY[key2].Value) * downScale)));
 
                             // if (sprite.TexturePath.Contains("bg.jpg")) {
                             //     Log("transform.X.Count: " + transform.X.Count);
-                            //     Log("keysY[key1].Value: " + keysY[key1].Value);
-                            //     Log("keysY[key2].Value: " + keysY[key2].Value);
+                            //     Log("(solidSize.Y * keysY[key1].Value): " + (solidSize.Y * keysY[key1].Value));
+                            //     Log("(solidSize.Y * keysY[key2].Value): " + (solidSize.Y * keysY[key2].Value));
                             // }
                         }
                         else if (key2 > 1 && key2 + 1 < keysX.Count && keysX.Count % 2 == 0)
                         {
                             key1 = key1 + 1; key2 = key2 + 1;
                             if (spriteType == "Text")
-                                sprite.ScaleVec(getEasing(keysX[key1].Easing), keysX[key1].Time, keysX[key2].Time + frameDuration,
+                                sprite.ScaleVec(getEasing(keysX[key1].Easing, keysX[key2].Easing), keysX[key1].Time, keysX[key2].Time + frameDuration,
                                     new Vector2((float)(keysX[key1].Value * downScale) * fontScaleShift, (float)(keysY[key1].Value * downScale) * fontScaleShift),
                                     new Vector2((float)(keysX[key2].Value * downScale) * fontScaleShift, (float)(keysY[key2].Value * downScale) * fontScaleShift));
                             if (spriteType != "Text")
-                                sprite.ScaleVec(getEasing(keysX[key1].Easing), keysX[key1].Time + frameDuration, keysX[key2].Time + frameDuration,
-                                    new Vector2((float)(keysX[key1].Value * downScale) + fillScaleShift, (float)(keysY[key1].Value * downScale) + fillScaleShift),
-                                    new Vector2((float)(keysX[key2].Value * downScale) + fillScaleShift, (float)(keysY[key2].Value * downScale) + fillScaleShift));
+                                sprite.ScaleVec(getEasing(keysX[key1].Easing, keysX[key2].Easing), keysX[key1].Time + frameDuration, keysX[key2].Time + frameDuration,
+                                    new Vector2((float)(keysX[key1].Value * downScale) + fillScaleShift + solidSize.X, (float)(keysY[key1].Value * downScale) + fillScaleShift + solidSize.Y),
+                                    new Vector2((float)(keysX[key2].Value * downScale) + fillScaleShift + solidSize.X, (float)(keysY[key2].Value * downScale) + fillScaleShift + solidSize.Y));
 
-                                if (shapeHasStroke && shapeHasFill && shapeType != "Path")
-                                    if (spriteType != "Text")
-                                        spriteStroke.ScaleVec(getEasing(keysX[key1].Easing), keysX[key1].Time + frameDuration, keysX[key2].Time + frameDuration,
-                                            new Vector2((float)(keysX[key1].Value * downScale), (float)(keysY[key1].Value * downScale)),
-                                            new Vector2((float)(keysX[key2].Value * downScale), (float)(keysY[key2].Value * downScale)));
+                            if (shapeHasStroke && shapeHasFill && shapeType != "Path" && spriteType == "Shape")
+                                if (spriteType != "Text")
+                                    spriteStroke.ScaleVec(getEasing(keysX[key1].Easing, keysX[key2].Easing), keysX[key1].Time + frameDuration, keysX[key2].Time + frameDuration,
+                                        new Vector2((float)((solidSize.X * keysX[key1].Value) * downScale), (float)((solidSize.Y * keysY[key1].Value) * downScale)),
+                                        new Vector2((float)((solidSize.X * keysX[key2].Value) * downScale), (float)((solidSize.Y * keysY[key2].Value) * downScale)));
                             // Log("2value1: " + key1 + " | value2: " + key2);
                         }
-                        else {
-                            if (key2 < keysX.Count) {
+                        else
+                        {
+                            if (key2 < keysX.Count)
+                            {
                                 if (spriteType == "Text")
-                                    sprite.ScaleVec(getEasing(keysX[key1].Easing), keysX[key1].Time, keysX[key2].Time + frameDuration,
+                                    sprite.ScaleVec(getEasing(keysX[key1].Easing, keysX[key2].Easing), keysX[key1].Time, keysX[key2].Time + frameDuration,
                                         new Vector2((float)(keysX[key1].Value * downScale) * fontScaleShift, (float)(keysY[key1].Value * downScale) * fontScaleShift),
                                         new Vector2((float)(keysX[key2].Value * downScale) * fontScaleShift, (float)(keysY[key2].Value * downScale) * fontScaleShift));
                                 if (spriteType != "Text")
-                                    sprite.ScaleVec(getEasing(keysX[key1].Easing), keysX[key1].Time + frameDuration, keysX[key2].Time + frameDuration,
-                                        new Vector2((float)(keysX[key1].Value * downScale) + fillScaleShift, (float)(keysY[key1].Value * downScale) + fillScaleShift),
-                                        new Vector2((float)(keysX[key2].Value * downScale) + fillScaleShift, (float)(keysY[key2].Value * downScale) + fillScaleShift));
+                                    sprite.ScaleVec(getEasing(keysX[key1].Easing, keysX[key2].Easing), keysX[key1].Time + frameDuration, keysX[key2].Time + frameDuration,
+                                        new Vector2((float)(keysX[key1].Value * downScale) + fillScaleShift + solidSize.X, (float)(keysY[key1].Value * downScale) + fillScaleShift + solidSize.Y),
+                                        new Vector2((float)(keysX[key2].Value * downScale) + fillScaleShift + solidSize.X, (float)(keysY[key2].Value * downScale) + fillScaleShift + solidSize.Y));
 
-                                    if (shapeHasStroke && shapeHasFill && shapeType != "Path")
-                                        if (spriteType != "Text")
-                                            spriteStroke.ScaleVec(getEasing(keysX[key1].Easing), keysX[key1].Time + frameDuration, keysX[key2].Time + frameDuration,
-                                                new Vector2((float)(keysX[key1].Value * downScale), (float)(keysY[key1].Value * downScale)),
-                                                new Vector2((float)(keysX[key2].Value * downScale), (float)(keysY[key2].Value * downScale)));
+                                if (shapeHasStroke && shapeHasFill && shapeType != "Path" && spriteType == "Shape")
+                                    if (spriteType != "Text")
+                                        spriteStroke.ScaleVec(getEasing(keysX[key1].Easing, keysX[key2].Easing), keysX[key1].Time + frameDuration, keysX[key2].Time + frameDuration,
+                                            new Vector2((float)((solidSize.X * keysX[key1].Value) * downScale), (float)((solidSize.Y * keysY[key1].Value) * downScale)),
+                                            new Vector2((float)(keysX[key2].Value * downScale), (float)((solidSize.Y * keysY[key2].Value) * downScale)));
                             }
                         }
                     }
@@ -1302,11 +1457,10 @@ namespace StorybrewScripts
                     if (spriteType == "Text")
                         sprite.ScaleVec(t[k].Time, new Vector2((float)scaleX[k], (float)scaleY[k]));
                     if (spriteType != "Text")
-                        sprite.ScaleVec(t[k].Time, new Vector2((float)scaleX[k] + fillScaleShift, (float)scaleY[k] + fillScaleShift));
+                        sprite.ScaleVec(t[k].Time, new Vector2((float)scaleX[k] + fillScaleShift + solidSize.X, (float)scaleY[k] + fillScaleShift + solidSize.Y));
 
-                        if (shapeHasStroke && shapeHasFill && shapeType != "Path")
-                            if (spriteType != "Text")
-                                spriteStroke.ScaleVec(t[k].Time, new Vector2((float)scaleX[k], (float)scaleY[k]));
+                    if (shapeHasStroke && shapeHasFill && shapeType != "Path" && spriteType == "Shape")
+                            spriteStroke.ScaleVec(t[k].Time, new Vector2((float)scaleX[k], (float)scaleY[k]));
 
                     scaleX.Clear();
                     scaleY.Clear();
@@ -1326,24 +1480,25 @@ namespace StorybrewScripts
                     {
                         if (key1 == 0 && key1 < key2 && keys.Count % 2 == 0)
                         {
-                            sprite.Rotate(getEasing(keys[key1].Easing), keys[key1].Time, keys[key2].Time + frameDuration, MathHelper.DegreesToRadians(keys[key1].Value), MathHelper.DegreesToRadians(keys[key2].Value));
-                            if (shapeHasStroke && shapeHasFill && shapeType != "Path")
-                                spriteStroke.Rotate(getEasing(keys[key1].Easing), keys[key1].Time, keys[key2].Time + frameDuration, MathHelper.DegreesToRadians(keys[key1].Value), MathHelper.DegreesToRadians(keys[key2].Value));
+                            sprite.Rotate(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time, keys[key2].Time + frameDuration, MathHelper.DegreesToRadians(keys[key1].Value), MathHelper.DegreesToRadians(keys[key2].Value));
+                            if (shapeHasStroke && shapeHasFill && shapeType != "Path" && spriteType == "Shape" && spriteType == "Shape")
+                                spriteStroke.Rotate(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time, keys[key2].Time + frameDuration, MathHelper.DegreesToRadians(keys[key1].Value), MathHelper.DegreesToRadians(keys[key2].Value));
                         }
                         else if (key2 > 1 && key2 + 1 < keys.Count && keys.Count % 2 == 0)
                         {
                             key1 = key1 + 1; key2 = key2 + 1;
-                            sprite.Rotate(getEasing(keys[key1].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, MathHelper.DegreesToRadians(keys[key1].Value), MathHelper.DegreesToRadians(keys[key2].Value));
-                            if (shapeHasStroke && shapeHasFill && shapeType != "Path")
-                                spriteStroke.Rotate(getEasing(keys[key1].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, MathHelper.DegreesToRadians(keys[key1].Value), MathHelper.DegreesToRadians(keys[key2].Value));
+                            sprite.Rotate(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, MathHelper.DegreesToRadians(keys[key1].Value), MathHelper.DegreesToRadians(keys[key2].Value));
+                            if (shapeHasStroke && shapeHasFill && shapeType != "Path" && spriteType == "Shape")
+                                spriteStroke.Rotate(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, MathHelper.DegreesToRadians(keys[key1].Value), MathHelper.DegreesToRadians(keys[key2].Value));
                             // Log("2value1: " + key1 + " | value2: " + key2);
                         }
-                        else {
+                        else
+                        {
                             if (key2 < keys.Count)
                             {
-                                sprite.Rotate(getEasing(keys[key1].Easing), keys[key1].Time, keys[key2].Time + frameDuration, MathHelper.DegreesToRadians(keys[key1].Value), MathHelper.DegreesToRadians(keys[key2].Value));
-                                if (shapeHasStroke && shapeHasFill && shapeType != "Path")
-                                    spriteStroke.Rotate(getEasing(keys[key1].Easing), keys[key1].Time, keys[key2].Time + frameDuration, MathHelper.DegreesToRadians(keys[key1].Value), MathHelper.DegreesToRadians(keys[key2].Value));
+                                sprite.Rotate(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, MathHelper.DegreesToRadians(keys[key1].Value), MathHelper.DegreesToRadians(keys[key2].Value));
+                                if (shapeHasStroke && shapeHasFill && shapeType != "Path" && spriteType == "Shape")
+                                    spriteStroke.Rotate(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, MathHelper.DegreesToRadians(keys[key1].Value), MathHelper.DegreesToRadians(keys[key2].Value));
                             }
                         }
                     }
@@ -1352,9 +1507,12 @@ namespace StorybrewScripts
                 {
                     foreach (var keyframe in transform)
                     {
-                        sprite.Rotate(keyframe.Time, MathHelper.DegreesToRadians(keyframe.Value));
-                        if (shapeHasStroke && shapeHasFill && shapeType != "Path")
+                        if (keyframe.Value != 0)
+                        {
+                            sprite.Rotate(keyframe.Time, MathHelper.DegreesToRadians(keyframe.Value));
+                            if (shapeHasStroke && shapeHasFill && shapeType != "Path" && spriteType == "Shape")
                                 spriteStroke.Rotate(keyframe.Time, MathHelper.DegreesToRadians(keyframe.Value));
+                        }
                     }
                 }
             }
@@ -1372,18 +1530,19 @@ namespace StorybrewScripts
                         if (key1 == 0 && key1 < key2 && keys.Count % 2 == 0)
                         {
                             // Log("1value1: " + key1 + " | value2: " + key2);
-                            sprite.Color(getEasing(keys[key1].Easing), keys[key1].Time, keys[key2].Time + frameDuration, keys[key1].Value, keys[key2].Value);
+                            sprite.Color(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time, keys[key2].Time + frameDuration, keys[key1].Value, keys[key2].Value);
                         }
                         else if (key2 > 1 && key2 + 1 < keys.Count && keys.Count % 2 == 0)
                         {
                             key1 = key1 + 1; key2 = key2 + 1;
-                            sprite.Color(getEasing(keys[key1].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, keys[key1].Value, keys[key2].Value);
+                            sprite.Color(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, keys[key1].Value, keys[key2].Value);
                             // Log("2value1: " + key1 + " | value2: " + key2);
                         }
-                        else {
+                        else
+                        {
                             if (key2 < keys.Count)
                             {
-                                sprite.Color(getEasing(keys[key1].Easing), keys[key1].Time, keys[key2].Time + frameDuration, keys[key1].Value, keys[key2].Value);
+                                sprite.Color(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, keys[key1].Value, keys[key2].Value);
                             }
                         }
                     }
@@ -1392,6 +1551,7 @@ namespace StorybrewScripts
                 {
                     foreach (var keyframe in color)
                     {
+                        if (keyframe.Value != "#ffffff")
                         sprite.Color(keyframe.Time, spriteEnd, keyframe.Value, keyframe.Value);
                     }
                 }
@@ -1410,18 +1570,19 @@ namespace StorybrewScripts
                         if (key1 == 0 && key1 < key2 && keys.Count % 2 == 0)
                         {
                             // Log("1value1: " + key1 + " | value2: " + key2);
-                            sprite.Color(getEasing(keys[key1].Easing), keys[key1].Time, keys[key2].Time + frameDuration, keys[key1].Value, keys[key2].Value);
+                            sprite.Color(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time, keys[key2].Time + frameDuration, keys[key1].Value, keys[key2].Value);
                         }
                         else if (key2 > 1 && key2 + 1 < keys.Count && keys.Count % 2 == 0)
                         {
                             key1 = key1 + 1; key2 = key2 + 1;
-                            sprite.Color(getEasing(keys[key1].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, keys[key1].Value, keys[key2].Value);
+                            sprite.Color(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, keys[key1].Value, keys[key2].Value);
                             // Log("2value1: " + key1 + " | value2: " + key2);
                         }
-                        else {
+                        else
+                        {
                             if (key2 < keys.Count)
                             {
-                                sprite.Color(getEasing(keys[key1].Easing), keys[key1].Time, keys[key2].Time + frameDuration, keys[key1].Value, keys[key2].Value);
+                                sprite.Color(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, keys[key1].Value, keys[key2].Value);
                             }
                         }
                     }
@@ -1430,35 +1591,53 @@ namespace StorybrewScripts
                 {
                     foreach (var keyframe in color)
                     {
+                        if (keyframe.Value != "#ffffff")
                         sprite.Color(keyframe.Time, spriteEnd, keyframe.Value, keyframe.Value);
                     }
                 }
             }
         }
 
-        public OsbEasing getEasing(string easing)
+        public void colorSolid(string color, OsbSprite sprite)
+        {
+            if (color != "#ffffff")
+            sprite.Color(spriteStart, color);
+        }
+
+        public OsbEasing getEasing(string easing, string nextEasing)
         {
             OsbEasing newEasing = new OsbEasing();
+            var hasEasing = nextEasing.Contains("In") || nextEasing.Contains("Out");
 
             switch (easing)
             {
                 // Normal
                 case "None":
                     newEasing = OsbEasing.None;
+                    if (hasEasing == true)
+                        newEasing = OsbEasing.InOutSine;
                     break;
                 case "In":
                     newEasing = OsbEasing.In;
+                    if (hasEasing == true)
+                        newEasing = OsbEasing.InOutSine;
                     break;
                 case "Out":
                     newEasing = OsbEasing.Out;
+                    if (hasEasing == true)
+                        newEasing = OsbEasing.InOutSine;
                     break;
 
                 // Sine
                 case "InSine":
                     newEasing = OsbEasing.InSine;
+                    if (hasEasing == true)
+                        newEasing = OsbEasing.InOutSine;
                     break;
                 case "OutSine":
                     newEasing = OsbEasing.OutSine;
+                    if (hasEasing == true)
+                        newEasing = OsbEasing.InOutSine;
                     break;
                 case "InOutSine":
                     newEasing = OsbEasing.InOutSine;
@@ -1467,9 +1646,13 @@ namespace StorybrewScripts
                 // Quad
                 case "InQuad":
                     newEasing = OsbEasing.InQuad;
+                    if (hasEasing == true)
+                        newEasing = OsbEasing.InOutQuad;
                     break;
                 case "OutQuad":
                     newEasing = OsbEasing.OutQuad;
+                    if (hasEasing == true)
+                        newEasing = OsbEasing.InOutQuad;
                     break;
                 case "InOutQuad":
                     newEasing = OsbEasing.InOutQuad;
@@ -1478,9 +1661,13 @@ namespace StorybrewScripts
                 // Cubic
                 case "InCubic":
                     newEasing = OsbEasing.InCubic;
+                    if (hasEasing == true)
+                        newEasing = OsbEasing.InOutCubic;
                     break;
                 case "OutCubic":
                     newEasing = OsbEasing.OutCubic;
+                    if (hasEasing == true)
+                        newEasing = OsbEasing.InOutCubic;
                     break;
                 case "InOutCubic":
                     newEasing = OsbEasing.InOutCubic;
@@ -1489,9 +1676,13 @@ namespace StorybrewScripts
                 // Quart
                 case "InQuart":
                     newEasing = OsbEasing.InQuart;
+                    if (hasEasing == true)
+                        newEasing = OsbEasing.InOutQuart;
                     break;
                 case "OutQuart":
                     newEasing = OsbEasing.OutQuart;
+                    if (hasEasing == true)
+                        newEasing = OsbEasing.InOutQuart;
                     break;
                 case "InOutQuart":
                     newEasing = OsbEasing.InOutQuart;
@@ -1500,9 +1691,13 @@ namespace StorybrewScripts
                 // Quint
                 case "InQuint":
                     newEasing = OsbEasing.InQuint;
+                    if (hasEasing == true)
+                        newEasing = OsbEasing.InOutQuint;
                     break;
                 case "OutQuint":
                     newEasing = OsbEasing.OutQuint;
+                    if (hasEasing == true)
+                        newEasing = OsbEasing.InOutQuint;
                     break;
                 case "InOutQuint":
                     newEasing = OsbEasing.InOutQuint;
@@ -1511,9 +1706,13 @@ namespace StorybrewScripts
                 // Expo
                 case "InExpo":
                     newEasing = OsbEasing.InExpo;
+                    if (hasEasing == true)
+                        newEasing = OsbEasing.InOutExpo;
                     break;
                 case "OutExpo":
                     newEasing = OsbEasing.OutExpo;
+                    if (hasEasing == true)
+                        newEasing = OsbEasing.InOutExpo;
                     break;
                 case "InOutExpo":
                     newEasing = OsbEasing.InOutExpo;
@@ -1522,9 +1721,13 @@ namespace StorybrewScripts
                 // Circ
                 case "InCirc":
                     newEasing = OsbEasing.InCirc;
+                    if (hasEasing == true)
+                        newEasing = OsbEasing.InOutCirc;
                     break;
                 case "OutCirc":
                     newEasing = OsbEasing.OutCirc;
+                    if (hasEasing == true)
+                        newEasing = OsbEasing.InOutCirc;
                     break;
                 case "InOutCirc":
                     newEasing = OsbEasing.InOutCirc;
@@ -1533,9 +1736,13 @@ namespace StorybrewScripts
                 // Back
                 case "InBack":
                     newEasing = OsbEasing.InBack;
+                    if (hasEasing == true)
+                        newEasing = OsbEasing.InOutBack;
                     break;
                 case "OutBack":
                     newEasing = OsbEasing.OutBack;
+                    if (hasEasing == true)
+                        newEasing = OsbEasing.InOutBack;
                     break;
                 case "InOutBack":
                     newEasing = OsbEasing.InOutBack;
@@ -1549,7 +1756,7 @@ namespace StorybrewScripts
             return newEasing;
         }
 
-        public void GenerateShape(bool generateStroke, bool generateFill)
+        public void ShapeGenerator(string compName, bool generateStroke, bool generateFill, List<string> allShapes, List<string> allShapesB)
         {
             // shapeType;
             // verticesPosition;
@@ -1567,27 +1774,27 @@ namespace StorybrewScripts
             if (projectPath.Contains("/"))
                 projectPath = projectPath.Replace("/", @"\");
 
-            saveFullPath = MapsetPath + "/" + sbFolderName + "/shapes/" + layerName + ".png";
-            saveFullPath2 = MapsetPath + "/" + sbFolderName + "/shapes/" + layerName + "(s).png";
-            var saveFolder = saveFullPath.Replace("/" + layerName + ".png", "");
-            var spritePath = sbFolderName + "/shapes/" + layerName + ".png";
-            var spritePath2 = sbFolderName + "/shapes/" + layerName + "(s).png";
+            shapeSaveFullPath = MapsetPath + "/" + aeToOsbOutput + "/shapes/" + layerName + ".png";
+            shapeSaveFullPath2 = MapsetPath + "/" + aeToOsbOutput + "/shapes/" + layerName + "(s).png";
+            var saveFolder = shapeSaveFullPath.Replace("/" + layerName + ".png", "").Replace(@"\", "/");
+            var spritePath = aeToOsbOutput + "/shapes/" + layerName + ".png";
+            var spritePath2 = aeToOsbOutput + "/shapes/" + layerName + "(s).png";
 
-            var bitmapFolderPath = projectPath + @"\assetlibrary\_AeToOsb\shapes";
+            var bitmapFolderPath = projectPath + @"\assetlibrary\_AeToOsb\compositions\" + compName + "\\shapes";
             var bitmapPath = bitmapFolderPath + @"\" + layerName + ".png";
             var bitmapPath2 = bitmapFolderPath + @"\" + layerName + "(s).png";
 
-            if (saveFullPath.Contains("/"))
-                saveFullPath = saveFullPath.Replace("/", @"\");
+            if (shapeSaveFullPath.Contains("/"))
+                shapeSaveFullPath = shapeSaveFullPath.Replace("/", @"\");
 
-            if (saveFullPath2.Contains("/"))
-                saveFullPath2 = saveFullPath2.Replace("/", @"\");
+            if (shapeSaveFullPath2.Contains("/"))
+                shapeSaveFullPath2 = shapeSaveFullPath2.Replace("/", @"\");
 
             if (!Directory.Exists(bitmapFolderPath))
-            Directory.CreateDirectory(bitmapFolderPath);
+                Directory.CreateDirectory(bitmapFolderPath);
 
             if (!Directory.Exists(saveFolder))
-            Directory.CreateDirectory(saveFolder);
+                Directory.CreateDirectory(saveFolder);
 
             var verticesX = new List<float>();
             var verticesY = new List<float>();
@@ -1598,7 +1805,7 @@ namespace StorybrewScripts
 
             if (verticesPosition != null)
             {
-                foreach(var pos in verticesPosition)
+                foreach (var pos in verticesPosition)
                 {
                     verticesX.Add(pos.X);
                     verticesY.Add(pos.Y);
@@ -1607,7 +1814,7 @@ namespace StorybrewScripts
 
             if (inTangent != null)
             {
-                foreach(var pos in inTangent)
+                foreach (var pos in inTangent)
                 {
                     tangentsInX.Add(pos.X);
                     tangentsInY.Add(pos.Y);
@@ -1616,7 +1823,7 @@ namespace StorybrewScripts
 
             if (outTangent != null)
             {
-                foreach(var pos in outTangent)
+                foreach (var pos in outTangent)
                 {
                     tangentsOutX.Add(pos.X);
                     tangentsOutY.Add(pos.Y);
@@ -1690,20 +1897,20 @@ namespace StorybrewScripts
                 var leftDistanceX = Math.Abs(pos.X - (pos.X + widthMin));
                 var rightDistanceX = Math.Abs((pos.X + widthMax) - pos.X);
                 if (rightDistanceX > leftDistanceX)
-                shapePosOffsetX = Math.Abs(rightDistanceX - leftDistanceX) + shiftOffsetX;
+                    shapePosOffsetX = Math.Abs(rightDistanceX - leftDistanceX) + shiftOffsetX;
                 else if (rightDistanceX < leftDistanceX)
-                shapePosOffsetX = -Math.Abs(rightDistanceX - leftDistanceX) + shiftOffsetX;
+                    shapePosOffsetX = -Math.Abs(rightDistanceX - leftDistanceX) + shiftOffsetX;
                 else if (rightDistanceX == leftDistanceX)
-                shapePosOffsetX = shiftOffsetX;
+                    shapePosOffsetX = shiftOffsetX;
 
-                var topDistanceY = Math.Abs(pos.Y -  (pos.Y + heightMin));
+                var topDistanceY = Math.Abs(pos.Y - (pos.Y + heightMin));
                 var bottomDistanceY = Math.Abs((pos.Y + heightMax) - pos.Y);
                 if (bottomDistanceY > topDistanceY)
-                shapePosOffsetY = -Math.Abs(bottomDistanceY - topDistanceY) + shiftOffsetY;
+                    shapePosOffsetY = -Math.Abs(bottomDistanceY - topDistanceY) + shiftOffsetY;
                 else if (bottomDistanceY < topDistanceY)
-                shapePosOffsetY = Math.Abs(bottomDistanceY - topDistanceY) + shiftOffsetY;
+                    shapePosOffsetY = Math.Abs(bottomDistanceY - topDistanceY) + shiftOffsetY;
                 else if (bottomDistanceY == topDistanceY)
-                shapePosOffsetY = shiftOffsetY;
+                    shapePosOffsetY = shiftOffsetY;
             }
             else
             {
@@ -1717,6 +1924,12 @@ namespace StorybrewScripts
 
                 width = shapeSize.X + margin + offsetX;
                 height = shapeSize.Y + margin + offsetY;
+
+                if (shapeType != "Path")
+                {
+                    width = shapeSize.X + (margin / 2);
+                    height = shapeSize.Y + (margin / 2);
+                }
 
                 // Log("width: " + width);
                 // Log("height: " + height);
@@ -1743,12 +1956,11 @@ namespace StorybrewScripts
             if (!File.Exists(bitmapPath2))
                 File.Copy(projectPath + @"\assetlibrary\_AeToOsb\b.png", bitmapPath2);
 
-
             if (File.Exists(bitmapPath)) ResizeImage(bitmapPath, new Vector2(width, height));
-                System.Drawing.Image bitmap = Image.FromFile(bitmapPath);
+            System.Drawing.Image bitmap = Image.FromFile(bitmapPath);
 
             if (File.Exists(bitmapPath2)) ResizeImage(bitmapPath2, new Vector2(width, height));
-                System.Drawing.Image bitmap2 = Image.FromFile(bitmapPath2);
+            System.Drawing.Image bitmap2 = Image.FromFile(bitmapPath2);
 
             Graphics graphics = Graphics.FromImage(bitmap);
             Graphics graphics2 = Graphics.FromImage(bitmap2);
@@ -1770,17 +1982,17 @@ namespace StorybrewScripts
                 List<float> ctrlPointOutX = new List<float>();
                 List<float> ctrlPointOutY = new List<float>();
 
-                foreach(var point in verticesX)
+                foreach (var point in verticesX)
                     pointsX.Add(point + (width / 2));
-                foreach(var point in verticesY)
+                foreach (var point in verticesY)
                     pointsY.Add(point + (height / 2));
-                foreach(var tangent in tangentsInX)
+                foreach (var tangent in tangentsInX)
                     ctrlPointInX.Add(tangent);
-                foreach(var tangent in tangentsInY)
+                foreach (var tangent in tangentsInY)
                     ctrlPointInY.Add(tangent);
-                foreach(var tangent in tangentsOutX)
+                foreach (var tangent in tangentsOutX)
                     ctrlPointOutX.Add(tangent);
-                foreach(var tangent in tangentsOutY)
+                foreach (var tangent in tangentsOutY)
                     ctrlPointOutY.Add(tangent);
 
                 // List<PointF> points = new List<PointF>();
@@ -1792,7 +2004,8 @@ namespace StorybrewScripts
                     List<float> ctrlPointsX = new List<float>();
                     List<float> ctrlPointsY = new List<float>();
 
-                    if (ctrlPointInX[i] >= 0) {
+                    if (ctrlPointInX[i] >= 0)
+                    {
                         ctrlPointsX.Add(ctrlPointInX[i]); // x
                         ctrlPointsX.Add(ctrlPointOutX[i]); // x
                     }
@@ -1802,7 +2015,8 @@ namespace StorybrewScripts
                         ctrlPointsX.Add(ctrlPointOutX[i]); // x
                     }
 
-                    if (ctrlPointInX[i] >= 0) {
+                    if (ctrlPointInX[i] >= 0)
+                    {
                         ctrlPointsY.Add(ctrlPointInY[i]); // y
                         ctrlPointsY.Add(ctrlPointOutY[i]); // y
                     }
@@ -1853,7 +2067,8 @@ namespace StorybrewScripts
                     // points.Add(point);
                 }
             }
-            else {
+            else
+            {
                 float offset = -3f;
                 float offset2 = -3f;
                 float m = margin - 1.5f;
@@ -1890,12 +2105,36 @@ namespace StorybrewScripts
                     // }
                     // else
                     // {
-                    PointF rectPos = new PointF((float)Math.Floor(m) + offset - s4, (float)Math.Floor(m) + offset - s4);
-                    PointF rectPos2 = new PointF((float)Math.Floor(m2) + offset2 - s1, (float)Math.Floor(m2) + offset2 - s1);
-                    SizeF rectSize = new SizeF(shapeSize.X + s2, shapeSize.Y + s2);
-                    SizeF rectSize2 = new SizeF(shapeSize.X + s3, shapeSize.Y + s3);
-                    RectangleF rectangle = new RectangleF(rectPos, rectSize);
-                    RectangleF rectangle2 = new RectangleF(rectPos2, rectSize2);
+                    if (!shapeHasStroke)
+                    {
+                        rectPos = new PointF(1, 1);
+                        rectPos2 = new PointF(1, 1);
+                        rectSize = new SizeF(shapeSize.X - 1, shapeSize.Y - 1);
+                        rectSize2 = new SizeF(shapeSize.X - 1, shapeSize.Y - 1);
+                        rectangle = new RectangleF(rectPos, rectSize);
+                        rectangle2 = new RectangleF(rectPos2, rectSize2);
+                    }
+                    else if (shapeHasStroke)
+                    {
+                        if (shapeHasFill)
+                        {
+                            rectPos = new PointF((float)Math.Floor(m) + offset - s4, (float)Math.Floor(m) + offset - s4);
+                            rectPos2 = new PointF((float)Math.Floor(m2) + offset2 - s1, (float)Math.Floor(m2) + offset2 - s1);
+                            rectSize = new SizeF(shapeSize.X + s2, shapeSize.Y + s2);
+                            rectSize2 = new SizeF(shapeSize.X + s3, shapeSize.Y + s3);
+                            rectangle = new RectangleF(rectPos, rectSize);
+                            rectangle2 = new RectangleF(rectPos2, rectSize2);
+                        }
+                        else if (!shapeHasFill)
+                        {
+                            rectPos = new PointF(1, 1);
+                            rectPos2 = new PointF(1, 1);
+                            rectSize = new SizeF(shapeSize.X - 1 + s2, shapeSize.Y - 1 + s2);
+                            rectSize2 = new SizeF(shapeSize.X - 1 + s3, shapeSize.Y - 1 + s3);
+                            rectangle = new RectangleF(rectPos, rectSize);
+                            rectangle2 = new RectangleF(rectPos2, rectSize2);
+                        }
+                    }
 
                     if (generateFill)
                         path.AddRectangle(rectangle);
@@ -1905,12 +2144,36 @@ namespace StorybrewScripts
                 }
                 if (shapeType == "Ellipse")
                 {
-                    PointF ellipsePos = new PointF((float)Math.Floor(m) + offset - s4, (float)Math.Floor(m) + offset - s4);
-                    PointF ellipsePos2 = new PointF((float)Math.Floor(m2) + offset2 - s1, (float)Math.Floor(m2) + offset2 - s1);
-                    SizeF ellipseSize = new SizeF(shapeSize.X + s2, shapeSize.Y + s2);
-                    SizeF ellipseSize2 = new SizeF(shapeSize.X + s3, shapeSize.Y + s3);
-                    RectangleF ellipse = new RectangleF(ellipsePos, ellipseSize);
-                    RectangleF ellipse2 = new RectangleF(ellipsePos2, ellipseSize2);
+                    if (!shapeHasStroke)
+                    {
+                        ellipsePos = new PointF(1, 1);
+                        ellipsePos2 = new PointF(1, 1);
+                        ellipseSize = new SizeF(shapeSize.X - 1, shapeSize.Y - 1);
+                        ellipseSize = new SizeF(shapeSize.X - 1, shapeSize.Y - 1);
+                        ellipse = new RectangleF(ellipsePos, ellipseSize);
+                        ellipse2 = new RectangleF(ellipsePos2, ellipseSize);
+                    }
+                    else if (shapeHasStroke)
+                    {
+                        if (shapeHasFill)
+                        {
+                            ellipsePos = new PointF((float)Math.Floor(m) + offset - s4, (float)Math.Floor(m) + offset - s4);
+                            ellipsePos2 = new PointF((float)Math.Floor(m2) + offset2 - s1, (float)Math.Floor(m2) + offset2 - s1);
+                            ellipseSize = new SizeF(shapeSize.X + s2, shapeSize.Y + s2);
+                            ellipseSize = new SizeF(shapeSize.X + s3, shapeSize.Y + s3);
+                            ellipse = new RectangleF(ellipsePos, ellipseSize);
+                            ellipse2 = new RectangleF(ellipsePos2, ellipseSize);
+                        }
+                        else if (!shapeHasFill)
+                        {
+                            ellipsePos = new PointF(1, 1);
+                            ellipsePos2 = new PointF(1, 1);
+                            ellipseSize = new SizeF(shapeSize.X - 1 + s2, shapeSize.Y - 1 + s2);
+                            ellipseSize = new SizeF(shapeSize.X - 1 + s3, shapeSize.Y - 1 + s3);
+                            ellipse = new RectangleF(ellipsePos, ellipseSize);
+                            ellipse2 = new RectangleF(ellipsePos2, ellipseSize2);
+                        }
+                    }
 
                     if (generateFill)
                         path.AddEllipse(ellipse);
@@ -1949,7 +2212,7 @@ namespace StorybrewScripts
                 Brush sColorBrush = new SolidBrush(sColor);
 
                 if (shapeType == "Path")
-                stroke = new Pen(sColorBrush);
+                    stroke = new Pen(sColorBrush);
             }
 
             if (shapeType == "Path")
@@ -1987,7 +2250,7 @@ namespace StorybrewScripts
                 SolidBrush fColorBrush = new SolidBrush(fColor);
 
                 if (shapeType == "Path")
-                fillColor = fColorBrush;
+                    fillColor = fColorBrush;
             }
 
             graphics.SmoothingMode = SmoothingMode.HighQuality;
@@ -2012,8 +2275,82 @@ namespace StorybrewScripts
             graphics.Dispose();
             graphics2.Dispose();
 
-            bitmap.Save(saveFullPath);
-            bitmap2.Save(saveFullPath2);
+            // use same sprite if identical
+            foreach (var bFile in Directory.GetFiles(bitmapFolderPath))
+            {
+                System.Drawing.Bitmap bFileBitmap = (System.Drawing.Bitmap)Image.FromFile(bFile);
+
+                if (!bFile.Contains("(s)") && CompareBitmaps((System.Drawing.Bitmap)bitmap, bFileBitmap))
+                {
+                    allShapes.Add(bFile);
+                    spritePath = aeToOsbOutput + "/shapes" + allShapes[0].Substring(allShapes[0].LastIndexOf('\\')).Replace(@"\", "/");
+                    // Log("spritePath: " + spritePath);
+                    bFileBitmap.Dispose();
+                    break;
+                }
+                else if (bFile.Contains("(s)") && CompareBitmaps((System.Drawing.Bitmap)bitmap, bFileBitmap))
+                {
+                    allShapesB.Add(bFile);
+                    spritePath2 = aeToOsbOutput + "/shapes" + allShapesB[0].Substring(allShapesB[0].LastIndexOf('\\')).Replace(@"\", "/");
+                    // Log("spritePath2: " + spritePath2);
+                    bFileBitmap.Dispose();
+                    break;
+                }
+                else if (!CompareBitmaps((System.Drawing.Bitmap)bitmap, bFileBitmap))
+                {
+                    bFileBitmap.Dispose();
+                    continue;
+                }
+            }
+
+            try
+            {
+                if (generateFill || shapeHasFill)
+                {
+                    bitmap.Save(shapeSaveFullPath);
+                }
+                else if (!generateFill || !shapeHasFill)
+                {
+                    if (File.Exists(shapeSaveFullPath))
+                        File.Delete(shapeSaveFullPath);
+                }
+
+                if (generateStroke || shapeHasStroke)
+                {
+                    bitmap2.Save(shapeSaveFullPath2);
+                }
+                else if (!generateStroke || !shapeHasStroke)
+                {
+                    if (File.Exists(shapeSaveFullPath2))
+                        File.Delete(shapeSaveFullPath2);
+                }
+            }
+            catch (System.Runtime.InteropServices.ExternalException e)
+            {
+                if (e != null)
+                {
+                    if (generateFill || shapeHasFill)
+                    {
+                        bitmap.Save(shapeSaveFullPath);
+                    }
+                    else if (!generateFill || !shapeHasFill)
+                    {
+                        if (File.Exists(shapeSaveFullPath))
+                            File.Delete(shapeSaveFullPath);
+                    }
+
+                    if (generateStroke || shapeHasStroke)
+                    {
+                        bitmap2.Save(shapeSaveFullPath2);
+                    }
+                    else if (!generateStroke || !shapeHasStroke)
+                    {
+                        if (File.Exists(shapeSaveFullPath2))
+                            File.Delete(shapeSaveFullPath2);
+                    }
+                }
+            }
+
             bitmap.Dispose();
             bitmap2.Dispose();
 
@@ -2023,29 +2360,14 @@ namespace StorybrewScripts
             if (File.Exists(bitmapPath2))
                 File.Delete(bitmapPath2);
 
-            if (!File.Exists(bitmapPath))
-                File.Copy(saveFullPath, bitmapPath);
+            if (!File.Exists(bitmapPath) && File.Exists(shapeSaveFullPath))
+                File.Copy(shapeSaveFullPath, bitmapPath);
 
-            if (!File.Exists(bitmapPath2))
-                File.Copy(saveFullPath2, bitmapPath2);
+            if (!File.Exists(bitmapPath2) && File.Exists(shapeSaveFullPath2))
+                File.Copy(shapeSaveFullPath2, bitmapPath2);
 
             fillPath = spritePath;
             strokePath = spritePath2;
-
-            if (!generateFill)
-            {
-                if (File.Exists(bitmapPath))
-                    File.Delete(bitmapPath);
-                if (File.Exists(spritePath))
-                    File.Delete(spritePath);
-            }
-            if (!generateStroke)
-            {
-                if (File.Exists(bitmapPath2))
-                    File.Delete(bitmapPath2);
-                if (File.Exists(spritePath2))
-                    File.Delete(spritePath2);
-            }
         }
 
         public static GraphicsPath RoundedRect(GraphicsPath path, PointF pos, SizeF size, float radius)
@@ -2079,7 +2401,7 @@ namespace StorybrewScripts
 
         public void ResizeImage(string fileName, Vector2 scale)
         {
-            var fileName2 = fileName.Insert(fileName.LastIndexOf('.')," (r)");
+            var fileName2 = fileName.Insert(fileName.LastIndexOf('.'), " (r)");
 
             using (Image image = Image.FromFile(fileName))
             {
@@ -2094,6 +2416,59 @@ namespace StorybrewScripts
 
             if (File.Exists(fileName2))
                 File.Delete(fileName2);
+        }
+
+        public static bool CompareBitmaps(System.Drawing.Bitmap bmp1, System.Drawing.Bitmap bmp2)
+        {
+            bool equals = true;
+            bool flag = true;  //Inner loop isn't broken
+
+            //Test to see if we have the same size of image
+            if (bmp1.Size == bmp2.Size)
+            {
+                for (int x = 0; x < bmp1.Width; ++x)
+                {
+                    for (int y = 0; y < bmp1.Height; ++y)
+                    {
+                        if (bmp1.GetPixel(x, y) != bmp2.GetPixel(x, y))
+                        {
+                            equals = false;
+                            flag = false;
+                            break;
+                        }
+                    }
+                    if (!flag)
+                    {
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                equals = false;
+            }
+            return equals;
+        }
+
+        private bool isFileInUse(FileInfo file)
+        {
+            FileStream stream = null;
+
+            try
+            {
+                stream = file.Open(FileMode.Open, FileAccess.Read, FileShare.None);
+            }
+            catch (IOException)
+            {
+                return true;
+            }
+            finally
+            {
+                if (stream != null)
+                    stream.Close();
+            }
+
+            return false;
         }
 
         public int[] GenerateRgba(string hex)
@@ -2115,6 +2490,17 @@ namespace StorybrewScripts
                 var grid = GetLayer("GridOverlay").CreateSprite(path, origin);
                 grid.Fade(compStart, compEnd, gridOpacity, gridOpacity);
                 grid.Scale(compStart, 480.0f / gridBitmap.Height);
+            }
+        }
+
+        public void DeleteBG()
+        {
+            if (deleteBeatmapBG)
+            {
+                var BgPath = Beatmap.BackgroundPath;
+                var Sprite = GetLayer("Delete Beatmap BG").CreateSprite(BgPath);
+
+                Sprite.Fade(0, 0);
             }
         }
     }
