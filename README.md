@@ -1,5 +1,5 @@
 # AeToOsb
-After Effects plugin that exports the project to a storybrew effect by [-Tochi](https://osu.ppy.sh/users/3664366).
+After Effects plugin that exports a project to a storybrew effect by [-Tochi](https://osu.ppy.sh/users/3664366).
 
 Get started here! https://github.com/T0chi/AeToOsb/wiki/Getting-Started
 
