@@ -215,8 +215,8 @@ namespace StorybrewScripts
 
         public override void Generate()
         {
-            var documentsFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            var pathSettings = documentsFolder + @"\AeToOsb\settings.json";
+            // var documentsFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            var pathSettings = '~/Documents/AeToOsb/settings.json';
 
             aeToOsbSettings = AeToOsbSettings.FromJson(File.ReadAllText(pathSettings));
             pathOutput = aeToOsbSettings.OutputFolderPath + "\\AeToOsb.json";

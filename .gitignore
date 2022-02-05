@@ -1,0 +1,15 @@
+
+ScriptUI_Data.json
+readme_tags.txt
+jsconfig.json
+AeToOsb/splitter.jsx
+AeToOsb/settingsBckp.json
+AeToOsb/AeToOsb_backup.jsx
+AeToStorybrew.code-workspace
+.vscode/launch.json
+AeToOsb.zip
+*.exe
+*.iss
+after_installation.txt
+disclaimer.txt
+license.txt

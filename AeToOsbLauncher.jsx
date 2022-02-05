@@ -30,21 +30,8 @@
 
         Launcher.show();
         launchButton.onClick = function () {
-            // var mainScriptPath = $.fileName.slice(0, -19) + "AeToOsb.jsx";
-            // var stringDiskLetter = mainScriptPath.slice(1, 2).toUpperCase();
-            // var mainScriptFullPath = stringDiskLetter + ":" + "/" + mainScriptPath.slice(3, mainScriptPath.length);
-            // var file = File(mainScriptFullPath.replace("%20", " "));
-            // alert(file.fsName);
 
             if (launchButton.enabled == true) {
-                // file.execute();
-                // launchButton.enabled = false;
-                // Launcher.update();
-
-                // var scriptFilePath = $.fileName.replace("AeToOsbLauncher", "AeToOsb\\AeToOsb");
-                // var scriptFile = new File(scriptFilePath);
-                // alert(scriptFile.fsName);
-                // app.executeCommand(8000);
                 launchScript();
             }
         }
@@ -52,4 +39,3 @@
         return Launcher;
     }());
 }
-// AeToOsb(this);
