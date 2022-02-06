@@ -361,7 +361,7 @@
             // UTILKEYFRAME
             // ============
             var utilKeyframeCheckbox6 = utilKeyframe.add("checkbox", undefined, undefined, { name: "utilKeyframeCheckbox6" });
-            utilKeyframeCheckbox6.helpTip = "Optimize keyframes based on the motion of the position and angle.";
+            utilKeyframeCheckbox6.helpTip = "Optimize keyframes based on the motion of the position and angle. ONLY FOR POSITIONS";
             utilKeyframeCheckbox6.text = "Optimize keyframes based on motion";
             utilKeyframeCheckbox6.value = true;
             utilKeyframeCheckbox6.alignment = ["left", "center"];
@@ -456,99 +456,9 @@
             button3.text = "Documentation";
             button3.alignment = ["center", "top"];
 
-            // EXPORTPROGRESS
-            // ==============
-            var exportProgress = new Window("palette"); 
-            exportProgress.text = "Exporting..."; 
-            exportProgress.preferredSize.width = 320; 
-            exportProgress.orientation = "column"; 
-            exportProgress.alignChildren = ["center","top"]; 
-            exportProgress.spacing = 10; 
-            exportProgress.margins = 16; 
-
-            // EXPLAYERPANEL
-            // =============
-            var expLayerPanel = exportProgress.add("panel", undefined, undefined, {name: "expLayerPanel"}); 
-            expLayerPanel.text = "Layer (1/1)"; 
-            expLayerPanel.preferredSize.width = 325; 
-            expLayerPanel.orientation = "column"; 
-            expLayerPanel.alignChildren = ["left","top"]; 
-            expLayerPanel.spacing = 10; 
-            expLayerPanel.margins = 10; 
-
-            // EXPLAYERGROUP
-            // =============
-            var expLayerGroup = expLayerPanel.add("group", undefined, {name: "expLayerGroup"}); 
-            expLayerGroup.preferredSize.width = 304; 
-            expLayerGroup.orientation = "row"; 
-            expLayerGroup.alignChildren = ["left","center"]; 
-            expLayerGroup.spacing = 10; 
-            expLayerGroup.margins = 0; 
-            expLayerGroup.alignment = ["center","top"]; 
-
-            // EXPLAYER
-            // ========
-            var expLayer = expLayerGroup.add("panel", undefined, undefined, {name: "expLayer"}); 
-            expLayer.text = "(layer name)"; 
-            expLayer.preferredSize.width = 270; 
-            expLayer.orientation = "column"; 
-            expLayer.alignChildren = ["left","top"]; 
-            expLayer.spacing = 10; 
-            expLayer.margins = 10; 
-            expLayer.alignment = ["left","center"]; 
-
-            var expLayerStatus = expLayer.add("statictext", undefined, undefined, {name: "expLayerStatus"}); 
-            expLayerStatus.text = "Status...";
-            expLayerStatus.preferredSize.width = 280;  
-            expLayerStatus.alignment = ["center","top"]; 
-
-            var expLayerProgress = expLayer.add("progressbar", undefined, undefined, {name: "expLayerProgress"}); 
-            expLayerProgress.maxvalue = 100; 
-            expLayerProgress.value = 0; 
-            expLayerProgress.preferredSize.width = 280; 
-            expLayerProgress.preferredSize.height = 8; 
-            expLayerProgress.alignment = ["center","top"]; 
-
-            // EXPCOMPPANEL
-            // ============
-            var expCompPanel = exportProgress.add("panel", undefined, undefined, {name: "expCompPanel"}); 
-            expCompPanel.text = "Composition (1/1)"; 
-            expCompPanel.preferredSize.width = 325; 
-            expCompPanel.orientation = "column"; 
-            expCompPanel.alignChildren = ["left","top"]; 
-            expCompPanel.spacing = 10; 
-            expCompPanel.margins = 10; 
-
-            // EXPCOMPGROUP
-            // ============
-            var expCompGroup = expCompPanel.add("group", undefined, {name: "expCompGroup"}); 
-            expCompGroup.preferredSize.width = 304; 
-            expCompGroup.orientation = "row"; 
-            expCompGroup.alignChildren = ["left","center"]; 
-            expCompGroup.spacing = 10; 
-            expCompGroup.margins = 0; 
-            expCompGroup.alignment = ["center","top"]; 
-
-            // EXPCOMP
-            // =======
-            var expComp = expCompGroup.add("panel", undefined, undefined, {name: "expComp"}); 
-            expComp.text = "(comp name)"; 
-            expComp.preferredSize.width = 270; 
-            expComp.orientation = "column"; 
-            expComp.alignChildren = ["left","top"]; 
-            expComp.spacing = 10; 
-            expComp.margins = 10; 
-            expComp.alignment = ["left","center"]; 
-
-            var expCompProgress = expComp.add("progressbar", undefined, undefined, {name: "expCompProgress"}); 
-            expCompProgress.maxvalue = 100; 
-            expCompProgress.value = 0; 
-            expCompProgress.preferredSize.width = 280; 
-            expCompProgress.preferredSize.height = 8; 
-            expCompProgress.alignment = ["center","top"];
-
             var parentsInComp = false;
-            var currentLayerStep = 0;
+            // var currentLayerStep = 0;
+
             // FUNCTIONS ////////////////////////////////////////////////////
             /////////////////////////////////////////////////////////////////
             /////////////////////////////////////////////////////////////////
@@ -1947,6 +1857,97 @@
                         var expCompSteps = 0;
                         var expProgressMax = 100;
 
+                        // EXPORTPROGRESS
+                        // ==============
+                        var exportProgress = new Window("palette"); 
+                        exportProgress.text = "Exporting..."; 
+                        exportProgress.preferredSize.width = 320; 
+                        exportProgress.orientation = "column"; 
+                        exportProgress.alignChildren = ["center","top"]; 
+                        exportProgress.spacing = 10; 
+                        exportProgress.margins = 16; 
+
+                        // EXPLAYERPANEL
+                        // =============
+                        var expLayerPanel = exportProgress.add("panel", undefined, undefined, {name: "expLayerPanel"}); 
+                        expLayerPanel.text = "Layer (1/1)"; 
+                        expLayerPanel.preferredSize.width = 325; 
+                        expLayerPanel.orientation = "column"; 
+                        expLayerPanel.alignChildren = ["left","top"]; 
+                        expLayerPanel.spacing = 10; 
+                        expLayerPanel.margins = 10; 
+
+                        // EXPLAYERGROUP
+                        // =============
+                        var expLayerGroup = expLayerPanel.add("group", undefined, {name: "expLayerGroup"}); 
+                        expLayerGroup.preferredSize.width = 304; 
+                        expLayerGroup.orientation = "row"; 
+                        expLayerGroup.alignChildren = ["left","center"]; 
+                        expLayerGroup.spacing = 10; 
+                        expLayerGroup.margins = 0; 
+                        expLayerGroup.alignment = ["center","top"]; 
+
+                        // EXPLAYER
+                        // ========
+                        var expLayer = expLayerGroup.add("panel", undefined, undefined, {name: "expLayer"}); 
+                        expLayer.text = "(layer name)"; 
+                        expLayer.preferredSize.width = 270; 
+                        expLayer.orientation = "column"; 
+                        expLayer.alignChildren = ["left","top"]; 
+                        expLayer.spacing = 10; 
+                        expLayer.margins = 10; 
+                        expLayer.alignment = ["left","center"]; 
+
+                        var expLayerStatus = expLayer.add("statictext", undefined, undefined, {name: "expLayerStatus"}); 
+                        expLayerStatus.text = "Status...";
+                        expLayerStatus.preferredSize.width = 280;  
+                        expLayerStatus.alignment = ["center","top"]; 
+
+                        var expLayerProgress = expLayer.add("progressbar", undefined, undefined, {name: "expLayerProgress"}); 
+                        expLayerProgress.maxvalue = 100; 
+                        expLayerProgress.value = 0; 
+                        expLayerProgress.preferredSize.width = 280; 
+                        expLayerProgress.preferredSize.height = 8; 
+                        expLayerProgress.alignment = ["center","top"]; 
+
+                        // EXPCOMPPANEL
+                        // ============
+                        var expCompPanel = exportProgress.add("panel", undefined, undefined, {name: "expCompPanel"}); 
+                        expCompPanel.text = "Composition (1/1)"; 
+                        expCompPanel.preferredSize.width = 325; 
+                        expCompPanel.orientation = "column"; 
+                        expCompPanel.alignChildren = ["left","top"]; 
+                        expCompPanel.spacing = 10; 
+                        expCompPanel.margins = 10; 
+
+                        // EXPCOMPGROUP
+                        // ============
+                        var expCompGroup = expCompPanel.add("group", undefined, {name: "expCompGroup"}); 
+                        expCompGroup.preferredSize.width = 304; 
+                        expCompGroup.orientation = "row"; 
+                        expCompGroup.alignChildren = ["left","center"]; 
+                        expCompGroup.spacing = 10; 
+                        expCompGroup.margins = 0; 
+                        expCompGroup.alignment = ["center","top"]; 
+
+                        // EXPCOMP
+                        // =======
+                        var expComp = expCompGroup.add("panel", undefined, undefined, {name: "expComp"}); 
+                        expComp.text = "(comp name)"; 
+                        expComp.preferredSize.width = 270; 
+                        expComp.orientation = "column"; 
+                        expComp.alignChildren = ["left","top"]; 
+                        expComp.spacing = 10; 
+                        expComp.margins = 10; 
+                        expComp.alignment = ["left","center"]; 
+
+                        var expCompProgress = expComp.add("progressbar", undefined, undefined, {name: "expCompProgress"}); 
+                        expCompProgress.maxvalue = 100; 
+                        expCompProgress.value = 0; 
+                        expCompProgress.preferredSize.width = 280; 
+                        expCompProgress.preferredSize.height = 8; 
+                        expCompProgress.alignment = ["center","top"];
+
                         function updateLayerSteps(step, layerName, statusText) {
                             expLayerSteps = expProgressMax * (step / 10);
                             expLayerProgress.value = expLayerSteps;
@@ -1971,7 +1972,17 @@
                             exportProgress.update();
                         }
 
-                        if (exportProgress instanceof Window) exportProgress.show();
+                        var aLayerHasParent = false;
+                        for (var I = 0; I < selectedComps.length; I++) {
+                            for (var la = 1; la < selectedComps[I].numLayers; la++) {
+                                if (selectedComps[I].layer(la).parent != null)
+                                aLayerHasParent = true;
+                            }
+                        }
+
+                        scriptSettings = readSettings();
+                        if (aLayerHasParent || scriptSettings.exportTextPerLetter == true)
+                            if (exportProgress instanceof Window) exportProgress.show();
 
                         for (var I = 0; I < selectedComps.length; I++) {
                             expCompCount++;
@@ -2625,6 +2636,7 @@
                                                     if (parentLayerData.property("Transform").property("X Position").numKeys !== 0) {
                                                         currentCompResolution = [4, 4];
                                                         newLayer = getChildPosition(currentCompLayer, parentLayerData, layer.transform.isRotating, layerHasParent);
+                                                        updateLayerSteps(6.35, currentComp.layer(la).name, "Baking parented keyframes into child layer...");
                                                         var newLayerPosXAfter = newLayer.property("Transform").property("X Position");
     
                                                         for (var k = 1; k <= newLayerPosXAfter.numKeys; k++) {
@@ -2640,6 +2652,7 @@
                                                     }
                                                     else {
                                                         newLayer = getChildPosition(currentCompLayer, parentLayerData, layer.transform.isRotating, layerHasParent);
+                                                        updateLayerSteps(6.35, currentComp.layer(la).name, "Baking parented keyframes into child layer...");
                                                         var newLayerPosXAfter = newLayer.property("Transform").property("X Position");
                                                         var keyframe = {};
     
@@ -2663,6 +2676,7 @@
                                                 if (layerHasParent == true) {
                                                     if (parentLayerData.property("Transform").property("X Position").numKeys !== 0) {
                                                         currentCompResolution = [4, 4];
+                                                        updateLayerSteps(6.35, currentComp.layer(la).name, "Baking parented keyframes into child layer...");
                                                         newLayer = getChildPosition(currentCompLayer, parentLayerData, layer.transform.isRotating, layerHasParent);
                                                         var newLayerPosXAfter = newLayer.property("Transform").property("X Position");
     
@@ -2676,6 +2690,7 @@
                                                     }
                                                     else {
                                                         currentCompResolution = [4, 4];
+                                                        updateLayerSteps(6.35, currentComp.layer(la).name, "Baking parented keyframes into child layer...");
                                                         newLayer = getChildPosition(currentCompLayer, parentLayerData, layer.transform.isRotating, layerHasParent);
                                                         var newLayerPosXAfter = newLayer.property("Transform").property("X Position");
     
@@ -2700,7 +2715,7 @@
                                             }
     
                                             // position y
-                                            updateLayerSteps(6.5, currentComp.layer(la).name, "Exporting position y keyframes...");
+                                            updateLayerSteps(6.8, currentComp.layer(la).name, "Exporting position y keyframes...");
                                             layer.transform.position.y = [];
                                             if (propPosY.numKeys !== 0) {
                                                 if (layerHasParent == true) {
@@ -3145,6 +3160,7 @@
                                                                             if (propPosX.numKeys !== 0) {
                                                                                 if (lineSpacingOffsetKeyframed[0] == false) {
                                                                                     currentCompResolution = [4, 4];
+                                                                                    updateLayerSteps(8.5, currentComp.layer(la).name, "Baking parented keyframes into child layer...");
                                                                                     explodedTextLayerNew = getChildPosition(explodedTextLayer, currentCompLayer, layer.transform.isRotating, layerHasParent);
                                                                                     var explodedTextLayerPosXAfter = explodedTextLayerNew.property("Transform").property("X Position");
     
@@ -3158,6 +3174,7 @@
                                                                                 }
                                                                                 else if (lineSpacingOffsetKeyframed[0] == true) {
                                                                                     currentCompResolution = [4, 4];
+                                                                                    updateLayerSteps(8.5, currentComp.layer(la).name, "Baking parented keyframes into child layer...");
                                                                                     explodedTextLayerNew = getChildPosition(explodedTextLayer, currentCompLayer, layer.transform.isRotating, layerHasParent);
                                                                                     var explodedTextLayerPosXAfter = explodedTextLayerNew.property("Transform").property("X Position");
     
@@ -3287,6 +3304,7 @@
                                                                                 }
                                                                                 else {
                                                                                     currentCompResolution = [4, 4];
+                                                                                    updateLayerSteps(8.5, currentComp.layer(la).name, "Baking parented keyframes into child layer...");
                                                                                     explodedTextLayerNew = getChildPosition(explodedTextLayer, currentCompLayer, layer.transform.isRotating, layerHasParent);
                                                                                     var explodedTextLayerPosXAfter = explodedTextLayerNew.property("Transform").property("X Position");
     
@@ -3448,6 +3466,7 @@
                                                                                 }
                                                                                 else if (lineSpacingOffsetKeyframed.length == 0 && layer.transform.isRotating == true) {
                                                                                     currentCompResolution = [4, 4];
+                                                                                    updateLayerSteps(8.5, currentComp.layer(la).name, "Baking parented keyframes into child layer...");
                                                                                     explodedTextLayerNew = getChildPosition(explodedTextLayer, currentCompLayer, layer.transform.isRotating, layerHasParent);
                                                                                     var explodedTextLayerPosXAfter = explodedTextLayerNew.property("Transform").property("X Position");
     
@@ -3461,6 +3480,7 @@
                                                                                 }
                                                                                 else {
                                                                                     currentCompResolution = [4, 4];
+                                                                                    updateLayerSteps(8.5, currentComp.layer(la).name, "Baking parented keyframes into child layer...");
                                                                                     explodedTextLayerNew = getChildPosition(explodedTextLayer, currentCompLayer, layer.transform.isRotating, layerHasParent);
                                                                                     var explodedTextLayerPosXAfter = explodedTextLayerNew.property("Transform").property("X Position");
     
@@ -4004,6 +4024,10 @@
                             compItems.push(composition)
                             // alert("currentCompLayer.parent: " + currentCompLayer.parent);
                         }
+                        scriptSettings = readSettings();
+                        if (aLayerHasParent || scriptSettings.exportTextPerLetter == true)
+                            if (exportProgress instanceof Window) exportProgress.close();
+                            else exportProgress.close();
                     }
                 }
 
@@ -4086,7 +4110,6 @@
                     scriptSettings.exportedComps = compSelectionNames;
                     scriptSettings.exportedCompNames = selectedCompsID;
                     writeSettings(scriptSettings);
-                    if (exportProgress instanceof Window) exportProgress.close();
                     if (parentsInComp) alert("AeToOsb alert: Your composition(s) are ready to be parsed.");
 
                     confirmSelection.onClick = function () {
@@ -4158,9 +4181,10 @@
                     }
                 }
 
-                if (selectedCompList_array[0] !== "Please select a composition.")
+                if (selectedCompList_array[0] !== "Please select a composition.") {
                     if (selectedCompsDialog instanceof Window) selectedCompsDialog.show();
-                // selectedCompsDialog.show();
+                    // selectedCompsDialog.show();
+                }
             }
 
             function round(value, precision) {
@@ -5102,8 +5126,25 @@
                 if ((parentProp.keyInInterpolationType(1) == 6613 || parentProp.keyOutInterpolationType(1) == 6613) &&
                     parentProp.keyInInterpolationType(parentProp.numKeys) == 6613 || parentProp.keyOutInterpolationType(parentProp.numKeys) == 6613) {
                     try {
-                        prop.setInterpolationTypeAtKey(1, KeyframeInterpolationType.BEZIER);
-                        prop.setInterpolationTypeAtKey(prop.numKeys, KeyframeInterpolationType.BEZIER);
+                        prop.setInterpolationTypeAtKey(1, KeyframeInterpolationType.LINEAR);
+                        prop.setInterpolationTypeAtKey(prop.numKeys, KeyframeInterpolationType.LINEAR);
+                        
+                        // if (prop.numKeys > 2) {
+                        //     if (prop.propertyValueType == 6414 || prop.propertyValueType == 6416 || prop.propertyValueType == 6417) {
+                        //         for (var e = 0; e < prop.keyInTemporalEase(1).length; e++) {
+                        //             prop.keyInTemporalEase(3)[e].influence = 0;
+                        //             prop.keyOutTemporalEase(3)[e].influence = 0;
+                        //             prop.keyInTemporalEase(prop.numKeys - 2)[e].influence = 0;
+                        //             prop.keyOutTemporalEase(prop.numKeys - 2)[e].influence = 0;
+                                    
+                        //             prop.keyInTemporalEase(2)[e].influence = 20;
+                        //             prop.keyOutTemporalEase(2)[e].influence = 20;
+                        //             prop.keyInTemporalEase(prop.numKeys - 1)[e].influence = 20;
+                        //             prop.keyOutTemporalEase(prop.numKeys - 1)[e].influence = 20;
+                        //             alert("yes");
+                        //         }
+                        //     }
+                        // }
                     }
                     catch (e) {}
                 }

@@ -216,7 +216,7 @@ namespace StorybrewScripts
         public override void Generate()
         {
             // var documentsFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            var pathSettings = '~/Documents/AeToOsb/settings.json';
+            var pathSettings = "~/Documents/AeToOsb/settings.json";
 
             aeToOsbSettings = AeToOsbSettings.FromJson(File.ReadAllText(pathSettings));
             pathOutput = aeToOsbSettings.OutputFolderPath + "\\AeToOsb.json";
@@ -339,6 +339,8 @@ namespace StorybrewScripts
 
                             startTime = spriteStart;
                             endTime = spriteEnd;
+                            
+                            if (spriteType == "NullLayer") continue;
 
                             // text parameters
                             var spriteTextProps = compLayer.Text;
@@ -1102,7 +1104,18 @@ namespace StorybrewScripts
                         }
                         else if (key2 > 1 && key2 + 1 < keys.Count && keys.Count % 2 == 0)
                         {
+                            var lastKey1 = key1;
+                            var lastKey2 = key2;
                             key1 = key1 + 1; key2 = key2 + 1;
+
+                            // tweening
+                            
+                            sprite.Fade(getEasing(keys[lastKey1].Easing, keys[lastKey2].Easing), keys[lastKey1].Time + frameDuration, keys[lastKey2].Time + frameDuration, keys[lastKey1].Value, keys[lastKey2].Value);
+                            if (shapeHasStroke && shapeHasFill && shapeType != "Path" && spriteType == "Shape")
+                                spriteStroke.Fade(getEasing(keys[lastKey1].Easing, keys[lastKey2].Easing), keys[lastKey1].Time + frameDuration, keys[lastKey2].Time + frameDuration, keys[lastKey1].Value, keys[lastKey2].Value);
+
+                            // after
+                            
                             sprite.Fade(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, keys[key1].Value, keys[key2].Value);
                             if (shapeHasStroke && shapeHasFill && shapeType != "Path" && spriteType == "Shape")
                                 spriteStroke.Fade(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, keys[key1].Value, keys[key2].Value);
@@ -1391,9 +1404,31 @@ namespace StorybrewScripts
                         }
                         else if (key2 > 1 && key2 + 1 < keysX.Count && keysX.Count % 2 == 0)
                         {
+                            var lastKey1 = key1;
+                            var lastKey2 = key2;
                             key1 = key1 + 1; key2 = key2 + 1;
+
+                            // tweening
+                            
                             if (spriteType == "Text")
-                                sprite.ScaleVec(getEasing(keysX[key1].Easing, keysX[key2].Easing), keysX[key1].Time, keysX[key2].Time + frameDuration,
+                                sprite.ScaleVec(getEasing(keysX[lastKey1].Easing, keysX[lastKey2].Easing), keysX[lastKey1].Time + frameDuration, keysX[lastKey2].Time + frameDuration,
+                                    new Vector2((float)(keysX[lastKey1].Value * downScale) * fontScaleShift, (float)(keysY[lastKey1].Value * downScale) * fontScaleShift),
+                                    new Vector2((float)(keysX[lastKey2].Value * downScale) * fontScaleShift, (float)(keysY[lastKey2].Value * downScale) * fontScaleShift));
+                            if (spriteType != "Text")
+                                sprite.ScaleVec(getEasing(keysX[lastKey1].Easing, keysX[lastKey2].Easing), keysX[lastKey1].Time + frameDuration, keysX[lastKey2].Time + frameDuration,
+                                    new Vector2((float)(keysX[lastKey1].Value * downScale) + fillScaleShift + solidSize.X, (float)(keysY[lastKey1].Value * downScale) + fillScaleShift + solidSize.Y),
+                                    new Vector2((float)(keysX[lastKey2].Value * downScale) + fillScaleShift + solidSize.X, (float)(keysY[lastKey2].Value * downScale) + fillScaleShift + solidSize.Y));
+
+                            if (shapeHasStroke && shapeHasFill && shapeType != "Path" && spriteType == "Shape")
+                                if (spriteType != "Text")
+                                    spriteStroke.ScaleVec(getEasing(keysX[lastKey1].Easing, keysX[lastKey2].Easing), keysX[lastKey1].Time + frameDuration, keysX[lastKey2].Time + frameDuration,
+                                        new Vector2((float)((solidSize.X * keysX[lastKey1].Value) * downScale), (float)((solidSize.Y * keysY[lastKey1].Value) * downScale)),
+                                        new Vector2((float)((solidSize.X * keysX[lastKey2].Value) * downScale), (float)((solidSize.Y * keysY[lastKey2].Value) * downScale)));
+
+                            // after
+
+                            if (spriteType == "Text")
+                                sprite.ScaleVec(getEasing(keysX[key1].Easing, keysX[key2].Easing), keysX[key1].Time + frameDuration, keysX[key2].Time + frameDuration,
                                     new Vector2((float)(keysX[key1].Value * downScale) * fontScaleShift, (float)(keysY[key1].Value * downScale) * fontScaleShift),
                                     new Vector2((float)(keysX[key2].Value * downScale) * fontScaleShift, (float)(keysY[key2].Value * downScale) * fontScaleShift));
                             if (spriteType != "Text")
@@ -1413,7 +1448,7 @@ namespace StorybrewScripts
                             if (key2 < keysX.Count)
                             {
                                 if (spriteType == "Text")
-                                    sprite.ScaleVec(getEasing(keysX[key1].Easing, keysX[key2].Easing), keysX[key1].Time, keysX[key2].Time + frameDuration,
+                                    sprite.ScaleVec(getEasing(keysX[key1].Easing, keysX[key2].Easing), keysX[key1].Time + frameDuration, keysX[key2].Time + frameDuration,
                                         new Vector2((float)(keysX[key1].Value * downScale) * fontScaleShift, (float)(keysY[key1].Value * downScale) * fontScaleShift),
                                         new Vector2((float)(keysX[key2].Value * downScale) * fontScaleShift, (float)(keysY[key2].Value * downScale) * fontScaleShift));
                                 if (spriteType != "Text")
@@ -1486,7 +1521,18 @@ namespace StorybrewScripts
                         }
                         else if (key2 > 1 && key2 + 1 < keys.Count && keys.Count % 2 == 0)
                         {
+                            var lastKey1 = key1;
+                            var lastKey2 = key2;
                             key1 = key1 + 1; key2 = key2 + 1;
+
+                            // tweening
+                            
+                            sprite.Rotate(getEasing(keys[lastKey1].Easing, keys[lastKey2].Easing), keys[lastKey1].Time + frameDuration, keys[lastKey2].Time + frameDuration, MathHelper.DegreesToRadians(keys[lastKey1].Value), MathHelper.DegreesToRadians(keys[lastKey2].Value));
+                            if (shapeHasStroke && shapeHasFill && shapeType != "Path" && spriteType == "Shape")
+                                spriteStroke.Rotate(getEasing(keys[lastKey1].Easing, keys[lastKey2].Easing), keys[lastKey1].Time + frameDuration, keys[lastKey2].Time + frameDuration, MathHelper.DegreesToRadians(keys[lastKey1].Value), MathHelper.DegreesToRadians(keys[lastKey2].Value));
+
+                            // after
+
                             sprite.Rotate(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, MathHelper.DegreesToRadians(keys[key1].Value), MathHelper.DegreesToRadians(keys[key2].Value));
                             if (shapeHasStroke && shapeHasFill && shapeType != "Path" && spriteType == "Shape")
                                 spriteStroke.Rotate(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, MathHelper.DegreesToRadians(keys[key1].Value), MathHelper.DegreesToRadians(keys[key2].Value));
@@ -1534,7 +1580,16 @@ namespace StorybrewScripts
                         }
                         else if (key2 > 1 && key2 + 1 < keys.Count && keys.Count % 2 == 0)
                         {
+                            var lastKey1 = key1;
+                            var lastKey2 = key2;
                             key1 = key1 + 1; key2 = key2 + 1;
+
+                            // tweening
+                            
+                            sprite.Color(getEasing(keys[lastKey1].Easing, keys[lastKey2].Easing), keys[lastKey1].Time + frameDuration, keys[lastKey2].Time + frameDuration, keys[lastKey1].Value, keys[lastKey2].Value);
+
+                            // after
+                            
                             sprite.Color(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, keys[key1].Value, keys[key2].Value);
                             // Log("2value1: " + key1 + " | value2: " + key2);
                         }
@@ -1574,7 +1629,16 @@ namespace StorybrewScripts
                         }
                         else if (key2 > 1 && key2 + 1 < keys.Count && keys.Count % 2 == 0)
                         {
+                            var lastKey1 = key1;
+                            var lastKey2 = key2;
                             key1 = key1 + 1; key2 = key2 + 1;
+
+                            // tweening
+                            
+                            sprite.Color(getEasing(keys[lastKey1].Easing, keys[lastKey2].Easing), keys[lastKey1].Time + frameDuration, keys[lastKey2].Time + frameDuration, keys[lastKey1].Value, keys[lastKey2].Value);
+
+                            // after
+                            
                             sprite.Color(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, keys[key1].Value, keys[key2].Value);
                             // Log("2value1: " + key1 + " | value2: " + key2);
                         }
@@ -1608,6 +1672,7 @@ namespace StorybrewScripts
         {
             OsbEasing newEasing = new OsbEasing();
             var hasEasing = nextEasing.Contains("In") || nextEasing.Contains("Out");
+            var noneEasing = nextEasing.Contains("None");
 
             switch (easing)
             {
@@ -1616,16 +1681,22 @@ namespace StorybrewScripts
                     newEasing = OsbEasing.None;
                     if (hasEasing == true)
                         newEasing = OsbEasing.InOutSine;
+                    if (noneEasing == true)
+                        newEasing = OsbEasing.None;
                     break;
                 case "In":
                     newEasing = OsbEasing.In;
                     if (hasEasing == true)
                         newEasing = OsbEasing.InOutSine;
+                    if (noneEasing == true)
+                        newEasing = OsbEasing.InSine;
                     break;
                 case "Out":
                     newEasing = OsbEasing.Out;
                     if (hasEasing == true)
                         newEasing = OsbEasing.InOutSine;
+                    if (noneEasing == true)
+                        newEasing = OsbEasing.OutSine;
                     break;
 
                 // Sine
@@ -1633,11 +1704,15 @@ namespace StorybrewScripts
                     newEasing = OsbEasing.InSine;
                     if (hasEasing == true)
                         newEasing = OsbEasing.InOutSine;
+                    if (noneEasing == true)
+                        newEasing = OsbEasing.InSine;
                     break;
                 case "OutSine":
                     newEasing = OsbEasing.OutSine;
                     if (hasEasing == true)
                         newEasing = OsbEasing.InOutSine;
+                    if (noneEasing == true)
+                        newEasing = OsbEasing.OutSine;
                     break;
                 case "InOutSine":
                     newEasing = OsbEasing.InOutSine;
@@ -1648,11 +1723,15 @@ namespace StorybrewScripts
                     newEasing = OsbEasing.InQuad;
                     if (hasEasing == true)
                         newEasing = OsbEasing.InOutQuad;
+                    if (noneEasing == true)
+                        newEasing = OsbEasing.InQuad;
                     break;
                 case "OutQuad":
                     newEasing = OsbEasing.OutQuad;
                     if (hasEasing == true)
                         newEasing = OsbEasing.InOutQuad;
+                    if (noneEasing == true)
+                        newEasing = OsbEasing.OutQuad;
                     break;
                 case "InOutQuad":
                     newEasing = OsbEasing.InOutQuad;
@@ -1663,11 +1742,15 @@ namespace StorybrewScripts
                     newEasing = OsbEasing.InCubic;
                     if (hasEasing == true)
                         newEasing = OsbEasing.InOutCubic;
+                    if (noneEasing == true)
+                        newEasing = OsbEasing.InCubic;
                     break;
                 case "OutCubic":
                     newEasing = OsbEasing.OutCubic;
                     if (hasEasing == true)
                         newEasing = OsbEasing.InOutCubic;
+                    if (noneEasing == true)
+                        newEasing = OsbEasing.OutCubic;
                     break;
                 case "InOutCubic":
                     newEasing = OsbEasing.InOutCubic;
@@ -1678,11 +1761,15 @@ namespace StorybrewScripts
                     newEasing = OsbEasing.InQuart;
                     if (hasEasing == true)
                         newEasing = OsbEasing.InOutQuart;
+                    if (noneEasing == true)
+                        newEasing = OsbEasing.InQuart;
                     break;
                 case "OutQuart":
                     newEasing = OsbEasing.OutQuart;
                     if (hasEasing == true)
                         newEasing = OsbEasing.InOutQuart;
+                    if (noneEasing == true)
+                        newEasing = OsbEasing.OutQuart;
                     break;
                 case "InOutQuart":
                     newEasing = OsbEasing.InOutQuart;
@@ -1693,11 +1780,15 @@ namespace StorybrewScripts
                     newEasing = OsbEasing.InQuint;
                     if (hasEasing == true)
                         newEasing = OsbEasing.InOutQuint;
+                    if (noneEasing == true)
+                        newEasing = OsbEasing.InQuint;
                     break;
                 case "OutQuint":
                     newEasing = OsbEasing.OutQuint;
                     if (hasEasing == true)
                         newEasing = OsbEasing.InOutQuint;
+                    if (noneEasing == true)
+                        newEasing = OsbEasing.OutQuint;
                     break;
                 case "InOutQuint":
                     newEasing = OsbEasing.InOutQuint;
@@ -1708,11 +1799,15 @@ namespace StorybrewScripts
                     newEasing = OsbEasing.InExpo;
                     if (hasEasing == true)
                         newEasing = OsbEasing.InOutExpo;
+                    if (noneEasing == true)
+                        newEasing = OsbEasing.InExpo;
                     break;
                 case "OutExpo":
                     newEasing = OsbEasing.OutExpo;
                     if (hasEasing == true)
                         newEasing = OsbEasing.InOutExpo;
+                    if (noneEasing == true)
+                        newEasing = OsbEasing.OutExpo;
                     break;
                 case "InOutExpo":
                     newEasing = OsbEasing.InOutExpo;
@@ -1723,11 +1818,15 @@ namespace StorybrewScripts
                     newEasing = OsbEasing.InCirc;
                     if (hasEasing == true)
                         newEasing = OsbEasing.InOutCirc;
+                    if (noneEasing == true)
+                        newEasing = OsbEasing.InCirc;
                     break;
                 case "OutCirc":
                     newEasing = OsbEasing.OutCirc;
                     if (hasEasing == true)
                         newEasing = OsbEasing.InOutCirc;
+                    if (noneEasing == true)
+                        newEasing = OsbEasing.OutCirc;
                     break;
                 case "InOutCirc":
                     newEasing = OsbEasing.InOutCirc;
@@ -1738,11 +1837,15 @@ namespace StorybrewScripts
                     newEasing = OsbEasing.InBack;
                     if (hasEasing == true)
                         newEasing = OsbEasing.InOutBack;
+                    if (noneEasing == true)
+                        newEasing = OsbEasing.InBack;
                     break;
                 case "OutBack":
                     newEasing = OsbEasing.OutBack;
                     if (hasEasing == true)
                         newEasing = OsbEasing.InOutBack;
+                    if (noneEasing == true)
+                        newEasing = OsbEasing.OutBack;
                     break;
                 case "InOutBack":
                     newEasing = OsbEasing.InOutBack;
