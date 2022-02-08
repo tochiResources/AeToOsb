@@ -2060,6 +2060,8 @@
                                         layer.path = currentCompLayer.source.mainSource.file.fsName;
                                 }
                                 // layer.id = currentCompLayer.id;
+                                if (layerType == "Image")
+                                    layer.path = currentCompLayer.source.mainSource.file.fsName;
 
                                 if (currentCompLayer.enabled === true || layerType === "NullLayer") {
                                     updateLayerSteps(1, currentComp.layer(la).name, "Layer is enabled...");

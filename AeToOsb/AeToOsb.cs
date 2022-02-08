@@ -30,6 +30,12 @@ namespace StorybrewScripts
         [Configurable]
         public string sbFolderName = "sb";
 
+        // [Configurable]
+        // public bool changeDocumentsFolder = false;
+
+        // [Configurable]
+        // public string documentsFolder = "";
+
         [Configurable]
         public Vector2 offsetEverything = new Vector2(-107, 0);
 
@@ -131,7 +137,8 @@ namespace StorybrewScripts
         private string spriteLayer;
         private string sequenceLoopType;
         private OsbLoopType spriteLoopType;
-        private string sequenceFilePath;
+        private string spriteFilePath;
+        private string spriteFileSBPath;
         private string sequenceFileName;
         private string spriteFont;
         private string spriteFontFamily;
@@ -325,11 +332,17 @@ namespace StorybrewScripts
                             }
 
                             layerName = compLayer.Name;
+                            spriteFilePath = compLayer.Path;
                             layerFileName = compLayer.FileName;
                             spriteType = compLayer.Type;
                             spriteLayer = compLayer.LayerLayer;
                             sequenceLoopType = compLayer.LoopType;
-                            sequenceFilePath = compLayer.Path;
+
+                            if (spriteType == "Image")
+                            {
+                                var spriteFilePathIndex = spriteFilePath.IndexOf(sbFolderName);
+                                spriteFileSBPath = spriteFilePath.Substring(spriteFilePathIndex).Replace(@"\", "/");
+                            }
 
                             spriteStart = compLayer.StartTime;
                             spriteEnd = compLayer.EndTime;
@@ -628,11 +641,11 @@ namespace StorybrewScripts
                                     }
                                     else if (!autoGen || (layerName.Contains("{") && layerName.Contains("}")))
                                     {
-                                        var sbIndex = sequenceFilePath.IndexOf(sbFolderName);
-                                        var sbLastIndex = sequenceFilePath.LastIndexOf('\\');
-                                        var sequencePathRemove = sequenceFilePath.Substring(sbLastIndex);
+                                        var sbIndex = spriteFilePath.IndexOf(sbFolderName);
+                                        var sbLastIndex = spriteFilePath.LastIndexOf('\\');
+                                        var sequencePathRemove = spriteFilePath.Substring(sbLastIndex);
 
-                                        sequencePath = sequenceFilePath.Substring(sbIndex);
+                                        sequencePath = spriteFilePath.Substring(sbIndex);
                                         sequencePath = MapsetPath + "/" + sequencePath.Replace(sequencePathRemove, "").Replace(@"\", "/");
                                         sequenceEntries = Directory.GetFiles(sequencePath).Length;
 
@@ -755,21 +768,30 @@ namespace StorybrewScripts
                                 else if (spriteType == "Solid")
                                 {
                                     solid = compLayer.Solid;
+                                    var aeosbFolder = MapsetPath + "/" + sbFolderName + "/AeToOsb";
                                     var solidSBSpriteFile = MapsetPath + "/" + sbFolderName + "/AeToOsb/p.png";
                                     var solidSpriteFile = ProjectPath + "/assetlibrary/_AeToOsb/p.png";
+
+                                    if (!Directory.Exists(aeosbFolder.Replace("/", @"\")))
+                                        Directory.CreateDirectory(aeosbFolder);
 
                                     // move sprite to sb folder
                                     if (!File.Exists(solidSBSpriteFile.Replace("/", @"\")))
                                     {
                                         if (File.Exists(solidSpriteFile.Replace("/", @"\")))
-                                            File.Copy(solidSpriteFile.Replace("/", @"\"), solidSBSpriteFile);
+                                            File.Copy(solidSpriteFile.Replace("/", @"\"), solidSBSpriteFile.Replace("/", @"\"));
                                         else Log("Cannot find file 'p.png' in .../assetlibrary/_AeToOsb/");
                                     }
 
                                     sprite = GetLayer(spriteType + ": " + layerName + ": " + spriteIndex).CreateSprite(sbFolderName + "/AeToOsb/p.png", origin);
                                 }
                                 else if (spriteType != "Sequence" && spriteType != "Shape" && spriteType != "Solid")
-                                    sprite = GetLayer(spriteType + ": " + layerFileName + ": " + spriteIndex).CreateSprite(sbFolderName + "/" + layerFileName, origin);
+                                {
+                                    if (spriteType != "Image")
+                                        sprite = GetLayer(spriteType + ": " + layerFileName + ": " + spriteIndex).CreateSprite(sbFolderName + "/" + layerFileName, origin);
+                                    if (spriteType == "Image")
+                                        sprite = GetLayer(spriteType + ": " + layerFileName + ": " + spriteIndex).CreateSprite(spriteFileSBPath, origin);
+                                }
 
                                 // fade
                                 fade(spriteTransform.Fade, sprite, spriteStroke);
@@ -888,47 +910,57 @@ namespace StorybrewScripts
                             }
                         }
                     }
-                    // delete unused shapes
-                    string projectPath_ = ProjectPath;
-                    string shapeSBFolderPath = MapsetPath + "/" + aeToOsbOutput + "/shapes";
 
-                    if (projectPath_.Contains("/"))
-                        projectPath_ = projectPath_.Replace("/", @"\");
-                    if (shapeSBFolderPath.Contains("/"))
-                        shapeSBFolderPath = shapeSBFolderPath.Replace("/", @"\");
-
-                    var shapesFolderPath = projectPath_ + @"\assetlibrary\_AeToOsb\compositions\" + compName + "\\shapes";
-
-                    for (var s = 0; s < allShapes.Count; s++)
+                    if (spriteType == "Shape")
                     {
-                        if (s != 0)
+                        // delete unused shapes
+                        string projectPath_ = ProjectPath;
+                        string shapeSBFolderPath = MapsetPath + "/" + aeToOsbOutput + "/shapes";
+
+                        if (!Directory.Exists(shapeSBFolderPath.Replace("/", @"\")))
+                            Directory.CreateDirectory(shapeSBFolderPath);
+
+                        if (projectPath_.Contains("/"))
+                            projectPath_ = projectPath_.Replace("/", @"\");
+                        if (shapeSBFolderPath.Contains("/"))
+                            shapeSBFolderPath = shapeSBFolderPath.Replace("/", @"\");
+
+                        var shapesFolderPath = projectPath_ + @"\assetlibrary\_AeToOsb\compositions\" + compName + "\\shapes";
+
+                        if (!Directory.Exists(shapesFolderPath.Replace("/", @"\")))
+                            Directory.CreateDirectory(shapesFolderPath);
+
+                        for (var s = 0; s < allShapes.Count; s++)
                         {
-                            if (File.Exists(allShapes[s]) && !isFileInUse(new FileInfo(allShapes[s])))
-                                File.Delete(allShapes[s]);
+                            if (s != 0)
+                            {
+                                if (File.Exists(allShapes[s]) && !isFileInUse(new FileInfo(allShapes[s])))
+                                    File.Delete(allShapes[s]);
+                            }
                         }
-                    }
-                    for (var s = 0; s < allShapesB.Count; s++)
-                    {
-                        if (s != 0)
+                        for (var s = 0; s < allShapesB.Count; s++)
                         {
-                            if (File.Exists(allShapesB[s]) && !isFileInUse(new FileInfo(allShapesB[s])))
-                                File.Delete(allShapesB[s]);
+                            if (s != 0)
+                            {
+                                if (File.Exists(allShapesB[s]) && !isFileInUse(new FileInfo(allShapesB[s])))
+                                    File.Delete(allShapesB[s]);
+                            }
                         }
-                    }
 
-                    foreach (var file in Directory.GetFiles(shapeSBFolderPath))
-                    {
-                        if (File.Exists(file) && !isFileInUse(new FileInfo(file)))
-                            File.Delete(file);
-                    }
+                        foreach (var file in Directory.GetFiles(shapeSBFolderPath))
+                        {
+                            if (File.Exists(file) && !isFileInUse(new FileInfo(file)))
+                                File.Delete(file);
+                        }
 
-                    foreach (var file in Directory.GetFiles(shapesFolderPath))
-                    {
-                        var fileInfo = new FileInfo(file);
-                        string newFileName = Path.Combine(shapeSBFolderPath, fileInfo.Name);
+                        foreach (var file in Directory.GetFiles(shapesFolderPath))
+                        {
+                            var fileInfo = new FileInfo(file);
+                            string newFileName = Path.Combine(shapeSBFolderPath, fileInfo.Name);
 
-                        if (File.Exists(file) && !File.Exists(newFileName))
-                            File.Copy(file, newFileName);
+                            if (File.Exists(file) && !File.Exists(newFileName))
+                                File.Copy(file, newFileName);
+                        }
                     }
                 }
                 if (spriteType == "NullLayer") sprite = nullItem;
@@ -1365,7 +1397,7 @@ namespace StorybrewScripts
             {
                 solidSize = new Vector2(solid.Bitmap.Width * (float)downScale, solid.Bitmap.Height * (float)downScale);
             }
-            Log("solidSize: " + solidSize);
+            // Log("solidSize: " + solidSize);
 
             // scale
             if (transform != null)
