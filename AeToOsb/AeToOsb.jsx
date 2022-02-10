@@ -238,17 +238,155 @@
             // ===========
             tabbedpanel.selection = utilities;
 
-            // UTILGROUP
-            // =========
-            var utilGroup = utilities.add("group", undefined, { name: "utilGroup" });
-            utilGroup.orientation = "column";
-            utilGroup.alignChildren = ["center", "center"];
-            utilGroup.spacing = 10;
-            utilGroup.margins = 0;
+            // UTILITYTABS
+            // ===========
+            var utilityTabs = utilities.add("tabbedpanel", undefined, undefined, {name: "utilityTabs"}); 
+            utilityTabs.alignChildren = "fill"; 
+            utilityTabs.preferredSize.width = 290.031; 
+            utilityTabs.alignChildren = ["center", "center"];
+            utilityTabs.margins = 0;
+
+            // UTILGENERAL
+            // ===========
+            var utilGeneral = utilityTabs.add("tab", undefined, undefined, {name: "utilGeneral"}); 
+            utilGeneral.text = "General"; 
+            utilGeneral.orientation = "column"; 
+            utilGeneral.alignChildren = ["center","top"]; 
+            utilGeneral.spacing = 10; 
+            utilGeneral.margins = 10;
+
+            // UTILLAYERGROUP
+            // ==============
+            var utilLayerGroup = utilGeneral.add("panel", undefined, undefined, {name: "utilLayerGroup"}); 
+            utilLayerGroup.text = "Layer Group"; 
+            utilLayerGroup.orientation = "column"; 
+            utilLayerGroup.alignChildren = ["center","top"]; 
+            utilLayerGroup.spacing = 10; 
+            utilLayerGroup.margins = 10; 
+
+            // UTILLAYERGROUPINFO
+            // ==================
+            var utilLayerGroupInfo = utilLayerGroup.add("group", undefined, {name: "utilLayerGroupInfo"}); 
+            utilLayerGroupInfo.orientation = "row"; 
+            utilLayerGroupInfo.alignChildren = ["center","center"]; 
+            utilLayerGroupInfo.spacing = 10; 
+            utilLayerGroupInfo.margins = 0; 
+
+            var utilLayerGroupName = utilLayerGroupInfo.add("statictext", undefined, undefined, {name: "utilLayerGroupName"}); 
+            utilLayerGroupName.text = "Group name"; 
+
+            var utilLayerGroupNameInput = utilLayerGroupInfo.add('edittext {properties: {name: "utilLayerGroupNameInput"}}'); 
+            utilLayerGroupNameInput.preferredSize.width = 83; 
+            utilLayerGroupNameInput.alignment = ["center","center"]; 
+
+            var utilLayerGroupApplyButton = utilLayerGroupInfo.add("button", undefined, undefined, {name: "utilLayerGroupApplyButton"}); 
+            utilLayerGroupApplyButton.text = "Apply"; 
+
+            // UTILLAYERORIGINS
+            // ================
+            var utilLayerOrigins = utilGeneral.add("panel", undefined, undefined, {name: "utilLayerOrigins"}); 
+            utilLayerOrigins.text = "Origins"; 
+            utilLayerOrigins.orientation = "column"; 
+            utilLayerOrigins.alignChildren = ["center","top"]; 
+            utilLayerOrigins.spacing = 10; 
+            utilLayerOrigins.margins = 10; 
+
+            // UTILLAYERORIGINTOP
+            // ==================
+            var utilLayerOriginTop = utilLayerOrigins.add("group", undefined, {name: "utilLayerOriginTop"}); 
+            utilLayerOriginTop.orientation = "row"; 
+            utilLayerOriginTop.alignChildren = ["center","center"]; 
+            utilLayerOriginTop.spacing = 10; 
+            utilLayerOriginTop.margins = 0; 
+            utilLayerOriginTop.alignment = ["center","top"]; 
+
+            var utilLayerOriginTopLeft = utilLayerOriginTop.add("button", undefined, undefined, {name: "utilLayerOriginTopLeft"}); 
+            utilLayerOriginTopLeft.text = "T-Left"; 
+
+            var utilLayerOriginTopCentre = utilLayerOriginTop.add("button", undefined, undefined, {name: "utilLayerOriginTopCentre"}); 
+            utilLayerOriginTopCentre.text = "T-Centre"; 
+
+            var utilLayerOriginTopRight = utilLayerOriginTop.add("button", undefined, undefined, {name: "utilLayerOriginTopRight"}); 
+            utilLayerOriginTopRight.text = "T-Right"; 
+
+            // UTILLAYERORIGINCENTER
+            // =====================
+            var utilLayerOriginCenter = utilLayerOrigins.add("group", undefined, {name: "utilLayerOriginCenter"}); 
+            utilLayerOriginCenter.orientation = "row"; 
+            utilLayerOriginCenter.alignChildren = ["center","center"]; 
+            utilLayerOriginCenter.spacing = 10; 
+            utilLayerOriginCenter.margins = 0; 
+            utilLayerOriginCenter.alignment = ["center","top"]; 
+
+            var utilLayerOriginCentreLeft = utilLayerOriginCenter.add("button", undefined, undefined, {name: "utilLayerOriginCentreLeft"}); 
+            utilLayerOriginCentreLeft.text = "C-Left"; 
+
+            var utilLayerOriginCentre = utilLayerOriginCenter.add("button", undefined, undefined, {name: "utilLayerOriginCentre"}); 
+            utilLayerOriginCentre.text = "Centre"; 
+
+            var utilLayerOriginCentreRight = utilLayerOriginCenter.add("button", undefined, undefined, {name: "utilLayerOriginCentreRight"}); 
+            utilLayerOriginCentreRight.text = "C-Right"; 
+
+            // UTILLAYERORIGINBOTTOM
+            // =====================
+            var utilLayerOriginBottom = utilLayerOrigins.add("group", undefined, {name: "utilLayerOriginBottom"}); 
+            utilLayerOriginBottom.orientation = "row"; 
+            utilLayerOriginBottom.alignChildren = ["center","center"]; 
+            utilLayerOriginBottom.spacing = 10; 
+            utilLayerOriginBottom.margins = 0; 
+            utilLayerOriginBottom.alignment = ["center","top"]; 
+
+            var utilLayerOriginBottomLeft = utilLayerOriginBottom.add("button", undefined, undefined, {name: "utilLayerOriginBottomLeft"}); 
+            utilLayerOriginBottomLeft.text = "B-Left"; 
+
+            var utilLayerOriginBottomCentre = utilLayerOriginBottom.add("button", undefined, undefined, {name: "utilLayerOriginBottomCentre"}); 
+            utilLayerOriginBottomCentre.text = "B-Centre"; 
+
+            var utilLayerOriginBottomRight = utilLayerOriginBottom.add("button", undefined, undefined, {name: "utilLayerOriginBottomRight"}); 
+            utilLayerOriginBottomRight.text = "B-Right"; 
+
+            // UTILLAYERLAYERING
+            // =================
+            var utilLayerLayering = utilGeneral.add("panel", undefined, undefined, {name: "utilLayerLayering"}); 
+            utilLayerLayering.text = "Layering"; 
+            utilLayerLayering.orientation = "column"; 
+            utilLayerLayering.alignChildren = ["center","top"]; 
+            utilLayerLayering.spacing = 10; 
+            utilLayerLayering.margins = 10; 
+
+            // UTILLAYERLAYERINGGROUP1
+            // =======================
+            var utilLayerLayeringGroup1 = utilLayerLayering.add("group", undefined, {name: "utilLayerLayeringGroup1"}); 
+            utilLayerLayeringGroup1.orientation = "row"; 
+            utilLayerLayeringGroup1.alignChildren = ["center","center"]; 
+            utilLayerLayeringGroup1.spacing = 10; 
+            utilLayerLayeringGroup1.margins = 0; 
+            utilLayerLayeringGroup1.alignment = ["center","top"]; 
+
+            var utilLayerLayeringDefault = utilLayerLayeringGroup1.add("statictext", undefined, undefined, {name: "utilLayerLayeringDefault"}); 
+            utilLayerLayeringDefault.text = "Choose layer type"; 
+
+            var utilLayerLayeringDefaultTypes_array = ["Background","Foreground","Overlay","-","Fail","Pass"]; 
+            var utilLayerLayeringDefaultTypes = utilLayerLayeringGroup1.add("dropdownlist", undefined, undefined, {name: "utilLayerLayeringDefaultTypes", items: utilLayerLayeringDefaultTypes_array}); 
+            utilLayerLayeringDefaultTypes.selection = 0; 
+
+            // UTILLAYERLAYERING
+            // =================
+            var utilLayerLayeringApplyButton = utilLayerLayering.add("button", undefined, undefined, {name: "utilLayerLayeringApplyButton"}); 
+            utilLayerLayeringApplyButton.text = "Apply"; 
+
+            // UTILTEXTHELPER
+            // ==============
+            var utilTextAndKeyframeHelper = utilityTabs.add("tab", undefined, undefined, {name: "utilTextAndKeyframeHelper"}); 
+            utilTextAndKeyframeHelper.text = "Text & Keyframe"; 
+            utilTextAndKeyframeHelper.orientation = "column"; 
+            utilTextAndKeyframeHelper.alignChildren = ["center","top"]; 
+            utilTextAndKeyframeHelper.spacing = 10; 
+            utilTextAndKeyframeHelper.margins = 10;
 
             // UTILTEXT
             // ========
-            var utilText = utilGroup.add("panel", undefined, undefined, { name: "utilText" });
+            var utilText = utilTextAndKeyframeHelper.add("panel", undefined, undefined, { name: "utilText" });
             utilText.text = "Text Helper";
             utilText.orientation = "column";
             utilText.alignChildren = ["center", "top"];
@@ -282,7 +420,7 @@
 
             // UTILKEYFRAME
             // ============
-            var utilKeyframe = utilGroup.add("panel", undefined, undefined, { name: "utilKeyframe" });
+            var utilKeyframe = utilTextAndKeyframeHelper.add("panel", undefined, undefined, { name: "utilKeyframe" });
             utilKeyframe.text = "Keyframe Helper";
             utilKeyframe.orientation = "column";
             utilKeyframe.alignChildren = ["center", "top"];
@@ -318,7 +456,7 @@
             utilKeyframeGroup1.alignChildren = ["center", "center"];
             utilKeyframeGroup1.spacing = 10;
             utilKeyframeGroup1.margins = 0;
-            utilKeyframeGroup1.alignment = ["left", "top"];
+            utilKeyframeGroup1.alignment = ["center", "top"];
 
             var utilKeyframeCheckbox1 = utilKeyframeGroup1.add("checkbox", undefined, undefined, { name: "utilKeyframeCheckbox1" });
             utilKeyframeCheckbox1.text = "X Position";
@@ -342,7 +480,7 @@
             utilKeyframeGroup2.alignChildren = ["center", "center"];
             utilKeyframeGroup2.spacing = 10;
             utilKeyframeGroup2.margins = 0;
-            utilKeyframeGroup2.alignment = ["left", "top"];
+            utilKeyframeGroup2.alignment = ["center", "top"];
 
             var utilKeyframeCheckbox4 = utilKeyframeGroup2.add("checkbox", undefined, undefined, { name: "utilKeyframeCheckbox4" });
             utilKeyframeCheckbox4.text = "Rotation";
@@ -364,7 +502,97 @@
             utilKeyframeCheckbox6.helpTip = "Optimize keyframes based on the motion of the position and angle. ONLY FOR POSITIONS";
             utilKeyframeCheckbox6.text = "Optimize keyframes based on motion";
             utilKeyframeCheckbox6.value = true;
-            utilKeyframeCheckbox6.alignment = ["left", "center"];
+            utilKeyframeCheckbox6.alignment = ["center", "center"];
+
+            // UTILLOOPHELPER
+            // ==============
+            var utilLoopHelper = utilityTabs.add("tab", undefined, undefined, {name: "utilLoopHelper"}); 
+            utilLoopHelper.text = "Loop"; 
+            utilLoopHelper.orientation = "column"; 
+            utilLoopHelper.alignChildren = ["center","top"]; 
+            utilLoopHelper.spacing = 10; 
+            utilLoopHelper.margins = 10; 
+
+            // UTILITYTABS
+            // ===========
+            utilityTabs.selection = utilGeneral; 
+
+            // UTILLOOPINFO
+            // ============
+            var utilLoopInfo = utilLoopHelper.add("group", undefined, {name: "utilLoopInfo"}); 
+            utilLoopInfo.orientation = "row"; 
+            utilLoopInfo.alignChildren = ["center","center"]; 
+            utilLoopInfo.spacing = 10; 
+            utilLoopInfo.margins = 0; 
+
+            var utilLoopStart = utilLoopInfo.add("statictext", undefined, undefined, {name: "utilLoopStart"}); 
+            utilLoopStart.text = "Start frame"; 
+
+            var utilLoopStartInput = utilLoopInfo.add('edittext {properties: {name: "utilLoopStartInput"}}'); 
+            utilLoopStartInput.preferredSize.width = 70; 
+            utilLoopStartInput.alignment = ["center","center"]; 
+
+            // UTILLOOPINFO1
+            // =============
+            var utilLoopInfo1 = utilLoopHelper.add("group", undefined, {name: "utilLoopInfo1"}); 
+            utilLoopInfo1.orientation = "row"; 
+            utilLoopInfo1.alignChildren = ["center","center"]; 
+            utilLoopInfo1.spacing = 10; 
+            utilLoopInfo1.margins = 0; 
+
+            var utilLoopEnd = utilLoopInfo1.add("statictext", undefined, undefined, {name: "utilLoopEnd"}); 
+            utilLoopEnd.text = "End frame"; 
+
+            var utilLoopEndInput = utilLoopInfo1.add('edittext {properties: {name: "utilLoopEndInput"}}'); 
+            utilLoopEndInput.preferredSize.width = 70; 
+            utilLoopEndInput.alignment = ["center","center"]; 
+
+            // UTILLOOPTYPEINFO
+            // ================
+            var utilLoopTypeInfo = utilLoopHelper.add("group", undefined, {name: "utilLoopTypeInfo"}); 
+            utilLoopTypeInfo.orientation = "row"; 
+            utilLoopTypeInfo.alignChildren = ["center","center"]; 
+            utilLoopTypeInfo.spacing = 10; 
+            utilLoopTypeInfo.margins = 0; 
+
+            var utilLoopType = utilLoopTypeInfo.add("statictext", undefined, undefined, {name: "utilLoopType"}); 
+            utilLoopType.text = "Loop type"; 
+
+            var utilLoopTypes_array = ["LoopForever","LoopOnce"]; 
+            var utilLoopTypes = utilLoopTypeInfo.add("dropdownlist", undefined, undefined, {name: "utilLoopTypes", items: utilLoopTypes_array}); 
+            utilLoopTypes.selection = 0; 
+
+            var utilLoopLayerIsSequence = utilLoopHelper.add("checkbox", undefined, undefined, { name: "utilLoopLayerIsSequence" });
+            utilLoopLayerIsSequence.text = "Layer(s) is a sequence";
+            utilLoopLayerIsSequence.helpTip = "Is the layer a Sequence? If checked, the marker will only include the Loop type";
+            utilLoopLayerIsSequence.value = false;
+            utilLoopLayerIsSequence.alignment = ["center", "top"];
+
+            // UTILLOOPBUTTONS
+            // ===============
+            var utilLoopButtons = utilLoopHelper.add("group", undefined, {name: "utilLoopButtons"}); 
+            utilLoopButtons.orientation = "row"; 
+            utilLoopButtons.alignChildren = ["center","center"]; 
+            utilLoopButtons.spacing = 10; 
+            utilLoopButtons.margins = 0; 
+            utilLoopButtons.alignment = ["center","top"]; 
+
+            var utilLoopEnd = utilLoopButtons.add("statictext", undefined, undefined, {name: "utilLoopEnd"}); 
+            utilLoopEnd.text = "Set"; 
+
+            var utilLoopFrameButtonStart = utilLoopButtons.add("button", undefined, undefined, {name: "utilLoopFrameButtonStart"}); 
+            utilLoopFrameButtonStart.text = "Start"; 
+
+            var utilLoopFrameButtonEnd = utilLoopButtons.add("button", undefined, undefined, {name: "utilLoopFrameButtonEnd"}); 
+            utilLoopFrameButtonEnd.text = "End";
+
+            var utilLoopEnd = utilLoopButtons.add("statictext", undefined, undefined, {name: "utilLoopEnd"}); 
+            utilLoopEnd.text = "frame"; 
+
+            // UTILLOOPAPPLYBUTTON
+            // ===============
+            var utilLoopApplyButton = utilLoopHelper.add("button", undefined, undefined, {name: "utilLoopApplyButton"}); 
+            utilLoopApplyButton.text = "Apply";
 
             // HOME
             // ====
@@ -983,42 +1211,42 @@
 
                 scriptslibraryFolderFileObj = new File(scriptSettings.scriptslibraryFolderPath.slice(0, -15) + "\\assetlibrary\\_AeToOsb\\grid.png");
                 decodedName = File.decode(scriptslibraryFolderFileObj.fsName);
-                if (!decodedName.exists)
+                if (!File(decodedName).exists)
                     gridImage.copy(decodedName);
 
                 scriptslibraryFolderFileObj = new File(scriptSettings.scriptslibraryFolderPath.slice(0, -15) + "\\assetlibrary\\_AeToOsb\\b.png");
                 decodedName = File.decode(scriptslibraryFolderFileObj.fsName);
-                if (!decodedName.exists)
+                if (!File(decodedName).exists)
                     bImage.copy(decodedName);
 
                 scriptslibraryFolderFileObj = new File(scriptSettings.scriptslibraryFolderPath.slice(0, -15) + "\\assetlibrary\\_AeToOsb\\p.png");
                 decodedName = File.decode(scriptslibraryFolderFileObj.fsName);
-                if (!decodedName.exists)
+                if (!File(decodedName).exists)
                     pImage.copy(decodedName);
 
                 scriptslibraryFolderFileObj = new File(scriptSettings.scriptslibraryFolderPath + "\\Newtonsoft.Json.dll");
                 decodedName = File.decode(scriptslibraryFolderFileObj.fsName);
-                if (!decodedName.exists)
+                if (!File(decodedName).exists)
                     NewtonsoftFile.copy(decodedName);
 
                 scriptslibraryFolderFileObj = new File(scriptSettings.scriptslibraryFolderPath.slice(0, -15) + "\\AeToOsb.cs");
                 decodedName = File.decode(scriptslibraryFolderFileObj.fsName);
-                if (!decodedName.exists)
+                if (!File(decodedName).exists)
                     AeToOsbFile.copy(decodedName);
 
                 scriptslibraryFolderFileObj = new File(scriptSettings.scriptslibraryFolderPath + "\\AeToOsbParser.cs");
                 decodedName = File.decode(scriptslibraryFolderFileObj.fsName);
-                if (!decodedName.exists)
+                if (!File(decodedName).exists)
                     AeToOsbParserFile.copy(decodedName);
 
                 scriptslibraryFolderFileObj = new File(scriptSettings.scriptslibraryFolderPath + "\\AeToOsbSettings.cs");
                 decodedName = File.decode(scriptslibraryFolderFileObj.fsName);
-                if (!decodedName.exists)
+                if (!File(decodedName).exists)
                     AeToOsbSettingsFile.copy(decodedName);
 
                 // scriptslibraryFolderFileObj = new File(scriptSettings.scriptslibraryFolderPath.slice(0, -15) + "\\DeleteBackground.cs");
                 // decodedName = File.decode(scriptslibraryFolderFileObj.fsName.replaceAll);
-                // if (!decodedName.exists)
+                // if (!File(decodedName).exists)
                 //     DeleteBackgroundFile.copy(decodedName);
             }
 
@@ -2136,22 +2364,30 @@
                                             keyframe.easing = "None";
                                             layer.transform.fade.push(keyframe);
                                         }
-
+                                        
+                                        layer.layerGroup = "";
+                                        layer.loopGroup = "";
                                         for (var m = 1; m <= currentCompLayer.marker.numKeys; m++) {
                                             var marker = currentCompLayer.marker.keyValue(m).comment;
-                                            if (marker.match(new RegExp("(TopLeft|TopCentre|TopRight|CentreLeft|Centre|CentreRight|BottomLeft|BottomCentre|BottomRight|TL|TC|TR|CL|C|CR|BL|BC|BR)", "i"))) {
+                                            if (marker.match(new RegExp("(TopLeft|TopCentre|TopRight|CentreLeft|Centre|CentreRight|BottomLeft|BottomCentre|BottomRight|TL|TC|TR|CL|C|CR|BL|BC|BR)", "i")) && !marker.match(new RegExp("(;)", "i"))) {
                                                 layer.transform.origin = marker;
                                             }
                                             else {
                                                 layer.transform.origin = "Centre";
                                             }
-                                            if (marker.match(new RegExp("(Background|Fail|Pass|Foreground|Overlay|Sound|BG|F|P|FG|O|S)", "i"))) {
+                                            if (marker.match(new RegExp("(Background|Fail|Pass|Foreground|Overlay|Sound|BG|F|P|FG|O|S)", "i")) && !marker.match(new RegExp("(;)", "i"))) {
                                                 layer.layer = marker;
                                             }
                                             if (layerType == "Sequence") {
                                                 if (marker.match(new RegExp("(LoopOnce|LoopForever|LO|LF|1|0)", "i"))) {
                                                     layer.loopType = marker;
                                                 }
+                                            }
+                                            else if (layerType != "Sequence") {
+                                                if (marker.includes('group;') || marker.includes('Group;') || marker.includes('g;') || marker.includes('G;'))
+                                                    layer.layerGroup = marker;
+                                                if (marker.includes('loop;') || marker.includes('Loop;') || marker.includes('L;') || marker.includes('l;'))
+                                                    layer.loopGroup = marker;
                                             }
                                             // if (layer.layer == null || layer.transform.origin == null) {
                                             //     alert("AeToOsb WARNING: Remember to add a marker on the layer '" + currentCompLayer.name + "' with a comment that represents the OsbOrigin and/or OsbLayer.");
@@ -4069,10 +4305,6 @@
                 //     return false;
                 // }
 
-                function milliseconds(num) {
-                    return round(num * 1000, 0);
-                }
-
                 if (!checkUnsupportedLayers()) selectedCompList_array = compSelectionNames;
                 if (selectedCompList_array == "")
                     selectedCompList_array = ["Please select a composition."];
@@ -4192,6 +4424,10 @@
             function round(value, precision) {
                 var multiplier = Math.pow(10, precision || 0);
                 return Math.round(value * multiplier) / multiplier;
+            }
+
+            function milliseconds(num) {
+                return round(num * 1000, 0);
             }
 
             function layerStart(Comp, layerStartTime) {
@@ -4465,6 +4701,329 @@
                         }
                     }
                 }
+            }
+            
+            // global utilities variables
+            var utilLayerGroupNameInputText = "";
+            var utilLayerLayeringDefaultTypesSelection = 0;
+            var currentLoopStartTime = 0;
+            var currentLoopEndTime = 0;
+            var utilLoopStartInputText = "";
+            var utilLoopEndInputText = "";
+            var utilLoopTypesSelection = 0;
+            var utilLoopLayerIsSequenceValue = false;
+            var utilLoopStartInputTextValue = 0;
+            var utilLoopEndInputTextValue = 0;
+
+            utilLayerGroupNameInput.onChanging = function () {
+                utilLayerGroupNameInputText = this.text;
+                utilLayerGroupNameInput.text = utilLayerGroupNameInputText;
+            }
+
+            utilLayerGroupApplyButton.onClick = function () {
+                app.beginUndoGroup("Layer Group Helper");
+                if (utilLayerGroupNameInputText !== "") {
+                    var currentLayer;
+                    var currentComp = app.project.activeItem;
+                    var markerText = new MarkerValue("g; " + utilLayerGroupNameInputText);
+                    
+                    if (currentComp instanceof CompItem) {
+                        var currentTime = currentComp.time;
+                        if (currentComp.selectedLayers != 0) {
+                            var markerExists = false;
+                            for (var l = 0; l < currentComp.selectedLayers.length; l++) {
+                                currentLayer = currentComp.selectedLayers[l];
+                                currentLayer.marker.setValueAtTime(currentTime, markerText);
+                            }
+                        }
+                        else alert("AeToOsb WARNING: Please select at least one layer.");
+                    }
+                    else alert("AeToOsb WARNING: Please highlight a composition panel.");
+                }
+                else if (utilLayerGroupNameInputText == "") {
+                    var currentLayer;
+                    var markerExists = false;
+                    var currentComp = app.project.activeItem;
+
+                    if (currentComp instanceof CompItem) {
+                        var currentTime = currentComp.time;
+                        if (currentComp.selectedLayers != 0) {
+                            for (var l = 0; l < currentComp.selectedLayers.length; l++) {
+                                currentLayer = currentComp.selectedLayers[l];
+                                // check if marker already exists
+                                if (currentLayer.marker.numKeys != 0) {
+                                    for (var m = 1; m <= currentLayer.marker.numKeys; m++) {
+                                        if (currentLayer.marker.keyValue(m).comment.includes('g;')) {
+                                            markerExists = true;
+                                            currentLayer.marker.removeKey(m);
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                            if (markerExists)
+                                alert("AeToOsb WARNING: Layer Group marker(s) already exists and has now been deleted.");
+                            else if (!markerExists)
+                                alert("AeToOsb WARNING: Please type in a group name before applying.");
+                        }
+                        else alert("AeToOsb WARNING: Please select at least one layer.");
+                    }
+                    else alert("AeToOsb WARNING: Please highlight a composition panel.");
+                }
+                app.endUndoGroup();
+            }
+
+            function originsHelper(origin) {
+                var currentLayer;
+                var currentComp = app.project.activeItem;
+                var markerText = new MarkerValue(origin);
+                
+                if (currentComp instanceof CompItem) {
+                    var currentTime = currentComp.time;
+                    if (currentComp.selectedLayers != 0) {
+                        var markerExists = false;
+                        for (var l = 0; l < currentComp.selectedLayers.length; l++) {
+                            currentLayer = currentComp.selectedLayers[l];
+
+                            // check if marker already exists
+                            if (currentLayer.marker.numKeys != 0) {
+                                for (var m = 1; m <= currentLayer.marker.numKeys; m++) {
+                                    if (currentLayer.marker.keyValue(m).comment == origin) {
+                                        markerExists = true;
+                                        currentLayer.marker.removeKey(m);
+                                        break;
+                                    }
+                                }
+                            }
+                            if (!markerExists)
+                            currentLayer.marker.setValueAtTime(currentTime, markerText);
+                        }
+                        if (markerExists)
+                            alert("AeToOsb WARNING: Origin marker(s) already exists and has now been deleted.");
+                    }
+                    else alert("AeToOsb WARNING: Please select at least one layer.");
+                }
+                else alert("AeToOsb WARNING: Please highlight a composition panel.");
+            }
+
+            utilLayerOriginTopLeft.onClick = function () {
+                app.beginUndoGroup("Origins Helper: TopLeft");
+                originsHelper("tl");
+                app.endUndoGroup();
+            }
+
+            utilLayerOriginTopCentre.onClick = function () {
+                app.beginUndoGroup("Origins Helper: TopCentre");
+                originsHelper("tc");
+                app.endUndoGroup();
+            }
+
+            utilLayerOriginTopRight.onClick = function () {
+                app.beginUndoGroup("Origins Helper: TopRight");
+                originsHelper("tr");
+                app.endUndoGroup();
+            }
+
+            utilLayerOriginCentreLeft.onClick = function () {
+                app.beginUndoGroup("Origins Helper: CentreLeft");
+                originsHelper("cl");
+                app.endUndoGroup();
+            }
+
+            utilLayerOriginCentre.onClick = function () {
+                app.beginUndoGroup("Origins Helper: Centre");
+                originsHelper("c");
+                app.endUndoGroup();
+            }
+
+            utilLayerOriginCentreRight.onClick = function () {
+                app.beginUndoGroup("Origins Helper: CentreRight");
+                originsHelper("cr");
+                app.endUndoGroup();
+            }
+
+            utilLayerOriginBottomLeft.onClick = function () {
+                app.beginUndoGroup("Origins Helper: BottomLeft");
+                originsHelper("bl");
+                app.endUndoGroup();
+            }
+
+            utilLayerOriginBottomCentre.onClick = function () {
+                app.beginUndoGroup("Origins Helper: BottomCentre");
+                originsHelper("bc");
+                app.endUndoGroup();
+            }
+
+            utilLayerOriginBottomRight.onClick = function () {
+                app.beginUndoGroup("Origins Helper: BottomRight");
+                originsHelper("br");
+                app.endUndoGroup();
+            }
+            
+            utilLayerLayeringDefaultTypes.onChange = function () {
+                utilLayerLayeringDefaultTypesSelection = this.selection.index;
+            }
+
+            utilLayerLayeringApplyButton.onClick = function () {
+                app.beginUndoGroup("Layering Helper");
+                var markerText;
+                var currentLayer;
+                var currentComp = app.project.activeItem;
+
+                if (utilLayerLayeringDefaultTypesSelection == 0)
+                    markerText = new MarkerValue("bg");
+                else if (utilLayerLayeringDefaultTypesSelection == 1)
+                    markerText = new MarkerValue("fg");
+                else if (utilLayerLayeringDefaultTypesSelection == 2)
+                    markerText = new MarkerValue("o");
+                else if (utilLayerLayeringDefaultTypesSelection == 4)
+                    markerText = new MarkerValue("f");
+                else if (utilLayerLayeringDefaultTypesSelection == 5)
+                    markerText = new MarkerValue("p");
+                
+                if (currentComp instanceof CompItem) {
+                    var currentTime = currentComp.time;
+                    if (currentComp.selectedLayers != 0) {
+                        var markerExists = false;
+                        for (var l = 0; l < currentComp.selectedLayers.length; l++) {
+                            currentLayer = currentComp.selectedLayers[l];
+
+                            // check if marker already exists
+                            if (currentLayer.marker.numKeys != 0) {
+                                for (var m = 1; m <= currentLayer.marker.numKeys; m++) {
+                                    if (currentLayer.marker.keyValue(m).comment == markerText.comment) {
+                                        markerExists = true;
+                                        currentLayer.marker.removeKey(m);
+                                        break;
+                                    }
+                                }
+                            }
+                            if (!markerExists)
+                            currentLayer.marker.setValueAtTime(currentTime, markerText);
+                        }
+                        if (markerExists)
+                            alert("AeToOsb WARNING: Layering marker(s) already exists and has now been deleted.");
+                    }
+                    else alert("AeToOsb WARNING: Please select at least one layer.");
+                }
+                else alert("AeToOsb WARNING: Please highlight a composition panel.");
+                app.endUndoGroup();
+            }
+
+            utilLoopStartInput.onChanging = function () {
+                utilLoopStartInputText = this.text;
+                utilLoopStartInput.text = utilLoopStartInputText;
+            }
+
+            utilLoopEndInput.onChanging = function () {
+                utilLoopEndInputText = this.text;
+                utilLoopEndInput.text = utilLoopEndInputText;
+            }
+            
+            utilLoopTypes.onChange = function () {
+                utilLoopTypesSelection = this.selection.index;
+            }
+
+            utilLoopLayerIsSequence.onClick = function () {
+                function checkBox(value) {
+                    utilLoopLayerIsSequenceValue = value;
+                }
+                utilLoopLayerIsSequence.value == false
+                    ? checkBox(false)
+                    : checkBox(true);
+            }
+            
+            utilLoopFrameButtonStart.onClick = function () {
+                var currentFrame = 0;
+                var currentComp = app.project.activeItem;
+                var currentTime = currentComp.time;
+                if (currentComp instanceof CompItem) {
+                    // currentTime = round(milliseconds(currentComp.time), 0);
+                    var currentTime = currentComp.time;
+                    currentFrame = Math.ceil(currentTime * currentComp.frameRate);
+                    currentLoopStartTime = Math.ceil(milliseconds(currentTime));
+                    
+                    utilLoopStartInputTextValue = currentFrame;
+                    utilLoopStartInputText = currentFrame.toString();
+                    utilLoopStartInput.text = currentFrame.toString();
+
+                    if (utilLoopEndInputTextValue != 0 && utilLoopStartInputTextValue >= utilLoopEndInputTextValue) {
+                        alert("AeToOsb WARNING: Start frame cannot be equal to, or greater than the End frame value.");
+                        utilLoopStartInputText = "";
+                        utilLoopStartInput.text = "";
+                    }
+                }
+                else alert("AeToOsb WARNING: Please highlight a composition panel.");
+            }
+            
+            utilLoopFrameButtonEnd.onClick = function () {
+                var currentFrame = 0;
+                var currentComp = app.project.activeItem;
+                var currentTime = currentComp.time;
+                if (currentComp instanceof CompItem) {
+                    // currentTime = round(milliseconds(currentComp.time), 0);
+                    var currentTime = currentComp.time;
+                    currentFrame = Math.ceil(currentTime * currentComp.frameRate);
+                    currentLoopEndTime = Math.ceil(milliseconds(currentTime));
+                
+                    utilLoopEndInputTextValue = currentFrame;
+                    utilLoopEndInputText = currentFrame.toString();
+                    utilLoopEndInput.text = currentFrame.toString();
+
+                    if (utilLoopStartInputTextValue != 0 && utilLoopEndInputTextValue <= utilLoopStartInputTextValue) {
+                        alert("AeToOsb WARNING: End frame cannot be equal to, or a less than the Start frame value.");
+                        utilLoopEndInputText = "";
+                        utilLoopEndInput.text = "";
+                    }
+                }
+                else alert("AeToOsb WARNING: Please highlight a composition panel.");
+            }
+
+            utilLoopApplyButton.onClick = function () {
+                app.beginUndoGroup("Loop Helper");
+                var markerText;
+                var currentLayer;
+                var currentComp = app.project.activeItem;
+                
+                if (utilLoopTypesSelection == 0)
+                    markerText = new MarkerValue("l;0;" + currentLoopStartTime.toString() + ";" + currentLoopEndTime.toString());
+                else if (utilLoopTypesSelection == 1)
+                    markerText = new MarkerValue("l;1;" + currentLoopStartTime.toString() + ";" + currentLoopEndTime.toString());
+
+                if ((currentLoopStartTime.toString() == "0" && currentLoopEndTime.toString() == "0") || utilLoopLayerIsSequenceValue) {
+                    if (utilLoopTypesSelection == 0)
+                        markerText = new MarkerValue("lf");
+                    else if (utilLoopTypesSelection == 1)
+                        markerText = new MarkerValue("lo");
+                }
+                
+                if (currentComp instanceof CompItem) {
+                    var currentTime = currentComp.time;
+                    if (currentComp.selectedLayers != 0) {
+                        var markerExists = false;
+                        for (var l = 0; l < currentComp.selectedLayers.length; l++) {
+                            currentLayer = currentComp.selectedLayers[l];
+
+                            // check if marker already exists
+                            if (currentLayer.marker.numKeys != 0) {
+                                for (var m = 1; m <= currentLayer.marker.numKeys; m++) {
+                                    if (currentLayer.marker.keyValue(m).comment == "lf" || currentLayer.marker.keyValue(m).comment == "lo" || currentLayer.marker.keyValue(m).comment.includes('l;')) {
+                                        markerExists = true;
+                                        currentLayer.marker.removeKey(m);
+                                        break;
+                                    }
+                                }
+                            }
+                            if (!markerExists)
+                            currentLayer.marker.setValueAtTime(currentTime, markerText);
+                        }
+                        if (markerExists)
+                            alert("AeToOsb WARNING: Loop marker(s) already exists and has now been deleted.");
+                    }
+                    else alert("AeToOsb WARNING: Please select at least one layer.");
+                }
+                else alert("AeToOsb WARNING: Please highlight a composition panel.");
+                app.endUndoGroup();
             }
 
             utilKeyframeIntervalInput.onChanging = function () {
@@ -5322,9 +5881,34 @@
                 discord2: AeToOsb.findElement("discord2"), // iconbutton
                 website: AeToOsb.findElement("website"), // iconbutton
                 atsStatus: AeToOsb.findElement("atsStatus"), // tab
-                utilities: AeToOsb.findElement("utilities"), // tab
                 atsStatusGroup: AeToOsb.findElement("atsStatusGroup"), // group
-                utilGroup: AeToOsb.findElement("utilGroup"), // group
+                utilities: AeToOsb.findElement("utilities"), // tab
+                utilityTabs: AeToOsb.findElement("utilityTabs"), // group
+                utilGeneral: AeToOsb.findElement("utilGeneral"), // tab
+                utilLayerGroup: AeToOsb.findElement("utilLayerGroup"), // panel
+                utilLayerGroupInfo: AeToOsb.findElement("utilLayerGroupInfo"), // group
+                utilLayerGroupName: AeToOsb.findElement("utilLayerGroupName"), // statictext
+                utilLayerGroupNameInput: AeToOsb.findElement("utilLayerGroupNameInput"), // edittext
+                utilLayerGroupApplyButton: AeToOsb.findElement("utilLayerGroupApplyButton"), // button
+                utilLayerOrigins: AeToOsb.findElement("utilLayerOrigins"), // panel
+                utilLayerOriginTop: AeToOsb.findElement("utilLayerOriginTop"), // group
+                utilLayerOriginTopLeft: AeToOsb.findElement("utilLayerOriginTopLeft"), // button
+                utilLayerOriginTopCentre: AeToOsb.findElement("utilLayerOriginTopCentre"), // button
+                utilLayerOriginTopRight: AeToOsb.findElement("utilLayerOriginTopRight"), // button
+                utilLayerOriginCenter: AeToOsb.findElement("utilLayerOriginCenter"), // group
+                utilLayerOriginCentreLeft: AeToOsb.findElement("utilLayerOriginCentreLeft"), // button
+                utilLayerOriginCentre: AeToOsb.findElement("utilLayerOriginCentre"), // button
+                utilLayerOriginCentreRight: AeToOsb.findElement("utilLayerOriginCentreRight"), // button
+                utilLayerOriginBottom: AeToOsb.findElement("utilLayerOriginBottom"), // group
+                utilLayerOriginBottomLeft: AeToOsb.findElement("utilLayerOriginBottomLeft"), // button
+                utilLayerOriginBottomCentre: AeToOsb.findElement("utilLayerOriginBottomCentre"), // button
+                utilLayerOriginBottomRight: AeToOsb.findElement("utilLayerOriginBottomRight"), // button
+                utilLayerLayering: AeToOsb.findElement("utilLayerLayering"), // panel
+                utilLayerLayeringGroup1: AeToOsb.findElement("utilLayerLayeringGroup1"), // group
+                utilLayerLayeringDefault: AeToOsb.findElement("utilLayerLayeringDefault"), // statictext
+                utilLayerLayeringDefaultTypes: AeToOsb.findElement("utilLayerLayeringDefaultTypes"), // dropdownlist
+                utilLayerLayeringApplyButton: AeToOsb.findElement("utilLayerLayeringApplyButton"), // button
+                utilTextAndKeyframeHelper: AeToOsb.findElement("utilTextAndKeyframeHelper"), // tab
                 utilText: AeToOsb.findElement("utilText"), // panel
                 utilTextTitle: AeToOsb.findElement("utilTextTitle"), // statictext
                 utilTextGroup: AeToOsb.findElement("utilTextGroup"), // group
@@ -5345,11 +5929,24 @@
                 utilKeyframeCheckbox5: AeToOsb.findElement("utilKeyframeCheckbox5"), // checkbox
                 utilKeyframeGenerateButton: AeToOsb.findElement("utilKeyframeGenerateButton"), // button
                 utilKeyframeCheckbox6: AeToOsb.findElement("utilKeyframeCheckbox6"), // checkbox
+                utilLoopHelper: AeToOsb.findElement("utilLoopHelper"), // tab
+                utilLoopInfo: AeToOsb.findElement("utilLoopInfo"), // group
+                utilLoopStart: AeToOsb.findElement("utilLoopStart"), // statictext
+                utilLoopStartInput: AeToOsb.findElement("utilLoopStartInput"), // edittext
+                utilLoopInfo1: AeToOsb.findElement("utilLoopInfo1"), // group
+                utilLoopEnd: AeToOsb.findElement("utilLoopEnd"), // statictext
+                utilLoopEndInput: AeToOsb.findElement("utilLoopEndInput"), // edittext
+                utilLoopTypeInfo: AeToOsb.findElement("utilLoopTypeInfo"), // group
+                utilLoopType: AeToOsb.findElement("utilLoopType"), // statictext
+                utilLoopTypes: AeToOsb.findElement("utilLoopTypes"), // dropdownlist
+                utilLoopButtons: AeToOsb.findElement("utilLoopButtons"), // group
+                utilLoopFrameButton: AeToOsb.findElement("utilLoopFrameButton"), // button
+                utilLoopApplyButton: AeToOsb.findElement("utilLoopApplyButton") // button
 
             };
             if (AeToOsb instanceof Window) AeToOsb.show();
 
-            AeToOsb.itemsArray = [AeToOsb, logo, tabbedpanel, settings, contents_group, scriptslibrary_button, outputpath_button, home, export_section, export_button, github, discord1, discord2, website, atsStatus, atsStatusGroup, utilities, utilGroup, utilText, utilTextTitle, utilTextGroup, utilTextLetterButton, utilTextWordButton, utilTextLineButton, utilKeyframe, utilKeyframeGroup, utilKeyframeTitle, utilKeyframeIntervalInput, utilKeyframeMs, utilKeyframeGroup1, utilKeyframeCheckbox1, utilKeyframeCheckbox2, utilKeyframeCheckbox3, utilKeyframeGroup2, utilKeyframeCheckbox4, utilKeyframeCheckbox5, utilKeyframeGenerateButton, utilKeyframeCheckbox6];
+            AeToOsb.itemsArray = [AeToOsb, logo, tabbedpanel, settings, contents_group, scriptslibrary_button, outputpath_button, home, export_section, export_button, github, discord1, discord2, website, atsStatus, atsStatusGroup, utilities, , utilGeneral, utilLayerGroup, utilLayerGroupInfo, utilLayerGroupName, utilLayerGroupNameInput, utilLayerGroupApplyButton, utilLayerOrigins, utilLayerOriginTop, utilLayerOriginTopLeft, utilLayerOriginTopCentre, utilLayerOriginTopRight, utilLayerOriginCenter, utilLayerOriginCentreLeft, utilLayerOriginCentre, utilLayerOriginCentreRight, utilLayerOriginBottom, utilLayerOriginBottomLeft, utilLayerOriginBottomCentre, utilLayerOriginBottomRight, utilLayerLayering, utilLayerLayeringGroup1, utilLayerLayeringDefault, utilLayerLayeringDefaultTypes, utilLayerLayeringApplyButton, utilTextAndKeyframeHelper, utilText, utilTextTitle, utilTextGroup, utilTextLetterButton, utilTextWordButton, utilTextLineButton, utilKeyframe, utilKeyframeGroup, utilKeyframeTitle, utilKeyframeIntervalInput, utilKeyframeMs, utilKeyframeGroup1, utilKeyframeCheckbox1, utilKeyframeCheckbox2, utilKeyframeCheckbox3, utilKeyframeGroup2, utilKeyframeCheckbox4, utilKeyframeCheckbox5, utilKeyframeGenerateButton, utilKeyframeCheckbox6, utilLoopHelper, utilLoopInfo, utilLoopStart, utilLoopStartInput, utilLoopInfo1, utilLoopEnd, utilLoopEndInput, utilLoopTypeInfo, utilLoopType, utilLoopTypes, utilLoopButtons, utilLoopFrameButton, utilLoopApplyButton];
             return AeToOsb;
         }());
     }

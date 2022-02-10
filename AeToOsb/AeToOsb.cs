@@ -94,6 +94,14 @@ namespace StorybrewScripts
         private int spriteDuration;
         private bool spriteAdditive;
         private Transform spriteTransform;
+        private string spriteLayerGroup;
+        private string spriteLoopGroup;
+        private int spriteLoopType;
+        private int spriteLoopStart;
+        private int spriteLoopEnd;
+        private double spriteLoopDuration;
+        private double spriteSingleLoopDuration;
+        private double spriteLoopCount;
 
         // text related parameters
         private string fontName;
@@ -136,7 +144,7 @@ namespace StorybrewScripts
         private string spriteType;
         private string spriteLayer;
         private string sequenceLoopType;
-        private OsbLoopType spriteLoopType;
+        private OsbLoopType spriteSequenceLoopType;
         private string spriteFilePath;
         private string spriteFileSBPath;
         private string sequenceFileName;
@@ -349,6 +357,43 @@ namespace StorybrewScripts
                             spriteDuration = compLayer.Duration;
                             spriteAdditive = compLayer.Additive;
                             spriteTransform = compLayer.Transform;
+                            spriteLayerGroup = compLayer.LayerGroup;
+                            spriteLoopGroup = compLayer.LoopGroup;
+
+                            // layer group info
+                            if (spriteLayerGroup != "" && spriteLayerGroup != null)
+                            {
+                                if (spriteLayerGroup.Contains("g;"))
+                                {
+                                    string[] slgValues = spriteLayerGroup.Split(';');
+                                    spriteLayerGroup = slgValues[1].Substring(1);
+                                }
+                            }
+                            if (spriteLayerGroup == null)
+                                spriteLayerGroup = "";
+
+                            // loop group info
+                            if (spriteLoopGroup != "" && spriteLoopGroup != null)
+                            {
+                                if (spriteLoopGroup.Contains("l;"))
+                                {
+                                    string[] slgValues = spriteLoopGroup.Split(';');
+                                    spriteLoopType = Int32.Parse(slgValues[1]);
+                                    spriteLoopStart = Int32.Parse(slgValues[2]);
+                                    spriteLoopEnd = Int32.Parse(slgValues[3]);
+
+                                    if (spriteLoopStart == 0) spriteLoopStart = -1;
+                                    if (spriteStart == 0) spriteStart = -1;
+
+                                    spriteLoopDuration = spriteLoopEnd - spriteLoopStart;
+                                    spriteSingleLoopDuration = spriteEnd - spriteStart;
+                                    // if (Math.Abs(spriteSingleLoopDuration) > Math.Abs(spriteLoopDuration))
+                                        spriteLoopCount = Math.Ceiling(spriteLoopDuration / spriteSingleLoopDuration);
+                                    // else spriteLoopCount = Math.Ceiling(Math.Abs(spriteLoopDuration) / Math.Abs(spriteSingleLoopDuration));
+                                }
+                            }
+                            if (spriteLoopGroup == null)
+                                spriteLoopGroup = "";
 
                             startTime = spriteStart;
                             endTime = spriteEnd;
@@ -476,21 +521,45 @@ namespace StorybrewScripts
                                                         if (textLength > 10) textLayerName = textLayerName + "...";
 
                                                         sprite = new OsbSprite();
-                                                        sprite = GetLayer(spriteType + ": " + spriteLayer + ": " + spriteIndex).CreateSprite(texture.Path, origin);
+                                                        if (spriteLayerGroup == "")
+                                                            sprite = GetLayer(spriteType + ": " + spriteLayer + ": " + spriteIndex).CreateSprite(texture.Path, origin);
+                                                        else if (spriteLayerGroup != "")
+                                                            sprite = GetLayer("Group: " + spriteLayerGroup).CreateSprite(texture.Path, origin);
 
-                                                        // fade
-                                                        fade(charaTransform.Fade, sprite, new OsbSprite());
-                                                        // position x
-                                                        moveX(charaTransform.Position, sprite, new OsbSprite());
-                                                        // position y
-                                                        moveY(charaTransform.Position, sprite, new OsbSprite());
-                                                        // scale
-                                                        scale(charaTransform.Scale, sprite, new OsbSprite());
-                                                        // rotation
-                                                        rotation(spriteTransform.Rotation, sprite, new OsbSprite());
-                                                        // additive
-                                                        if (spriteAdditive)
-                                                            additive(sprite, spriteStart, spriteEnd);
+                                                        if (spriteLoopGroup != "")
+                                                        {
+                                                            sprite.StartLoopGroup(spriteLoopStart, (int)spriteLoopCount);
+                                                            // fade
+                                                            fade(charaTransform.Fade, sprite, new OsbSprite());
+                                                            // position x
+                                                            moveX(charaTransform.Position, sprite, new OsbSprite());
+                                                            // position y
+                                                            moveY(charaTransform.Position, sprite, new OsbSprite());
+                                                            // scale
+                                                            scale(charaTransform.Scale, sprite, new OsbSprite());
+                                                            // rotation
+                                                            rotation(spriteTransform.Rotation, sprite, new OsbSprite());
+                                                            // additive
+                                                            if (spriteAdditive)
+                                                                additive(sprite, spriteStart, spriteEnd);
+                                                            sprite.EndGroup();
+                                                        }
+                                                        else
+                                                        {
+                                                            // fade
+                                                            fade(charaTransform.Fade, sprite, new OsbSprite());
+                                                            // position x
+                                                            moveX(charaTransform.Position, sprite, new OsbSprite());
+                                                            // position y
+                                                            moveY(charaTransform.Position, sprite, new OsbSprite());
+                                                            // scale
+                                                            scale(charaTransform.Scale, sprite, new OsbSprite());
+                                                            // rotation
+                                                            rotation(spriteTransform.Rotation, sprite, new OsbSprite());
+                                                            // additive
+                                                            if (spriteAdditive)
+                                                                additive(sprite, spriteStart, spriteEnd);
+                                                        }
 
                                                         // Log("Position: " + sprite.PositionAt(5320) + "   ||   lineSpacingOffset: " + letterSpacing[0] + ", " + letterSpacing[1] + ", " + letterSpacing[2] + ", " + letterSpacing[3]);
                                                         // letterSpacing.Clear();
@@ -555,18 +624,18 @@ namespace StorybrewScripts
                                 if (spriteType == "Sequence")
                                 {
                                     if (string.Equals(sequenceLoopType, "LoopOnce", StringComparison.OrdinalIgnoreCase))
-                                        spriteLoopType = OsbLoopType.LoopOnce;
+                                        spriteSequenceLoopType = OsbLoopType.LoopOnce;
                                     else if (string.Equals(sequenceLoopType, "LO", StringComparison.OrdinalIgnoreCase))
-                                        spriteLoopType = OsbLoopType.LoopOnce;
+                                        spriteSequenceLoopType = OsbLoopType.LoopOnce;
                                     else if (string.Equals(sequenceLoopType, "1", StringComparison.OrdinalIgnoreCase))
-                                        spriteLoopType = OsbLoopType.LoopOnce;
+                                        spriteSequenceLoopType = OsbLoopType.LoopOnce;
                                     else if (string.Equals(sequenceLoopType, "LoopForever", StringComparison.OrdinalIgnoreCase))
-                                        spriteLoopType = OsbLoopType.LoopForever;
+                                        spriteSequenceLoopType = OsbLoopType.LoopForever;
                                     else if (string.Equals(sequenceLoopType, "LF", StringComparison.OrdinalIgnoreCase))
-                                        spriteLoopType = OsbLoopType.LoopForever;
+                                        spriteSequenceLoopType = OsbLoopType.LoopForever;
                                     else if (string.Equals(sequenceLoopType, "0", StringComparison.OrdinalIgnoreCase))
-                                        spriteLoopType = OsbLoopType.LoopForever;
-                                    else spriteLoopType = OsbLoopType.LoopOnce;
+                                        spriteSequenceLoopType = OsbLoopType.LoopForever;
+                                    else spriteSequenceLoopType = OsbLoopType.LoopOnce;
 
                                     string sequencePath = "";
                                     int sequenceEntries = 0;
@@ -652,7 +721,10 @@ namespace StorybrewScripts
                                         seqPath = sequencePath.Substring(sequencePath.IndexOf(sbFolderName)) + "/" + layerFileName;
                                     }
 
-                                    sprite = GetLayer(spriteType + ": " + spriteLayer + ": " + spriteIndex).CreateAnimation(seqPath, sequenceEntries, frameDuration, spriteLoopType, origin);
+                                    if (spriteLayerGroup == "")
+                                        sprite = GetLayer(spriteType + ": " + spriteLayer + ": " + spriteIndex).CreateAnimation(seqPath, sequenceEntries, frameDuration, spriteSequenceLoopType, origin);
+                                    else if (spriteLayerGroup != "")
+                                        sprite = GetLayer("Group: " + spriteLayerGroup).CreateAnimation(seqPath, sequenceEntries, frameDuration, spriteSequenceLoopType, origin);
                                 }
                                 else if (spriteType == "Shape")
                                 {
@@ -699,24 +771,48 @@ namespace StorybrewScripts
                                         {
                                             if (shapeType != "Path")
                                             {
-                                                spriteStroke = GetLayer(spriteType + ": " + shapeType + ": " + spriteIndex).CreateSprite(strokeName, origin);
-                                                sprite = GetLayer(spriteType + ": " + shapeType + ": " + spriteIndex).CreateSprite(fillPath, origin);
+                                                if (spriteLayerGroup == "")
+                                                {
+                                                    spriteStroke = GetLayer(spriteType + ": " + shapeType + ": " + spriteIndex).CreateSprite(strokeName, origin);
+                                                    sprite = GetLayer(spriteType + ": " + shapeType + ": " + spriteIndex).CreateSprite(fillPath, origin);
+                                                }
+                                                else if (spriteLayerGroup != "")
+                                                {
+                                                    spriteStroke = GetLayer("Group: " + spriteLayerGroup).CreateSprite(strokeName, origin);
+                                                    sprite = GetLayer("Group: " + spriteLayerGroup).CreateSprite(fillPath, origin);
+                                                }
                                             }
                                         }
                                         else if (shapeFillComposite == "Above")
                                         {
                                             if (shapeType != "Path")
                                             {
-                                                spriteStroke = GetLayer(spriteType + ": " + shapeType + ": " + spriteIndex).CreateSprite(strokeName, origin);
-                                                sprite = GetLayer(spriteType + ": " + shapeType + ": " + spriteIndex).CreateSprite(fillPath, origin);
+                                                if (spriteLayerGroup == "")
+                                                {
+                                                    spriteStroke = GetLayer(spriteType + ": " + shapeType + ": " + spriteIndex).CreateSprite(strokeName, origin);
+                                                    sprite = GetLayer(spriteType + ": " + shapeType + ": " + spriteIndex).CreateSprite(fillPath, origin);
+                                                }
+                                                else if (spriteLayerGroup != "")
+                                                {
+                                                    spriteStroke = GetLayer("Group: " + spriteLayerGroup).CreateSprite(strokeName, origin);
+                                                    sprite = GetLayer("Group: " + spriteLayerGroup).CreateSprite(fillPath, origin);
+                                                }
                                             }
                                         }
                                         else
                                         {
                                             if (shapeType != "Path")
                                             {
-                                                spriteStroke = GetLayer(spriteType + ": " + shapeType + ": " + spriteIndex).CreateSprite(strokeName, origin);
-                                                sprite = GetLayer(spriteType + ": " + shapeType + ": " + spriteIndex).CreateSprite(fillPath, origin);
+                                                if (spriteLayerGroup == "")
+                                                {
+                                                    spriteStroke = GetLayer(spriteType + ": " + shapeType + ": " + spriteIndex).CreateSprite(strokeName, origin);
+                                                    sprite = GetLayer(spriteType + ": " + shapeType + ": " + spriteIndex).CreateSprite(fillPath, origin);
+                                                }
+                                                else if (spriteLayerGroup != "")
+                                                {
+                                                    spriteStroke = GetLayer("Group: " + spriteLayerGroup).CreateSprite(strokeName, origin);
+                                                    sprite = GetLayer("Group: " + spriteLayerGroup).CreateSprite(fillPath, origin);
+                                                }
                                             }
                                         }
                                     }
@@ -730,17 +826,26 @@ namespace StorybrewScripts
 
                                         if (shapeType != "Path")
                                         {
-                                            sprite = GetLayer(spriteType + ": " + shapeType + ": " + spriteIndex).CreateSprite(strokeName, origin);
+                                            if (spriteLayerGroup == "")
+                                                sprite = GetLayer(spriteType + ": " + shapeType + ": " + spriteIndex).CreateSprite(strokeName, origin);
+                                            else if (spriteLayerGroup != "")
+                                                sprite = GetLayer("Group: " + spriteLayerGroup).CreateSprite(strokeName, origin);
                                         }
                                         else
                                         {
-                                            sprite = GetLayer(spriteType + ": " + shapeType + ": " + spriteIndex).CreateSprite(fillPath, origin);
+                                            if (spriteLayerGroup == "")
+                                                sprite = GetLayer(spriteType + ": " + shapeType + ": " + spriteIndex).CreateSprite(fillPath, origin);
+                                            else if (spriteLayerGroup != "")
+                                                sprite = GetLayer("Group: " + spriteLayerGroup).CreateSprite(fillPath, origin);
                                         }
                                     }
                                     else if (!shapeHasStroke && shapeHasFill)
                                     {
                                         ShapeGenerator(compName, false, true, allShapes, allShapesB);
-                                        sprite = GetLayer(spriteType + ": " + shapeType + ": " + spriteIndex).CreateSprite(fillPath, origin);
+                                        if (spriteLayerGroup == "")
+                                            sprite = GetLayer(spriteType + ": " + shapeType + ": " + spriteIndex).CreateSprite(fillPath, origin);
+                                        else if (spriteLayerGroup != "")
+                                            sprite = GetLayer("Group: " + spriteLayerGroup).CreateSprite(fillPath, origin);
                                     }
                                     else continue;
 
@@ -783,46 +888,99 @@ namespace StorybrewScripts
                                         else Log("Cannot find file 'p.png' in .../assetlibrary/_AeToOsb/");
                                     }
 
-                                    sprite = GetLayer(spriteType + ": " + layerName + ": " + spriteIndex).CreateSprite(sbFolderName + "/AeToOsb/p.png", origin);
+                                    if (spriteLayerGroup == "")
+                                        sprite = GetLayer(spriteType + ": " + layerName + ": " + spriteIndex).CreateSprite(sbFolderName + "/AeToOsb/p.png", origin);
+                                    else if (spriteLayerGroup != "")
+                                        sprite = GetLayer("Group: " + spriteLayerGroup).CreateSprite(sbFolderName + "/AeToOsb/p.png", origin);
                                 }
                                 else if (spriteType != "Sequence" && spriteType != "Shape" && spriteType != "Solid")
                                 {
-                                    if (spriteType != "Image")
-                                        sprite = GetLayer(spriteType + ": " + layerFileName + ": " + spriteIndex).CreateSprite(sbFolderName + "/" + layerFileName, origin);
-                                    if (spriteType == "Image")
-                                        sprite = GetLayer(spriteType + ": " + layerFileName + ": " + spriteIndex).CreateSprite(spriteFileSBPath, origin);
-                                }
-
-                                // fade
-                                fade(spriteTransform.Fade, sprite, spriteStroke);
-                                // position x
-                                moveX(spriteTransform.Position, sprite, spriteStroke);
-                                // position y
-                                moveY(spriteTransform.Position, sprite, spriteStroke);
-                                // scale
-                                scale(spriteTransform.Scale, sprite, spriteStroke);
-                                // rotation
-                                rotation(spriteTransform.Rotation, sprite, spriteStroke);
-                                // color solid
-                                if (spriteType == "Solid")
-                                    colorSolid(solid.Color, sprite);
-                                // color shape
-                                if (spriteType == "Shape")
-                                {
-                                    if (shapeHasStroke && !shapeHasFill)
-                                        colorStroke(shapeStrokeColor, sprite);
-                                    else if (shapeHasStroke)
-                                        colorStroke(shapeStrokeColor, spriteStroke);
-
-                                    if (shapeHasFill)
+                                    if (spriteLayerGroup == "")
                                     {
-                                        if (shapeType != "Path")
-                                            colorFill(shapeFillColor, sprite);
+                                        if (spriteType != "Image")
+                                            sprite = GetLayer(spriteType + ": " + layerFileName + ": " + spriteIndex).CreateSprite(sbFolderName + "/" + layerFileName, origin);
+                                        if (spriteType == "Image")
+                                            sprite = GetLayer(spriteType + ": " + layerFileName + ": " + spriteIndex).CreateSprite(spriteFileSBPath, origin);
+                                    }
+                                    else if (spriteLayerGroup != "")
+                                    {
+                                        if (spriteType != "Image")
+                                            sprite = GetLayer("Group: " + spriteLayerGroup).CreateSprite(sbFolderName + "/" + layerFileName, origin);
+                                        if (spriteType == "Image")
+                                            sprite = GetLayer("Group: " + spriteLayerGroup).CreateSprite(spriteFileSBPath, origin);
                                     }
                                 }
-                                // additive
-                                if (spriteAdditive)
-                                    additive(sprite, spriteStart, spriteEnd);
+
+                                if (spriteLoopGroup != "")
+                                {
+                                    sprite.StartLoopGroup(spriteLoopStart, (int)spriteLoopCount);
+                                    spriteStroke.StartLoopGroup(spriteLoopStart, (int)spriteLoopCount);
+                                    // fade
+                                    fade(spriteTransform.Fade, sprite, spriteStroke);
+                                    // position x
+                                    moveX(spriteTransform.Position, sprite, spriteStroke);
+                                    // position y
+                                    moveY(spriteTransform.Position, sprite, spriteStroke);
+                                    // scale
+                                    scale(spriteTransform.Scale, sprite, spriteStroke);
+                                    // rotation
+                                    rotation(spriteTransform.Rotation, sprite, spriteStroke);
+                                    // color solid
+                                    if (spriteType == "Solid")
+                                        colorSolid(solid.Color, sprite);
+                                    // color shape
+                                    if (spriteType == "Shape")
+                                    {
+                                        if (shapeHasStroke && !shapeHasFill)
+                                            colorStroke(shapeStrokeColor, sprite);
+                                        else if (shapeHasStroke)
+                                            colorStroke(shapeStrokeColor, spriteStroke);
+
+                                        if (shapeHasFill)
+                                        {
+                                            if (shapeType != "Path")
+                                                colorFill(shapeFillColor, sprite);
+                                        }
+                                    }
+                                    // additive
+                                    if (spriteAdditive)
+                                        additive(sprite, spriteStart, spriteEnd);
+                                    sprite.EndGroup();
+                                    spriteStroke.EndGroup();
+                                }
+                                else
+                                {
+                                    // fade
+                                    fade(spriteTransform.Fade, sprite, spriteStroke);
+                                    // position x
+                                    moveX(spriteTransform.Position, sprite, spriteStroke);
+                                    // position y
+                                    moveY(spriteTransform.Position, sprite, spriteStroke);
+                                    // scale
+                                    scale(spriteTransform.Scale, sprite, spriteStroke);
+                                    // rotation
+                                    rotation(spriteTransform.Rotation, sprite, spriteStroke);
+                                    // color solid
+                                    if (spriteType == "Solid")
+                                        colorSolid(solid.Color, sprite);
+                                    // color shape
+                                    if (spriteType == "Shape")
+                                    {
+                                        if (shapeHasStroke && !shapeHasFill)
+                                            colorStroke(shapeStrokeColor, sprite);
+                                        else if (shapeHasStroke)
+                                            colorStroke(shapeStrokeColor, spriteStroke);
+
+                                        if (shapeHasFill)
+                                        {
+                                            if (shapeType != "Path")
+                                                colorFill(shapeFillColor, sprite);
+                                        }
+                                    }
+                                    // additive
+                                    if (spriteAdditive)
+                                        additive(sprite, spriteStart, spriteEnd);
+                                }
 
                                 if (spriteType != "NullLayer" && spriteType != "Sequence" && spriteType != "Shape" && spriteType != "Solid")
                                     spriteLibrary.Add(sprite);
@@ -880,21 +1038,46 @@ namespace StorybrewScripts
                                         if (textLength > 10) textLayerName = textLayerName + "...";
 
                                         sprite = new OsbSprite();
-                                        sprite = GetLayer(spriteType + ": " + textLayerName + ": " + spriteIndex).CreateSprite(texture.Path, origin);
+                                        if (spriteLayerGroup == "")
+                                            sprite = GetLayer(spriteType + ": " + textLayerName + ": " + spriteIndex).CreateSprite(texture.Path, origin);
+                                        else if (spriteLayerGroup != "")
+                                            sprite = GetLayer("Group: " + spriteLayerGroup).CreateSprite(texture.Path, origin);
 
-                                        // fade
-                                        fade(spriteTransform.Fade, sprite, new OsbSprite());
-                                        // position x
-                                        moveX(spriteTransform.Position, sprite, new OsbSprite());
-                                        // position y
-                                        moveY(spriteTransform.Position, sprite, new OsbSprite());
-                                        // scale
-                                        scale(spriteTransform.Scale, sprite, new OsbSprite());
-                                        // rotation
-                                        rotation(spriteTransform.Rotation, sprite, new OsbSprite());
-                                        // additive
-                                        if (spriteAdditive)
-                                            additive(sprite, spriteStart, spriteEnd);
+                                        if (spriteLoopGroup != "")
+                                        {
+
+                                            sprite.StartLoopGroup(spriteLoopStart, (int)spriteLoopCount);
+                                            // fade
+                                            fade(spriteTransform.Fade, sprite, new OsbSprite());
+                                            // position x
+                                            moveX(spriteTransform.Position, sprite, new OsbSprite());
+                                            // position y
+                                            moveY(spriteTransform.Position, sprite, new OsbSprite());
+                                            // scale
+                                            scale(spriteTransform.Scale, sprite, new OsbSprite());
+                                            // rotation
+                                            rotation(spriteTransform.Rotation, sprite, new OsbSprite());
+                                            // additive
+                                            if (spriteAdditive)
+                                                additive(sprite, spriteStart, spriteEnd);
+                                            sprite.EndGroup();
+                                        }
+                                        else
+                                        {
+                                            // fade
+                                            fade(spriteTransform.Fade, sprite, new OsbSprite());
+                                            // position x
+                                            moveX(spriteTransform.Position, sprite, new OsbSprite());
+                                            // position y
+                                            moveY(spriteTransform.Position, sprite, new OsbSprite());
+                                            // scale
+                                            scale(spriteTransform.Scale, sprite, new OsbSprite());
+                                            // rotation
+                                            rotation(spriteTransform.Rotation, sprite, new OsbSprite());
+                                            // additive
+                                            if (spriteAdditive)
+                                                additive(sprite, spriteStart, spriteEnd);
+                                        }
 
                                         if (spriteType != "NullLayer") spriteLibrary.Add(sprite);
 
@@ -905,7 +1088,11 @@ namespace StorybrewScripts
                             {
                                 if (enableSamples)
                                 {
-                                    var audioSprite = GetLayer(spriteType + ": " + spriteLayer + ": " + spriteIndex).CreateSample(layerFileName, (double)compLayer.StartTime, samplesVolume);
+                                    OsbSample audioSprite;
+                                    if (spriteLayerGroup == "")
+                                        audioSprite = GetLayer(spriteType + ": " + spriteLayer + ": " + spriteIndex).CreateSample(layerFileName, (double)compLayer.StartTime, samplesVolume);
+                                    else if (spriteLayerGroup != "")
+                                        audioSprite = GetLayer("Group: " + spriteLayerGroup).CreateSample(layerFileName, (double)compLayer.StartTime, samplesVolume);
                                 }
                             }
                         }
@@ -973,6 +1160,17 @@ namespace StorybrewScripts
 
         public void additive(OsbSprite spriteAdd, int start, int end)
         {
+            if (spriteLoopGroup != "")
+            {
+                if (start < spriteLoopStart) start = 0;
+                if (start - spriteLoopStart < spriteLoopStart || end - spriteLoopStart < spriteLoopStart)
+                {
+                    start = Math.Abs(start);
+                    end = Math.Abs(end);
+                }
+                start = start - spriteLoopStart;
+                end = end - spriteLoopStart;
+            }
             spriteAdd.Additive(start, end);
         }
 
@@ -1129,6 +1327,18 @@ namespace StorybrewScripts
                     {
                         if (key1 == 0 && key1 < key2 && keys.Count % 2 == 0)
                         {
+                            if (spriteLoopGroup != "")
+                            {
+                                if (keys[key1].Time < spriteLoopStart) keys[key1].Time = 0;
+                                if (keys[key2].Time > spriteEnd) keys[key2].Time = spriteEnd;
+                                if (keys[key1].Time - spriteLoopStart < spriteLoopStart || keys[key2].Time - spriteLoopStart < spriteLoopStart)
+                                {
+                                    keys[key1].Time = Math.Abs(keys[key1].Time);
+                                    keys[key2].Time = Math.Abs(keys[key2].Time);
+                                }
+                                keys[key1].Time = keys[key1].Time - spriteLoopStart;
+                                keys[key2].Time = keys[key2].Time - spriteLoopStart;
+                            }
                             // Log("1value1: " + key1 + " | value2: " + key2);
                             sprite.Fade(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time, keys[key2].Time + frameDuration, keys[key1].Value, keys[key2].Value);
                             if (shapeHasStroke && shapeHasFill && shapeType != "Path" && spriteType == "Shape")
@@ -1141,12 +1351,36 @@ namespace StorybrewScripts
                             key1 = key1 + 1; key2 = key2 + 1;
 
                             // tweening
+                            if (spriteLoopGroup != "")
+                            {
+                                if (keys[lastKey1].Time < spriteLoopStart) keys[lastKey1].Time = 0;
+                                if (keys[lastKey2].Time > spriteEnd) keys[lastKey2].Time = spriteEnd;
+                                if (keys[lastKey1].Time - spriteLoopStart < spriteLoopStart || keys[lastKey2].Time - spriteLoopStart < spriteLoopStart)
+                                {
+                                    keys[lastKey1].Time = Math.Abs(keys[lastKey1].Time);
+                                    keys[lastKey2].Time = Math.Abs(keys[lastKey2].Time);
+                                }
+                                keys[lastKey1].Time = keys[lastKey1].Time - spriteLoopStart;
+                                keys[lastKey2].Time = keys[lastKey2].Time - spriteLoopStart;
+                            }
                             
                             sprite.Fade(getEasing(keys[lastKey1].Easing, keys[lastKey2].Easing), keys[lastKey1].Time + frameDuration, keys[lastKey2].Time + frameDuration, keys[lastKey1].Value, keys[lastKey2].Value);
                             if (shapeHasStroke && shapeHasFill && shapeType != "Path" && spriteType == "Shape")
                                 spriteStroke.Fade(getEasing(keys[lastKey1].Easing, keys[lastKey2].Easing), keys[lastKey1].Time + frameDuration, keys[lastKey2].Time + frameDuration, keys[lastKey1].Value, keys[lastKey2].Value);
 
                             // after
+                            if (spriteLoopGroup != "")
+                            {
+                                if (keys[key1].Time < spriteLoopStart) keys[key1].Time = 0;
+                                if (keys[key2].Time > spriteEnd) keys[key2].Time = spriteEnd;
+                                if (keys[key1].Time - spriteLoopStart < spriteLoopStart || keys[key2].Time - spriteLoopStart < spriteLoopStart)
+                                {
+                                    keys[key1].Time = Math.Abs(keys[key1].Time);
+                                    keys[key2].Time = Math.Abs(keys[key2].Time);
+                                }
+                                keys[key1].Time = keys[key1].Time - spriteLoopStart;
+                                keys[key2].Time = keys[key2].Time - spriteLoopStart;
+                            }
                             
                             sprite.Fade(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, keys[key1].Value, keys[key2].Value);
                             if (shapeHasStroke && shapeHasFill && shapeType != "Path" && spriteType == "Shape")
@@ -1157,6 +1391,19 @@ namespace StorybrewScripts
                         {
                             if (key2 < keys.Count)
                             {
+                                if (spriteLoopGroup != "")
+                                {
+                                    if (keys[key1].Time < spriteLoopStart) keys[key1].Time = 0;
+                                    if (keys[key2].Time > spriteEnd) keys[key2].Time = spriteEnd;
+                                    if (keys[key1].Time - spriteLoopStart < spriteLoopStart || keys[key2].Time - spriteLoopStart < spriteLoopStart)
+                                    {
+                                        keys[key1].Time = Math.Abs(keys[key1].Time);
+                                        keys[key2].Time = Math.Abs(keys[key2].Time);
+                                    }
+                                    keys[key1].Time = keys[key1].Time - spriteLoopStart;
+                                    keys[key2].Time = keys[key2].Time - spriteLoopStart;
+                                }
+
                                 sprite.Fade(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, keys[key1].Value, keys[key2].Value);
                                 if (shapeHasStroke && shapeHasFill && shapeType != "Path" && spriteType == "Shape")
                                     spriteStroke.Fade(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, keys[key1].Value, keys[key2].Value);
@@ -1168,9 +1415,29 @@ namespace StorybrewScripts
                 {
                     foreach (var keyframe in transform)
                     {
-                        sprite.Fade(keyframe.Time, spriteEnd, keyframe.Value, keyframe.Value);
-                        if (shapeHasStroke && shapeHasFill && shapeType != "Path" && spriteType == "Shape")
-                            spriteStroke.Fade(keyframe.Time, spriteEnd, keyframe.Value, keyframe.Value);
+                        if (keyframe.Value != 1)
+                        {
+                            var spriteEndBefore = spriteEnd;
+                            if (spriteLoopGroup != "")
+                            {
+                                if (keyframe.Time < spriteLoopStart) keyframe.Time = 0;
+                                if (keyframe.Time - spriteLoopStart < spriteLoopStart) keyframe.Time = Math.Abs(keyframe.Time);
+                                keyframe.Time = keyframe.Time - spriteLoopStart;
+                                spriteEnd = keyframe.Time;
+                                
+                                sprite.Fade(keyframe.Time, keyframe.Value);
+                                if (shapeHasStroke && shapeHasFill && shapeType != "Path" && spriteType == "Shape")
+                                    spriteStroke.Fade(keyframe.Time, keyframe.Value);
+                            }
+                            else
+                            {
+                                sprite.Fade(keyframe.Time, spriteEnd, keyframe.Value, keyframe.Value);
+                                if (shapeHasStroke && shapeHasFill && shapeType != "Path" && spriteType == "Shape")
+                                    spriteStroke.Fade(keyframe.Time, spriteEnd, keyframe.Value, keyframe.Value);
+                            }
+
+                            spriteEnd = spriteEndBefore;
+                        }
                     }
                 }
             }
@@ -1202,6 +1469,19 @@ namespace StorybrewScripts
                                 k2 = k2 + shapePosOffsetX;
                             }
 
+                            if (spriteLoopGroup != "")
+                            {
+                                if (keys[key1].Time < spriteLoopStart) keys[key1].Time = 0;
+                                if (keys[key2].Time > spriteEnd) keys[key2].Time = spriteEnd;
+                                if (keys[key1].Time - spriteLoopStart < spriteLoopStart || keys[key2].Time - spriteLoopStart < spriteLoopStart)
+                                {
+                                    keys[key1].Time = Math.Abs(keys[key1].Time);
+                                    keys[key2].Time = Math.Abs(keys[key2].Time);
+                                }
+                                keys[key1].Time = keys[key1].Time - spriteLoopStart;
+                                keys[key2].Time = keys[key2].Time - spriteLoopStart;
+                            }
+
                             if (spriteType == "Text")
                                 sprite.MoveX(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time, keys[key2].Time + frameDuration, (keys[key1].Value * downScale) + offsetEverything.X + offsetText.X, (keys[key2].Value * downScale) + offsetEverything.X + offsetText.X);
                             if (spriteType != "Text")
@@ -1220,6 +1500,19 @@ namespace StorybrewScripts
                             {
                                 k1 = k1 + shapePosOffsetX;
                                 k2 = k2 + shapePosOffsetX;
+                            }
+                            
+                            if (spriteLoopGroup != "")
+                            {
+                                if (keys[key1].Time < spriteLoopStart) keys[key1].Time = 0;
+                                if (keys[key2].Time > spriteEnd) keys[key2].Time = spriteEnd;
+                                if (keys[key1].Time - spriteLoopStart < spriteLoopStart || keys[key2].Time - spriteLoopStart < spriteLoopStart)
+                                {
+                                    keys[key1].Time = Math.Abs(keys[key1].Time);
+                                    keys[key2].Time = Math.Abs(keys[key2].Time);
+                                }
+                                keys[key1].Time = keys[key1].Time - spriteLoopStart;
+                                keys[key2].Time = keys[key2].Time - spriteLoopStart;
                             }
 
                             // key1 = key1 + 1; key2 = key2 + 1;
@@ -1245,6 +1538,19 @@ namespace StorybrewScripts
                                     k1 = k1 + shapePosOffsetX;
                                     k2 = k2 + shapePosOffsetX;
                                 }
+                            
+                                if (spriteLoopGroup != "")
+                                {
+                                    if (keys[key1].Time < spriteLoopStart) keys[key1].Time = 0;
+                                    if (keys[key2].Time > spriteEnd) keys[key2].Time = spriteEnd;
+                                    if (keys[key1].Time - spriteLoopStart < spriteLoopStart || keys[key2].Time - spriteLoopStart < spriteLoopStart)
+                                    {
+                                        keys[key1].Time = Math.Abs(keys[key1].Time);
+                                        keys[key2].Time = Math.Abs(keys[key2].Time);
+                                    }
+                                    keys[key1].Time = keys[key1].Time - spriteLoopStart;
+                                    keys[key2].Time = keys[key2].Time - spriteLoopStart;
+                                }
 
                                 if (spriteType == "Text")
                                     sprite.MoveX(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, (keys[key1].Value * downScale) + offsetEverything.X + offsetText.X, (keys[key2].Value * downScale) + offsetEverything.X + offsetText.X);
@@ -1266,15 +1572,26 @@ namespace StorybrewScripts
 
                         if (spriteType == "Shape")
                             k1 = k1 + shapePosOffsetX;
+                            
+                        if (spriteLoopGroup != "")
+                        {
+                            if (keyframe.Time < spriteLoopStart) keyframe.Time = 0;
+                            if (keyframe.Time > spriteEnd) keyframe.Time = spriteEnd;
+                            if (keyframe.Time - spriteLoopStart < spriteLoopStart) keyframe.Time = Math.Abs(keyframe.Time);
+                            keyframe.Time = keyframe.Time - spriteLoopStart;
+                        }
 
-                        if (spriteType == "Text")
-                            sprite.MoveX(keyframe.Time, (k1 * downScale) + offsetEverything.X + offsetText.X);
-                        if (spriteType != "Text")
-                            sprite.MoveX(keyframe.Time, (k1 * downScale) + offsetEverything.X + shapeOffsetX);
-
-                        if (shapeHasStroke && shapeHasFill && shapeType != "Path" && spriteType == "Shape")
+                        if (keyframe.Value != 1922 && (offsetText.X != 0 && offsetEverything.X != 0 && shapeOffsetX != 0))
+                        {
+                            if (spriteType == "Text")
+                                sprite.MoveX(keyframe.Time, (k1 * downScale) + offsetEverything.X + offsetText.X);
                             if (spriteType != "Text")
-                                spriteStroke.MoveX(keyframe.Time, (k1 * downScale) + offsetEverything.X + shapeOffsetX);
+                                sprite.MoveX(keyframe.Time, (k1 * downScale) + offsetEverything.X + shapeOffsetX);
+
+                            if (shapeHasStroke && shapeHasFill && shapeType != "Path" && spriteType == "Shape")
+                                if (spriteType != "Text")
+                                    spriteStroke.MoveX(keyframe.Time, (k1 * downScale) + offsetEverything.X + shapeOffsetX);
+                        }
                     }
                 }
             }
@@ -1311,15 +1628,28 @@ namespace StorybrewScripts
                                 k1 = k1 + shapePosOffsetY;
                                 k2 = k2 + shapePosOffsetY;
                             }
+                            
+                            if (spriteLoopGroup != "")
+                            {
+                                if (keys[key1].Time < spriteLoopStart) keys[key1].Time = 0;
+                                if (keys[key2].Time > spriteEnd) keys[key2].Time = spriteEnd;
+                                if (keys[key1].Time - spriteLoopStart < spriteLoopStart || keys[key2].Time - spriteLoopStart < spriteLoopStart)
+                                {
+                                    keys[key1].Time = Math.Abs(keys[key1].Time);
+                                    keys[key2].Time = Math.Abs(keys[key2].Time);
+                                }
+                                keys[key1].Time = keys[key1].Time - spriteLoopStart;
+                                keys[key2].Time = keys[key2].Time - spriteLoopStart;
+                            }
 
                             if (spriteType == "Text")
                                 sprite.MoveY(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time, keys[key2].Time + frameDuration, (keys[key1].Value * downScale) + offsetEverything.Y + offsetText.Y + letterHeightOffset, (keys[key2].Value * downScale) + offsetEverything.Y + offsetText.Y + letterHeightOffset);
                             if (spriteType != "Text")
-                                sprite.MoveY(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time, keys[key2].Time + frameDuration, (k1 * downScale) + offsetEverything.Y + shapeOffsetY + shapeOffsetY, (k2 * downScale) + offsetEverything.Y + shapeOffsetY + shapeOffsetY);
+                                sprite.MoveY(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time, keys[key2].Time + frameDuration, (k1 * downScale) + offsetEverything.Y + shapeOffsetY, (k2 * downScale) + offsetEverything.Y + shapeOffsetY);
 
                             if (shapeHasStroke && shapeHasFill && shapeType != "Path" && spriteType == "Shape")
                                 if (spriteType != "Text")
-                                    spriteStroke.MoveY(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time, keys[key2].Time + frameDuration, (k1 * downScale) + offsetEverything.Y + shapeOffsetY + shapeOffsetY, (k2 * downScale) + offsetEverything.Y + shapeOffsetY + shapeOffsetY);
+                                    spriteStroke.MoveY(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time, keys[key2].Time + frameDuration, (k1 * downScale) + offsetEverything.Y + shapeOffsetY, (k2 * downScale) + offsetEverything.Y + shapeOffsetY);
                         }
                         else if (key2 > 1 && key2 + 1 < keys.Count && keys.Count % 2 == 0)
                         {
@@ -1331,16 +1661,29 @@ namespace StorybrewScripts
                                 k1 = k1 + shapePosOffsetY;
                                 k2 = k2 + shapePosOffsetY;
                             }
+                            
+                            if (spriteLoopGroup != "")
+                            {
+                                if (keys[key1].Time < spriteLoopStart) keys[key1].Time = 0;
+                                if (keys[key2].Time > spriteEnd) keys[key2].Time = spriteEnd;
+                                if (keys[key1].Time - spriteLoopStart < spriteLoopStart || keys[key2].Time - spriteLoopStart < spriteLoopStart)
+                                {
+                                    keys[key1].Time = Math.Abs(keys[key1].Time);
+                                    keys[key2].Time = Math.Abs(keys[key2].Time);
+                                }
+                                keys[key1].Time = keys[key1].Time - spriteLoopStart;
+                                keys[key2].Time = keys[key2].Time - spriteLoopStart;
+                            }
 
                             // key1 = key1 + 1; key2 = key2 + 1;
                             if (spriteType == "Text")
                                 sprite.MoveY(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, (keys[key1].Value * downScale) + offsetEverything.Y + offsetText.Y + letterHeightOffset, (keys[key2].Value * downScale) + offsetEverything.Y + offsetText.Y + letterHeightOffset);
                             if (spriteType != "Text")
-                                sprite.MoveY(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, (k1 * downScale) + offsetEverything.Y + shapeOffsetY + shapeOffsetY, (k2 * downScale) + offsetEverything.Y + shapeOffsetY + shapeOffsetY);
+                                sprite.MoveY(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, (k1 * downScale) + offsetEverything.Y + shapeOffsetY, (k2 * downScale) + offsetEverything.Y + shapeOffsetY);
 
                             if (shapeHasStroke && shapeHasFill && shapeType != "Path" && spriteType == "Shape")
                                 if (spriteType != "Text")
-                                    spriteStroke.MoveY(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, (k1 * downScale) + offsetEverything.Y + shapeOffsetY + shapeOffsetY, (k2 * downScale) + offsetEverything.Y + shapeOffsetY + shapeOffsetY);
+                                    spriteStroke.MoveY(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, (k1 * downScale) + offsetEverything.Y + shapeOffsetY, (k2 * downScale) + offsetEverything.Y + shapeOffsetY);
                             // Log("2value1: " + key1 + " | value2: " + key2);
                         }
                         else
@@ -1355,15 +1698,28 @@ namespace StorybrewScripts
                                     k1 = k1 + shapePosOffsetY;
                                     k2 = k2 + shapePosOffsetY;
                                 }
+                            
+                                if (spriteLoopGroup != "")
+                                {
+                                    if (keys[key1].Time < spriteLoopStart) keys[key1].Time = 0;
+                                    if (keys[key2].Time > spriteEnd) keys[key2].Time = spriteEnd;
+                                    if (keys[key1].Time - spriteLoopStart < spriteLoopStart || keys[key2].Time - spriteLoopStart < spriteLoopStart)
+                                    {
+                                        keys[key1].Time = Math.Abs(keys[key1].Time);
+                                        keys[key2].Time = Math.Abs(keys[key2].Time);
+                                    }
+                                        keys[key1].Time = keys[key1].Time - spriteLoopStart;
+                                        keys[key2].Time = keys[key2].Time - spriteLoopStart;
+                                    }
 
                                 if (spriteType == "Text")
                                     sprite.MoveY(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, (keys[key1].Value * downScale) + offsetEverything.Y + offsetText.Y + letterHeightOffset, (keys[key2].Value * downScale) + offsetEverything.Y + offsetText.Y + letterHeightOffset);
                                 if (spriteType != "Text")
-                                    sprite.MoveY(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, (k1 * downScale) + offsetEverything.Y + shapeOffsetY + shapeOffsetY, (k2 * downScale) + offsetEverything.Y + shapeOffsetY + shapeOffsetY);
+                                    sprite.MoveY(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, (k1 * downScale) + offsetEverything.Y + shapeOffsetY, (k2 * downScale) + offsetEverything.Y + shapeOffsetY);
 
                                 if (shapeHasStroke && shapeHasFill && shapeType != "Path" && spriteType == "Shape")
                                     if (spriteType != "Text")
-                                        spriteStroke.MoveY(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, (k1 * downScale) + offsetEverything.Y + shapeOffsetY + shapeOffsetY, (k2 * downScale) + offsetEverything.Y + shapeOffsetY + shapeOffsetY);
+                                        spriteStroke.MoveY(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, (k1 * downScale) + offsetEverything.Y + shapeOffsetY, (k2 * downScale) + offsetEverything.Y + shapeOffsetY);
                             }
                         }
                     }
@@ -1376,15 +1732,26 @@ namespace StorybrewScripts
 
                         if (spriteType == "Shape")
                             k1 = k1 + shapePosOffsetY;
+                            
+                        if (spriteLoopGroup != "")
+                        {
+                            if (keyframe.Time < spriteLoopStart) keyframe.Time = 0;
+                            if (keyframe.Time > spriteEnd) keyframe.Time = spriteEnd;
+                            if (keyframe.Time - spriteLoopStart < spriteLoopStart) keyframe.Time = Math.Abs(keyframe.Time);
+                            keyframe.Time = keyframe.Time - spriteLoopStart;
+                        }
 
-                        if (spriteType == "Text")
-                            sprite.MoveY(keyframe.Time, (k1 * downScale) + offsetEverything.Y + offsetText.Y + letterHeightOffset);
-                        if (spriteType != "Text")
-                            sprite.MoveY(keyframe.Time, (k1 * downScale) + offsetEverything.Y + shapeOffsetY + shapeOffsetY);
-
-                        if (shapeHasStroke && shapeHasFill && shapeType != "Path" && spriteType == "Shape")
+                        if (keyframe.Value != 1080 && (offsetText.Y != 0 && offsetEverything.Y != 0 && letterHeightOffset != 0 && shapeOffsetY != 0))
+                        {
+                            if (spriteType == "Text")
+                                sprite.MoveY(keyframe.Time, (k1 * downScale) + offsetEverything.Y + offsetText.Y + letterHeightOffset);
                             if (spriteType != "Text")
-                                spriteStroke.MoveY(keyframe.Time, (k1 * downScale) + offsetEverything.Y + shapeOffsetY + shapeOffsetY);
+                                sprite.MoveY(keyframe.Time, (k1 * downScale) + offsetEverything.Y + shapeOffsetY);
+
+                            if (shapeHasStroke && shapeHasFill && shapeType != "Path" && spriteType == "Shape")
+                                if (spriteType != "Text")
+                                    spriteStroke.MoveY(keyframe.Time, (k1 * downScale) + offsetEverything.Y + shapeOffsetY);
+                        }
                     }
                 }
             }
@@ -1412,6 +1779,28 @@ namespace StorybrewScripts
                     {
                         if (key1 == 0 && key1 < key2 && keysX.Count % 2 == 0)
                         {
+                            if (spriteLoopGroup != "")
+                            {
+                                if (keysX[key1].Time < spriteLoopStart) keysX[key1].Time = 0;
+                                if (keysY[key1].Time < spriteLoopStart) keysY[key1].Time = 0;
+                                if (keysX[key2].Time > spriteEnd) keysX[key2].Time = spriteEnd;
+                                if (keysY[key2].Time > spriteEnd) keysY[key2].Time = spriteEnd;
+                                if (keysX[key1].Time - spriteLoopStart < spriteLoopStart || keysX[key2].Time - spriteLoopStart < spriteLoopStart)
+                                {
+                                    keysX[key1].Time = Math.Abs(keysX[key1].Time);
+                                    keysX[key2].Time = Math.Abs(keysX[key2].Time);
+                                }
+                                if (keysY[key1].Time - spriteLoopStart < spriteLoopStart || keysY[key2].Time - spriteLoopStart < spriteLoopStart)
+                                {
+                                    keysY[key1].Time = Math.Abs(keysY[key1].Time);
+                                    keysY[key2].Time = Math.Abs(keysY[key2].Time);
+                                }
+                                keysX[key1].Time = keysX[key1].Time - spriteLoopStart;
+                                keysX[key2].Time = keysX[key2].Time - spriteLoopStart;
+                                keysY[key1].Time = keysY[key1].Time - spriteLoopStart;
+                                keysY[key2].Time = keysY[key2].Time - spriteLoopStart;
+                            }
+
                             // Log("1value1: " + key1 + " | value2: " + key2);
                             if (spriteType == "Text")
                                 sprite.ScaleVec(getEasing(keysX[key1].Easing, keysX[key2].Easing), keysX[key1].Time, keysX[key2].Time + frameDuration,
@@ -1441,6 +1830,27 @@ namespace StorybrewScripts
                             key1 = key1 + 1; key2 = key2 + 1;
 
                             // tweening
+                            if (spriteLoopGroup != "")
+                            {
+                                if (keysX[lastKey1].Time < spriteLoopStart) keysX[lastKey1].Time = 0;
+                                if (keysY[lastKey1].Time < spriteLoopStart) keysY[lastKey1].Time = 0;
+                                if (keysX[lastKey2].Time > spriteEnd) keysX[lastKey2].Time = spriteEnd;
+                                if (keysY[lastKey2].Time > spriteEnd) keysY[lastKey2].Time = spriteEnd;
+                                if (keysX[lastKey1].Time - spriteLoopStart < spriteLoopStart || keysX[lastKey2].Time - spriteLoopStart < spriteLoopStart)
+                                {
+                                    keysX[lastKey1].Time = Math.Abs(keysX[lastKey1].Time);
+                                    keysX[lastKey2].Time = Math.Abs(keysX[lastKey2].Time);
+                                }
+                                if (keysY[lastKey1].Time - spriteLoopStart < spriteLoopStart || keysY[lastKey2].Time - spriteLoopStart < spriteLoopStart)
+                                {
+                                    keysY[lastKey1].Time = Math.Abs(keysY[lastKey1].Time);
+                                    keysY[lastKey2].Time = Math.Abs(keysY[lastKey2].Time);
+                                }
+                                keysX[lastKey1].Time = keysX[lastKey1].Time - spriteLoopStart;
+                                keysX[lastKey2].Time = keysX[lastKey2].Time - spriteLoopStart;
+                                keysY[lastKey1].Time = keysY[lastKey1].Time - spriteLoopStart;
+                                keysY[lastKey2].Time = keysY[lastKey2].Time - spriteLoopStart;
+                            }
                             
                             if (spriteType == "Text")
                                 sprite.ScaleVec(getEasing(keysX[lastKey1].Easing, keysX[lastKey2].Easing), keysX[lastKey1].Time + frameDuration, keysX[lastKey2].Time + frameDuration,
@@ -1458,6 +1868,27 @@ namespace StorybrewScripts
                                         new Vector2((float)((solidSize.X * keysX[lastKey2].Value) * downScale), (float)((solidSize.Y * keysY[lastKey2].Value) * downScale)));
 
                             // after
+                            if (spriteLoopGroup != "")
+                            {
+                                if (keysX[key1].Time < spriteLoopStart) keysX[key1].Time = 0;
+                                if (keysY[key1].Time < spriteLoopStart) keysY[key1].Time = 0;
+                                if (keysX[key2].Time > spriteEnd) keysX[key2].Time = spriteEnd;
+                                if (keysY[key2].Time > spriteEnd) keysY[key2].Time = spriteEnd;
+                                if (keysX[key1].Time - spriteLoopStart < spriteLoopStart || keysX[key2].Time - spriteLoopStart < spriteLoopStart)
+                                {
+                                    keysX[key1].Time = Math.Abs(keysX[key1].Time);
+                                    keysX[key2].Time = Math.Abs(keysX[key2].Time);
+                                }
+                                if (keysY[key1].Time - spriteLoopStart < spriteLoopStart || keysY[key2].Time - spriteLoopStart < spriteLoopStart)
+                                {
+                                    keysY[key1].Time = Math.Abs(keysY[key1].Time);
+                                    keysY[key2].Time = Math.Abs(keysY[key2].Time);
+                                }
+                                keysX[key1].Time = keysX[key1].Time - spriteLoopStart;
+                                keysX[key2].Time = keysX[key2].Time - spriteLoopStart;
+                                keysY[key1].Time = keysY[key1].Time - spriteLoopStart;
+                                keysY[key2].Time = keysY[key2].Time - spriteLoopStart;
+                            }
 
                             if (spriteType == "Text")
                                 sprite.ScaleVec(getEasing(keysX[key1].Easing, keysX[key2].Easing), keysX[key1].Time + frameDuration, keysX[key2].Time + frameDuration,
@@ -1479,6 +1910,28 @@ namespace StorybrewScripts
                         {
                             if (key2 < keysX.Count)
                             {
+                                if (spriteLoopGroup != "")
+                                {
+                                    if (keysX[key1].Time < spriteLoopStart) keysX[key1].Time = 0;
+                                    if (keysY[key1].Time < spriteLoopStart) keysY[key1].Time = 0;
+                                    if (keysX[key2].Time > spriteEnd) keysX[key2].Time = spriteEnd;
+                                    if (keysY[key2].Time > spriteEnd) keysY[key2].Time = spriteEnd;
+                                    if (keysX[key1].Time - spriteLoopStart < spriteLoopStart || keysX[key2].Time - spriteLoopStart < spriteLoopStart)
+                                    {
+                                        keysX[key1].Time = Math.Abs(keysX[key1].Time);
+                                        keysX[key2].Time = Math.Abs(keysX[key2].Time);
+                                    }
+                                    if (keysY[key1].Time - spriteLoopStart < spriteLoopStart || keysY[key2].Time - spriteLoopStart < spriteLoopStart)
+                                    {
+                                        keysY[key1].Time = Math.Abs(keysY[key1].Time);
+                                        keysY[key2].Time = Math.Abs(keysY[key2].Time);
+                                    }
+                                    keysX[key1].Time = keysX[key1].Time - spriteLoopStart;
+                                    keysX[key2].Time = keysX[key2].Time - spriteLoopStart;
+                                    keysY[key1].Time = keysY[key1].Time - spriteLoopStart;
+                                    keysY[key2].Time = keysY[key2].Time - spriteLoopStart;
+                                }
+
                                 if (spriteType == "Text")
                                     sprite.ScaleVec(getEasing(keysX[key1].Easing, keysX[key2].Easing), keysX[key1].Time + frameDuration, keysX[key2].Time + frameDuration,
                                         new Vector2((float)(keysX[key1].Value * downScale) * fontScaleShift, (float)(keysY[key1].Value * downScale) * fontScaleShift),
@@ -1521,13 +1974,24 @@ namespace StorybrewScripts
                             scaleY.Add(keyframe.Value * downScale);
                     }
 
-                    if (spriteType == "Text")
-                        sprite.ScaleVec(t[k].Time, new Vector2((float)scaleX[k], (float)scaleY[k]));
-                    if (spriteType != "Text")
-                        sprite.ScaleVec(t[k].Time, new Vector2((float)scaleX[k] + fillScaleShift + solidSize.X, (float)scaleY[k] + fillScaleShift + solidSize.Y));
+                    if (spriteLoopGroup != "")
+                    {
+                        if (t[k].Time < spriteLoopStart) t[k].Time = 0;
+                        if (t[k].Time > spriteEnd) t[k].Time = spriteEnd;
+                        if (t[k].Time - spriteLoopStart < spriteLoopStart) t[k].Time = Math.Abs(t[k].Time);
+                        t[k].Time = t[k].Time - spriteLoopStart;
+                    }
 
-                    if (shapeHasStroke && shapeHasFill && shapeType != "Path" && spriteType == "Shape")
-                            spriteStroke.ScaleVec(t[k].Time, new Vector2((float)scaleX[k], (float)scaleY[k]));
+                    if (scaleX[k] != 1 && scaleY[k] != 1)
+                    {
+                        if (spriteType == "Text")
+                            sprite.ScaleVec(t[k].Time, new Vector2((float)scaleX[k], (float)scaleY[k]));
+                        if (spriteType != "Text")
+                            sprite.ScaleVec(t[k].Time, new Vector2((float)scaleX[k] + fillScaleShift + solidSize.X, (float)scaleY[k] + fillScaleShift + solidSize.Y));
+
+                        if (shapeHasStroke && shapeHasFill && shapeType != "Path" && spriteType == "Shape")
+                                spriteStroke.ScaleVec(t[k].Time, new Vector2((float)scaleX[k], (float)scaleY[k]));
+                    }
 
                     scaleX.Clear();
                     scaleY.Clear();
@@ -1547,6 +2011,19 @@ namespace StorybrewScripts
                     {
                         if (key1 == 0 && key1 < key2 && keys.Count % 2 == 0)
                         {
+                            if (spriteLoopGroup != "")
+                            {
+                                if (keys[key1].Time < spriteLoopStart) keys[key1].Time = 0;
+                                if (keys[key2].Time > spriteEnd) keys[key2].Time = spriteEnd;
+                                if (keys[key1].Time - spriteLoopStart < spriteLoopStart || keys[key2].Time - spriteLoopStart < spriteLoopStart)
+                                {
+                                    keys[key1].Time = Math.Abs(keys[key1].Time);
+                                    keys[key2].Time = Math.Abs(keys[key2].Time);
+                                }
+                                keys[key1].Time = keys[key1].Time - spriteLoopStart;
+                                keys[key2].Time = keys[key2].Time - spriteLoopStart;
+                            }
+
                             sprite.Rotate(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time, keys[key2].Time + frameDuration, MathHelper.DegreesToRadians(keys[key1].Value), MathHelper.DegreesToRadians(keys[key2].Value));
                             if (shapeHasStroke && shapeHasFill && shapeType != "Path" && spriteType == "Shape" && spriteType == "Shape")
                                 spriteStroke.Rotate(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time, keys[key2].Time + frameDuration, MathHelper.DegreesToRadians(keys[key1].Value), MathHelper.DegreesToRadians(keys[key2].Value));
@@ -1558,12 +2035,36 @@ namespace StorybrewScripts
                             key1 = key1 + 1; key2 = key2 + 1;
 
                             // tweening
+                            if (spriteLoopGroup != "")
+                            {
+                                if (keys[lastKey1].Time < spriteLoopStart) keys[lastKey1].Time = 0;
+                                if (keys[lastKey2].Time > spriteEnd) keys[lastKey2].Time = spriteEnd;
+                                if (keys[lastKey1].Time - spriteLoopStart < spriteLoopStart || keys[lastKey2].Time - spriteLoopStart < spriteLoopStart)
+                                {
+                                    keys[lastKey1].Time = Math.Abs(keys[lastKey1].Time);
+                                    keys[lastKey2].Time = Math.Abs(keys[lastKey2].Time);
+                                }
+                                keys[lastKey1].Time = keys[lastKey1].Time - spriteLoopStart;
+                                keys[lastKey2].Time = keys[lastKey2].Time - spriteLoopStart;
+                            }
                             
                             sprite.Rotate(getEasing(keys[lastKey1].Easing, keys[lastKey2].Easing), keys[lastKey1].Time + frameDuration, keys[lastKey2].Time + frameDuration, MathHelper.DegreesToRadians(keys[lastKey1].Value), MathHelper.DegreesToRadians(keys[lastKey2].Value));
                             if (shapeHasStroke && shapeHasFill && shapeType != "Path" && spriteType == "Shape")
                                 spriteStroke.Rotate(getEasing(keys[lastKey1].Easing, keys[lastKey2].Easing), keys[lastKey1].Time + frameDuration, keys[lastKey2].Time + frameDuration, MathHelper.DegreesToRadians(keys[lastKey1].Value), MathHelper.DegreesToRadians(keys[lastKey2].Value));
 
                             // after
+                            if (spriteLoopGroup != "")
+                            {
+                                if (keys[key1].Time < spriteLoopStart) keys[key1].Time = 0;
+                                if (keys[key2].Time > spriteEnd) keys[key2].Time = spriteEnd;
+                                if (keys[key1].Time - spriteLoopStart < spriteLoopStart || keys[key2].Time - spriteLoopStart < spriteLoopStart)
+                                {
+                                    keys[key1].Time = Math.Abs(keys[key1].Time);
+                                    keys[key2].Time = Math.Abs(keys[key2].Time);
+                                }
+                                keys[key1].Time = keys[key1].Time - spriteLoopStart;
+                                keys[key2].Time = keys[key2].Time - spriteLoopStart;
+                            }
 
                             sprite.Rotate(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, MathHelper.DegreesToRadians(keys[key1].Value), MathHelper.DegreesToRadians(keys[key2].Value));
                             if (shapeHasStroke && shapeHasFill && shapeType != "Path" && spriteType == "Shape")
@@ -1574,6 +2075,19 @@ namespace StorybrewScripts
                         {
                             if (key2 < keys.Count)
                             {
+                                if (spriteLoopGroup != "")
+                                {
+                                    if (keys[key1].Time < spriteLoopStart) keys[key1].Time = 0;
+                                    if (keys[key2].Time > spriteEnd) keys[key2].Time = spriteEnd;
+                                    if (keys[key1].Time - spriteLoopStart < spriteLoopStart || keys[key2].Time - spriteLoopStart < spriteLoopStart)
+                                    {
+                                        keys[key1].Time = Math.Abs(keys[key1].Time);
+                                        keys[key2].Time = Math.Abs(keys[key2].Time);
+                                    }
+                                    keys[key1].Time = keys[key1].Time - spriteLoopStart;
+                                    keys[key2].Time = keys[key2].Time - spriteLoopStart;
+                                }
+
                                 sprite.Rotate(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, MathHelper.DegreesToRadians(keys[key1].Value), MathHelper.DegreesToRadians(keys[key2].Value));
                                 if (shapeHasStroke && shapeHasFill && shapeType != "Path" && spriteType == "Shape")
                                     spriteStroke.Rotate(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, MathHelper.DegreesToRadians(keys[key1].Value), MathHelper.DegreesToRadians(keys[key2].Value));
@@ -1587,6 +2101,14 @@ namespace StorybrewScripts
                     {
                         if (keyframe.Value != 0)
                         {
+                            if (spriteLoopGroup != "")
+                            {
+                                if (keyframe.Time < spriteLoopStart) keyframe.Time = 0;
+                            if (keyframe.Time > spriteEnd) keyframe.Time = spriteEnd;
+                                if (keyframe.Time - spriteLoopStart < spriteLoopStart) keyframe.Time = Math.Abs(keyframe.Time);
+                                keyframe.Time = keyframe.Time - spriteLoopStart;
+                            }
+
                             sprite.Rotate(keyframe.Time, MathHelper.DegreesToRadians(keyframe.Value));
                             if (shapeHasStroke && shapeHasFill && shapeType != "Path" && spriteType == "Shape")
                                 spriteStroke.Rotate(keyframe.Time, MathHelper.DegreesToRadians(keyframe.Value));
@@ -1607,6 +2129,19 @@ namespace StorybrewScripts
                     {
                         if (key1 == 0 && key1 < key2 && keys.Count % 2 == 0)
                         {
+                            if (spriteLoopGroup != "")
+                            {
+                                if (keys[key1].Time < spriteLoopStart) keys[key1].Time = 0;
+                                if (keys[key2].Time > spriteEnd) keys[key2].Time = spriteEnd;
+                                if (keys[key1].Time - spriteLoopStart < spriteLoopStart || keys[key2].Time - spriteLoopStart < spriteLoopStart)
+                                {
+                                    keys[key1].Time = Math.Abs(keys[key1].Time);
+                                    keys[key2].Time = Math.Abs(keys[key2].Time);
+                                }
+                                keys[key1].Time = keys[key1].Time - spriteLoopStart;
+                                keys[key2].Time = keys[key2].Time - spriteLoopStart;
+                            }
+
                             // Log("1value1: " + key1 + " | value2: " + key2);
                             sprite.Color(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time, keys[key2].Time + frameDuration, keys[key1].Value, keys[key2].Value);
                         }
@@ -1617,10 +2152,34 @@ namespace StorybrewScripts
                             key1 = key1 + 1; key2 = key2 + 1;
 
                             // tweening
+                            if (spriteLoopGroup != "")
+                            {
+                                if (keys[lastKey1].Time < spriteLoopStart) keys[lastKey1].Time = 0;
+                                if (keys[lastKey2].Time > spriteEnd) keys[lastKey2].Time = spriteEnd;
+                                if (keys[lastKey1].Time - spriteLoopStart < spriteLoopStart || keys[lastKey2].Time - spriteLoopStart < spriteLoopStart)
+                                {
+                                    keys[lastKey1].Time = Math.Abs(keys[lastKey1].Time);
+                                    keys[lastKey2].Time = Math.Abs(keys[lastKey2].Time);
+                                }
+                                keys[lastKey1].Time = keys[lastKey1].Time - spriteLoopStart;
+                                keys[lastKey2].Time = keys[lastKey2].Time - spriteLoopStart;
+                            }
                             
                             sprite.Color(getEasing(keys[lastKey1].Easing, keys[lastKey2].Easing), keys[lastKey1].Time + frameDuration, keys[lastKey2].Time + frameDuration, keys[lastKey1].Value, keys[lastKey2].Value);
 
                             // after
+                            if (spriteLoopGroup != "")
+                            {
+                                if (keys[key1].Time < spriteLoopStart) keys[key1].Time = 0;
+                                if (keys[key2].Time > spriteEnd) keys[key2].Time = spriteEnd;
+                                if (keys[key1].Time - spriteLoopStart < spriteLoopStart || keys[key2].Time - spriteLoopStart < spriteLoopStart)
+                                {
+                                    keys[key1].Time = Math.Abs(keys[key1].Time);
+                                    keys[key2].Time = Math.Abs(keys[key2].Time);
+                                }
+                                keys[key1].Time = keys[key1].Time - spriteLoopStart;
+                                keys[key2].Time = keys[key2].Time - spriteLoopStart;
+                            }
                             
                             sprite.Color(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, keys[key1].Value, keys[key2].Value);
                             // Log("2value1: " + key1 + " | value2: " + key2);
@@ -1629,6 +2188,19 @@ namespace StorybrewScripts
                         {
                             if (key2 < keys.Count)
                             {
+                                if (spriteLoopGroup != "")
+                                {
+                                    if (keys[key1].Time < spriteLoopStart) keys[key1].Time = 0;
+                                    if (keys[key2].Time > spriteEnd) keys[key2].Time = spriteEnd;
+                                    if (keys[key1].Time - spriteLoopStart < spriteLoopStart || keys[key2].Time - spriteLoopStart < spriteLoopStart)
+                                    {
+                                        keys[key1].Time = Math.Abs(keys[key1].Time);
+                                        keys[key2].Time = Math.Abs(keys[key2].Time);
+                                    }
+                                    keys[key1].Time = keys[key1].Time - spriteLoopStart;
+                                    keys[key2].Time = keys[key2].Time - spriteLoopStart;
+                                }
+
                                 sprite.Color(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, keys[key1].Value, keys[key2].Value);
                             }
                         }
@@ -1638,6 +2210,14 @@ namespace StorybrewScripts
                 {
                     foreach (var keyframe in color)
                     {
+                        if (spriteLoopGroup != "")
+                        {
+                            if (keyframe.Time < spriteLoopStart) keyframe.Time = 0;
+                            if (keyframe.Time > spriteEnd) keyframe.Time = spriteEnd;
+                            if (keyframe.Time - spriteLoopStart < spriteLoopStart) keyframe.Time = Math.Abs(keyframe.Time);
+                            keyframe.Time = keyframe.Time - spriteLoopStart;
+                        }
+
                         if (keyframe.Value != "#ffffff")
                         sprite.Color(keyframe.Time, spriteEnd, keyframe.Value, keyframe.Value);
                     }
@@ -1656,6 +2236,19 @@ namespace StorybrewScripts
                     {
                         if (key1 == 0 && key1 < key2 && keys.Count % 2 == 0)
                         {
+                            if (spriteLoopGroup != "")
+                            {
+                                if (keys[key1].Time < spriteLoopStart) keys[key1].Time = 0;
+                                if (keys[key2].Time > spriteEnd) keys[key2].Time = spriteEnd;
+                                if (keys[key1].Time - spriteLoopStart < spriteLoopStart || keys[key2].Time - spriteLoopStart < spriteLoopStart)
+                                {
+                                    keys[key1].Time = Math.Abs(keys[key1].Time);
+                                    keys[key2].Time = Math.Abs(keys[key2].Time);
+                                }
+                                keys[key1].Time = keys[key1].Time - spriteLoopStart;
+                                keys[key2].Time = keys[key2].Time - spriteLoopStart;
+                            }
+
                             // Log("1value1: " + key1 + " | value2: " + key2);
                             sprite.Color(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time, keys[key2].Time + frameDuration, keys[key1].Value, keys[key2].Value);
                         }
@@ -1666,10 +2259,34 @@ namespace StorybrewScripts
                             key1 = key1 + 1; key2 = key2 + 1;
 
                             // tweening
+                            if (spriteLoopGroup != "")
+                            {
+                                if (keys[lastKey1].Time < spriteLoopStart) keys[lastKey1].Time = 0;
+                                if (keys[lastKey2].Time > spriteEnd) keys[lastKey2].Time = spriteEnd;
+                                if (keys[lastKey1].Time - spriteLoopStart < spriteLoopStart || keys[lastKey2].Time - spriteLoopStart < spriteLoopStart)
+                                {
+                                    keys[lastKey1].Time = Math.Abs(keys[lastKey1].Time);
+                                    keys[lastKey2].Time = Math.Abs(keys[lastKey2].Time);
+                                }
+                                keys[lastKey1].Time = keys[lastKey1].Time - spriteLoopStart;
+                                keys[lastKey2].Time = keys[lastKey2].Time - spriteLoopStart;
+                            }
                             
                             sprite.Color(getEasing(keys[lastKey1].Easing, keys[lastKey2].Easing), keys[lastKey1].Time + frameDuration, keys[lastKey2].Time + frameDuration, keys[lastKey1].Value, keys[lastKey2].Value);
 
                             // after
+                            if (spriteLoopGroup != "")
+                            {
+                                if (keys[key1].Time < spriteLoopStart) keys[key1].Time = 0;
+                                if (keys[key2].Time > spriteEnd) keys[key2].Time = spriteEnd;
+                                if (keys[key1].Time - spriteLoopStart < spriteLoopStart || keys[key2].Time - spriteLoopStart < spriteLoopStart)
+                                {
+                                    keys[key1].Time = Math.Abs(keys[key1].Time);
+                                    keys[key2].Time = Math.Abs(keys[key2].Time);
+                                }
+                                keys[key1].Time = keys[key1].Time - spriteLoopStart;
+                                keys[key2].Time = keys[key2].Time - spriteLoopStart;
+                            }
                             
                             sprite.Color(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, keys[key1].Value, keys[key2].Value);
                             // Log("2value1: " + key1 + " | value2: " + key2);
@@ -1678,6 +2295,19 @@ namespace StorybrewScripts
                         {
                             if (key2 < keys.Count)
                             {
+                                if (spriteLoopGroup != "")
+                                {
+                                    if (keys[key1].Time < spriteLoopStart) keys[key1].Time = 0;
+                                    if (keys[key2].Time > spriteEnd) keys[key2].Time = spriteEnd;
+                                    if (keys[key1].Time - spriteLoopStart < spriteLoopStart || keys[key2].Time - spriteLoopStart < spriteLoopStart)
+                                    {
+                                        keys[key1].Time = Math.Abs(keys[key1].Time);
+                                        keys[key2].Time = Math.Abs(keys[key2].Time);
+                                    }
+                                    keys[key1].Time = keys[key1].Time - spriteLoopStart;
+                                    keys[key2].Time = keys[key2].Time - spriteLoopStart;
+                                }
+
                                 sprite.Color(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, keys[key1].Value, keys[key2].Value);
                             }
                         }
@@ -1687,6 +2317,14 @@ namespace StorybrewScripts
                 {
                     foreach (var keyframe in color)
                     {
+                        if (spriteLoopGroup != "")
+                        {
+                            if (keyframe.Time < spriteLoopStart) keyframe.Time = 0;
+                            if (keyframe.Time > spriteEnd) keyframe.Time = spriteEnd;
+                            if (keyframe.Time - spriteLoopStart < spriteLoopStart) keyframe.Time = Math.Abs(keyframe.Time);
+                            keyframe.Time = keyframe.Time - spriteLoopStart;
+                        }
+
                         if (keyframe.Value != "#ffffff")
                         sprite.Color(keyframe.Time, spriteEnd, keyframe.Value, keyframe.Value);
                     }
@@ -1696,6 +2334,17 @@ namespace StorybrewScripts
 
         public void colorSolid(string color, OsbSprite sprite)
         {
+            if (spriteLoopGroup != "")
+            {
+                if (spriteStart < spriteLoopStart) spriteStart = 0;
+                if (spriteStart > spriteEnd) spriteStart = spriteEnd;
+                if (spriteStart - spriteLoopStart < spriteLoopStart)
+                {
+                    spriteStart = Math.Abs(spriteStart);
+                }
+                spriteStart = spriteStart - spriteLoopStart;
+            }
+
             if (color != "#ffffff")
             sprite.Color(spriteStart, color);
         }
@@ -2622,7 +3271,7 @@ namespace StorybrewScripts
             {
                 var gridBitmap = GetProjectBitmap("assetlibrary\\_AeToOsb\\grid.png");
                 var path = aeToOsbSettings.ScriptslibraryFolderPath.Replace("scriptslibrary", "assetlibrary\\_AeToOsb\\grid.png");
-                var grid = GetLayer("GridOverlay").CreateSprite(path, origin);
+                var grid = GetLayer("Grid Overlay").CreateSprite(path, origin);
                 grid.Fade(compStart, compEnd, gridOpacity, gridOpacity);
                 grid.Scale(compStart, 480.0f / gridBitmap.Height);
             }

@@ -92,6 +92,12 @@ namespace AeToOsbParser
         [JsonProperty("transform")]
         public Transform Transform { get; set; }
 
+        [JsonProperty("layerGroup")]
+        public string LayerGroup { get; set; }
+
+        [JsonProperty("loopGroup")]
+        public string LoopGroup { get; set; }
+
         [JsonProperty("shape")]
         public Shape Shape { get; set; }
 
