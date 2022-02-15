@@ -13,7 +13,7 @@ Get started here! https://github.com/T0chi/AeToOsb/wiki/Getting-Started
 - [x] Text layers
 - [x] Transform properties
 - [x] Shapes
-- [x] osu! loops
+- [x] Loop layers
 - [x] Solids
 - [x] Sequences
 - [x] Audio
