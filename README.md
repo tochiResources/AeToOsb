@@ -22,7 +22,7 @@ Get started here! https://github.com/T0chi/AeToOsb/wiki/Getting-Started
 **Upcoming items & features:**
 - [ ] 3D functionality
 - [ ] Make a few effects compatible for export:
-Possibly support audio spectrum, masking, gaussian blur, drop shadow, outer glow effects etc.
+* Possibly support audio spectrum, masking, gaussian blur, drop shadow, outer glow effects etc.
 
 Official Todo list can be found [here](https://github.com/T0chi/AeToOsb/wiki#todo-list).
 
