@@ -4,6 +4,7 @@
         $.evalFile('~/Documents/AeToOsb/splitter.aeosb');
         $.evalFile('~/Documents/AeToOsb/easings.jsx');
         $.evalFile('~/Documents/AeToOsb/json2.js');
+        $.evalFile('~/Documents/AeToOsb/effects.jsx');
 
         var AeToOsb = (function (thisObj) {
             function scriptFileName() {
@@ -24,6 +25,7 @@
             var scriptSettings = { // the default settings
                 scriptslibraryFolderPath: "",
                 outputFolderPath: "",
+                beatmapFilePath: "",
                 options: {
                     exportJsonOnly: false,
                     exportTextPerLetter: false,
@@ -202,11 +204,12 @@
 
             var scriptslibrary_button = group2.add("button", undefined, undefined, { name: "scriptslibrary_button" });
             scriptslibrary_button.helpTip = "Change your scriptslibrary path.";
+            scriptslibrary_button.text = "Scriptslibrary folder";
             scriptslibrary_button.alignment = ["center", "center"];
 
             var statictext1 = group2.add('edittext {properties: {name: "statictext1", scrollable: true}}');
             // var statictext1 = group2.add("statictext", undefined, undefined, { name: "statictext1", scrolling: true });
-            statictext1.preferredSize.width = 117;
+            statictext1.preferredSize.width = 203;
 
             // GROUP3
             // ======
@@ -223,7 +226,23 @@
 
             var statictext2 = group3.add('edittext {properties: {name: "statictext2", scrollable: true}}');
             // var statictext2 = group3.add("statictext", undefined, undefined, { name: "statictext2", scrolling: true });
-            statictext2.preferredSize.width = 162;
+            statictext2.preferredSize.width = 239;
+
+            // GROUP3
+            // ======
+            var group_4 = settings.add("group", undefined, { name: "group_4" });
+            group_4.orientation = "row";
+            group_4.alignChildren = ["center", "center"];
+            group_4.spacing = 10;
+            group_4.margins = 0;
+
+            var beatmapFilePath_button = group_4.add("button", undefined, undefined, { name: "beatmapFilePath_button" });
+            beatmapFilePath_button.helpTip = "Change your mapset folder path.";
+            beatmapFilePath_button.text = "Import beatmap";
+            beatmapFilePath_button.alignment = ["center", "center"];
+
+            var beatmapFilePath_text = group_4.add('edittext {properties: {name: "beatmapFilePath_text", scrollable: true}}');
+            beatmapFilePath_text.preferredSize.width = 218;
 
             // UTILITIES
             // =========
@@ -644,10 +663,15 @@
             export_button.text = "Export compositions";
             export_button.alignment = ["center", "center"];
 
-            var renderAndImport_iconbutton_imgString = (File($.fileName).path) + "/bitmap/f.png";
-            var renderAndImport_iconbutton = export_section.add("iconbutton", undefined, renderAndImport_iconbutton_imgString, { name: "renderAndImport_iconbutton", style: "toolbutton" });
-            renderAndImport_iconbutton.text = "Open file location";
-            renderAndImport_iconbutton.alignment = ["center", "center"];
+            var openOutputLocation_iconbutton_imgString = (File($.fileName).path) + "/bitmap/f.png";
+            var openOutputLocation_iconbutton = export_section.add("iconbutton", undefined, openOutputLocation_iconbutton_imgString, { name: "openOutputLocation_iconbutton", style: "toolbutton" });
+            openOutputLocation_iconbutton.text = "Open output location";
+            openOutputLocation_iconbutton.alignment = ["center", "center"];
+
+            var importBookmarks_iconbutton_imgString = (File($.fileName).path) + "/bitmap/bm.png";
+            var importBookmarks_iconbutton = export_section.add("iconbutton", undefined, importBookmarks_iconbutton_imgString, { name: "importBookmarks_iconbutton", style: "toolbutton" });
+            importBookmarks_iconbutton.text = "Import bookmarks";
+            importBookmarks_iconbutton.alignment = ["center", "center"];
 
             // HOME
             // ====
@@ -685,6 +709,7 @@
             button3.alignment = ["center", "top"];
 
             var parentsInComp = false;
+            var layerComment = "";
             // var currentLayerStep = 0;
 
             // FUNCTIONS ////////////////////////////////////////////////////
@@ -699,7 +724,7 @@
                     settingsJsonFile.open('w');
                     statictext1.text = scriptSettings.scriptslibraryFolderPath;
                     statictext2.text = scriptSettings.outputFolderPath;
-                    scriptslibrary_button.text = "Scriptslibrary folder";
+                    beatmapFilePath_text.text = scriptSettings.beatmapFilePath;
                     checkbox1.text = "Export .json only";
                     checkbox1.value = scriptSettings.options.exportJsonOnly;
                     checkbox2.text = "Export text per letter";
@@ -743,7 +768,7 @@
 
                     statictext1.text = currentSettings.scriptslibraryFolderPath;
                     statictext2.text = currentSettings.outputFolderPath;
-                    scriptslibrary_button.text = "Scriptslibrary folder";
+                    beatmapFilePath_text.text = currentSettings.beatmapFilePath;
                     checkbox1.text = "Export .json only";
                     checkbox1.value = currentSettings.options.exportJsonOnly;
                     checkbox1.enabled = false;
@@ -850,12 +875,36 @@
                 }
             }
 
-            statictext2.onChanging = function () { // scriptslibrary path text
+            statictext2.onChanging = function () { // output path text
                 // add changes to settings.json ////////////////
                 ////////////////////////////////////////////////
                 var writtenText = this.text;
                 statictext2.text = writtenText;
                 updateSettings('outputFolderPath', writtenText);
+            }
+
+            beatmapFilePath_button.onClick = function () {
+                var beatmapFilePathFolder = selectFile("Please find and select an .osu file.", '*.osu;', false);
+
+                // add changes to settings.json ////////////////
+                ////////////////////////////////////////////////
+                var selectedPath = beatmapFilePathFolder.fsName;
+                beatmapFilePath_text.text = selectedPath;
+
+                if (beatmapFilePathFolder !== null) {
+                    updateSettings('beatmapFilePath', selectedPath);
+                }
+                else {
+                    updateSettings('beatmapFilePath', "");
+                }
+            }
+
+            beatmapFilePath_text.onChanging = function () { // mapset path text
+                // add changes to settings.json ////////////////
+                ////////////////////////////////////////////////
+                var writtenText = this.text;
+                beatmapFilePath_text.text = writtenText;
+                updateSettings('beatmapFilePath', writtenText);
             }
 
             checkbox1.onClick = function () {
@@ -1020,31 +1069,31 @@
             //     return savedFile;
             // }
 
-            // selectFile = function (message, filetypes, multiselect) {
+            function selectFile(message, filetypes, multiselect) {
 
-            //     if ($.os.search(/windows/i) != -1) {
-            //         var selectedFile = File.openDialog(message, filetypes, multiselect);
-            //         //// filetype input example for windows //////
-            //         // '*.nef;*.cr2;*.crw;*.dcs;*.raf;*.arw;*.orf;*.dng;*.psd;*.tif;*.tiff;*.jpg;*.jpe;*.jpeg;*.png;*.bmp'
-            //     }
-            //     else {
-            //         var selectedFile = File.openDialog(message, fileTypesMac(), multiselect);
-            //     }
+                if ($.os.search(/windows/i) != -1) {
+                    var selectedFile = File.openDialog(message, filetypes, multiselect);
+                    //// filetype input example for windows //////
+                    // '*.nef;*.cr2;*.crw;*.dcs;*.raf;*.arw;*.orf;*.dng;*.psd;*.tif;*.tiff;*.jpg;*.jpe;*.jpeg;*.png;*.bmp'
+                    return selectedFile;
+                }
+                else {
+                    var selectedFile = File.openDialog(message, fileTypesMac(), multiselect);
+                    return selectedFile;
+                }
 
-            //     //// filetype input example for mac //////
-            //     function fileTypesMac() {
-            //         if (filetypes !== undefined) {
-            //             filetypes.replace("*.", ""); filetypes.replace(";", "|");
-            //         }
+                //// filetype input example for mac //////
+                function fileTypesMac() {
+                    if (filetypes !== undefined) {
+                        filetypes.replace("*.", ""); filetypes.replace(";", "|");
+                    }
 
-            //         var ftString = '/\.(' + filetypes + ')$/i';
-            //         if (selectedFile.name.match(ftString) || selectedFile.constructor.name == "Folder") {
-            //             return true;
-            //         }
-
-            //         return selectedFile;
-            //     }
-            // }
+                    var ftString = '/\.(' + filetypes + ')$/i';
+                    if (selectedFile.name.match(ftString) || selectedFile.constructor.name == "Folder") {
+                        return true;
+                    }
+                }
+            }
 
             function updateSettings(optionName, optionValue) {
                 if (settingsJsonFile.exists) {
@@ -1077,6 +1126,9 @@
                     }
                     if (optionName == 'outputFolderPath') {
                         data.outputFolderPath = optionValue;
+                    }
+                    if (optionName == 'beatmapFilePath') {
+                        data.beatmapFilePath = optionValue;
                     }
                     if (optionName == 'exportJsonOnly') {
                         data.options.exportJsonOnly = optionValue;
@@ -1126,6 +1178,7 @@
                     var newData = {
                         scriptslibraryFolderPath: Folder.decode(data.scriptslibraryFolderPath),
                         outputFolderPath: data.outputFolderPath,
+                        beatmapFilePath: data.beatmapFilePath,
                         options: {
                             exportJsonOnly: data.options.exportJsonOnly,
                             exportTextPerLetter: data.options.exportTextPerLetter,
@@ -2216,11 +2269,9 @@
                             expCompCount++;
                             updateCompProgress(selectedComps[I].name);
 
-                            var firstTextLayerIndex = [];
                             var currentComp = selectedComps[I];
                             var currentCompTime = currentComp.time;
                             var currentCompResolution = currentComp.resolutionFactor;
-                            var layerHasParent = false;
 
                             var composition = ({
                                 type: "composition",
@@ -2242,8 +2293,14 @@
                                 expLayerCountTotal = currentComp.numLayers;
                                 updateLayerSteps(0, currentComp.layer(la).name, "Exporting " + currentComp.layer(la).name + "...");
 
+                                layerComment = "";
+
                                 var layer = {};
                                 var parentLayerData;
+                                var currentCompLayerStart;
+                                var currentCompLayerEnd;
+                                var layerHasParent = false;
+                                var firstTextLayerIndex = [];
                                 var dimensionAlreadySeparated = true;
                                 var parentDimensionAlreadySeparated = true;
                                 var currentCompLayer = selectedComps[I].layer(la);
@@ -2313,8 +2370,11 @@
                                     }
                                     layer.visible = currentCompLayer.enabled;
                                     layer.startTime = round(milliseconds(layerStart(selectedComps[I], currentCompLayer.inPoint) + currentComp.displayStartTime), 0);
+                                    currentCompLayerStart = layerStart(selectedComps[I], currentCompLayer.inPoint) + currentComp.displayStartTime;
                                     layer.endTime = round(layer.startTime + layerDuration(), 0);
+                                    currentCompLayerEnd = (currentCompLayerStart + (layerEnd(selectedComps[I], currentCompLayer.outPoint) - layerStart(selectedComps[I], currentCompLayer.inPoint)) - (currentComp.frameRate / 1000));
                                     layer.duration = round(layerDuration(), 0);
+                                    layer.comments = "";
                                     layer.type = layerType;
                                     layer.layer = null;
                                     updateLayerSteps(2, currentComp.layer(la).name, "Exporting timings...");
@@ -2349,6 +2409,16 @@
                                         if (currentCompLayer.opacity.numKeys !== 0) {
                                             // layer.transform.fade.keyframed = true;
                                             for (var k = 1; k <= currentCompLayer.opacity.numKeys; k++) {
+                                                if (k == 1) {
+                                                    if (currentCompLayer.opacity.keyTime(k) != currentCompLayerStart)
+                                                        currentCompLayer.opacity.addKey(currentCompLayerStart);
+                                                }
+                                                if (k == currentCompLayer.opacity.numKeys) {
+                                                    if (currentCompLayer.opacity.keyTime(k) != currentCompLayerEnd)
+                                                        currentCompLayer.opacity.addKey(currentCompLayerEnd);
+                                                }
+                                            }
+                                            for (var k = 1; k <= currentCompLayer.opacity.numKeys; k++) {
                                                 var keyframe = {};
                                                 keyframe.time = milliseconds(currentCompLayer.opacity.keyTime(k) + currentComp.displayStartTime);
                                                 keyframe.value = currentCompLayer.opacity.keyValue(k) / 100;
@@ -2358,11 +2428,48 @@
                                         }
                                         else if (currentCompLayer.opacity.numKeys === 0) {
                                             // layer.transform.fade.keyframed = false;
-                                            var keyframe = {};
-                                            keyframe.time = layer.startTime + currentComp.displayStartTime;
-                                            keyframe.value = currentCompLayer.opacity.value / 100;
-                                            keyframe.easing = "None";
-                                            layer.transform.fade.push(keyframe);
+                                            currentCompLayer.opacity.addKey(currentCompLayerStart);
+                                            currentCompLayer.opacity.addKey(currentCompLayerEnd);
+                                            for (var k = 1; k <= currentCompLayer.opacity.numKeys; k++) {
+                                                var keyframe = {};
+                                                keyframe.time = milliseconds(currentCompLayer.opacity.keyTime(k) + currentComp.displayStartTime);
+                                                keyframe.value = currentCompLayer.opacity.keyValue(k) / 100;
+                                                keyframe.easing = easingType(currentCompLayer.opacity, k);
+                                                layer.transform.fade.push(keyframe);
+                                            }
+
+                                            // var keyframe = {};
+                                            // keyframe.time = layer.startTime + currentComp.displayStartTime;
+                                            // keyframe.value = currentCompLayer.opacity.value / 100;
+                                            // keyframe.easing = "None";
+                                            // layer.transform.fade.push(keyframe);
+                                        }
+
+                                        // effects
+                                        layer.transform.effect = {};
+
+                                        // Fill
+                                        if (effectExists(currentCompLayer, "Fill")) {
+                                            var fillEffectProp = currentCompLayer.effect("Fill")("Color");
+                                            layer.transform.effect.fill = [];
+                                            if (fillEffectProp.numKeys !== 0) {
+                                                // layer.transform.effect.fill.keyframed = true;
+                                                for (var k = 1; k <= fillEffectProp.numKeys; k++) {
+                                                    var keyframe = {};
+                                                    keyframe.time = milliseconds(fillEffectProp.keyTime(k) + currentComp.displayStartTime);
+                                                    keyframe.value = rgbColor(fillEffectProp.keyValue(k));
+                                                    keyframe.easing = easingType(fillEffectProp, k);
+                                                    layer.transform.effect.fill.push(keyframe);
+                                                }
+                                            }
+                                            else if (fillEffectProp.numKeys === 0) {
+                                                // layer.transform.effect.fill.keyframed = false;
+                                                var keyframe = {};
+                                                keyframe.time = layer.startTime + currentComp.displayStartTime;
+                                                keyframe.value = rgbColor(fillEffectProp.value);
+                                                keyframe.easing = "None";
+                                                layer.transform.effect.fill.push(keyframe);
+                                            }
                                         }
                                         
                                         layer.layerGroup = "";
@@ -2372,12 +2479,22 @@
                                             if (marker.match(new RegExp("(TopLeft|TopCentre|TopRight|CentreLeft|Centre|CentreRight|BottomLeft|BottomCentre|BottomRight|TL|TC|TR|CL|C|CR|BL|BC|BR)", "i")) && !marker.match(new RegExp("(;)", "i"))) {
                                                 layer.transform.origin = marker;
                                             }
+                                            else if (marker.match(new RegExp("(;)", "i"))) continue;
                                             else {
                                                 layer.transform.origin = "Centre";
                                             }
+                                        }
+
+                                        for (var m = 1; m <= currentCompLayer.marker.numKeys; m++) {
+                                            var marker = currentCompLayer.marker.keyValue(m).comment;
                                             if (marker.match(new RegExp("(Background|Fail|Pass|Foreground|Overlay|Sound|BG|F|P|FG|O|S)", "i")) && !marker.match(new RegExp("(;)", "i"))) {
                                                 layer.layer = marker;
                                             }
+                                            else if (marker.match(new RegExp("(;)", "i"))) continue;
+                                        }
+
+                                        for (var m = 1; m <= currentCompLayer.marker.numKeys; m++) {
+                                            var marker = currentCompLayer.marker.keyValue(m).comment;
                                             if (layerType == "Sequence") {
                                                 if (marker.match(new RegExp("(LoopOnce|LoopForever|LO|LF|1|0)", "i"))) {
                                                     layer.loopType = marker;
@@ -2873,8 +2990,8 @@
                                                 if (layerHasParent == true) {
                                                     if (parentLayerData.property("Transform").property("X Position").numKeys !== 0) {
                                                         currentCompResolution = [4, 4];
-                                                        newLayer = getChildPosition(currentCompLayer, parentLayerData, layer.transform.isRotating, layerHasParent);
                                                         updateLayerSteps(6.35, currentComp.layer(la).name, "Baking parented keyframes into child layer...");
+                                                        newLayer = getChildPosition(currentCompLayer, parentLayerData, layer.transform.isRotating, layerHasParent);
                                                         var newLayerPosXAfter = newLayer.property("Transform").property("X Position");
     
                                                         for (var k = 1; k <= newLayerPosXAfter.numKeys; k++) {
@@ -2885,18 +3002,30 @@
                                                             keyframe.easing = easingType(newLayerPosXAfter, k);
                                                             // alert("child ID: " + layer.id + " | name: " + layer.name);
                                                             layer.transform.position.x.push(keyframe);
-                                                            // alert("hmm");
                                                         }
                                                     }
                                                     else {
-                                                        newLayer = getChildPosition(currentCompLayer, parentLayerData, layer.transform.isRotating, layerHasParent);
+                                                        currentCompResolution = [4, 4];
                                                         updateLayerSteps(6.35, currentComp.layer(la).name, "Baking parented keyframes into child layer...");
+                                                        // alert(currentCompLayer.name);
+                                                        newLayer = getChildPosition(currentCompLayer, parentLayerData, layer.transform.isRotating, layerHasParent);
                                                         var newLayerPosXAfter = newLayer.property("Transform").property("X Position");
-                                                        var keyframe = {};
-    
-                                                        keyframe.time = layer.startTime + currentComp.displayStartTime;
-                                                        keyframe.value = round(newLayerPosXAfter.valueAtTime(layer.startTime), 2);
-                                                        layer.transform.position.x.push(keyframe);
+                                                        
+                                                        if (newLayerPosXAfter.numKeys != 0) {
+                                                            for (var k = 1; k <= newLayerPosXAfter.numKeys; k++) {
+                                                                var keyframe = {};
+                                                                keyframe.time = milliseconds(newLayerPosXAfter.keyTime(k) + currentComp.displayStartTime);
+                                                                keyframe.value = round(newLayerPosXAfter.keyValue(k), 2);
+                                                                keyframe.easing = easingType(newLayerPosXAfter, k);
+                                                                layer.transform.position.x.push(keyframe);
+                                                            }
+                                                        }
+                                                        else {
+                                                            var keyframe = {};
+                                                            keyframe.time = layer.startTime + currentComp.displayStartTime;
+                                                            keyframe.value = round(newLayerPosXAfter.valueAtTime(layer.startTime), 2);
+                                                            layer.transform.position.x.push(keyframe);
+                                                        }
                                                     }
                                                 }
                                                 else {
@@ -2915,6 +3044,7 @@
                                                     if (parentLayerData.property("Transform").property("X Position").numKeys !== 0) {
                                                         currentCompResolution = [4, 4];
                                                         updateLayerSteps(6.35, currentComp.layer(la).name, "Baking parented keyframes into child layer...");
+                                                        // alert(currentCompLayer.name + " 2");
                                                         newLayer = getChildPosition(currentCompLayer, parentLayerData, layer.transform.isRotating, layerHasParent);
                                                         var newLayerPosXAfter = newLayer.property("Transform").property("X Position");
     
@@ -2929,6 +3059,7 @@
                                                     else {
                                                         currentCompResolution = [4, 4];
                                                         updateLayerSteps(6.35, currentComp.layer(la).name, "Baking parented keyframes into child layer...");
+                                                        // alert(currentCompLayer.name + " 3");
                                                         newLayer = getChildPosition(currentCompLayer, parentLayerData, layer.transform.isRotating, layerHasParent);
                                                         var newLayerPosXAfter = newLayer.property("Transform").property("X Position");
     
@@ -3050,6 +3181,7 @@
                                                         }
                                                     }
                                                     else {
+                                                        currentCompResolution = [4, 4];
                                                         newLayer = getChildPosition(currentCompLayer, parentLayerData, layer.transform.isRotating, layerHasParent);
                                                         var newLayerPosYAfter = newLayer.property("Transform").property("Y Position");
                                                         var keyframe = {};
@@ -3364,6 +3496,16 @@
                                                                         if (explodedTextLayer.opacity.numKeys !== 0) {
                                                                             // et.transform.fade.keyframed = true;
                                                                             for (var k = 1; k <= explodedTextLayer.opacity.numKeys; k++) {
+                                                                                if (k == 1) {
+                                                                                    if (explodedTextLayer.opacity.keyTime(k) != currentCompLayerStart)
+                                                                                        explodedTextLayer.opacity.addKey(currentCompLayerStart);
+                                                                                }
+                                                                                if (k == explodedTextLayer.opacity.numKeys) {
+                                                                                    if (explodedTextLayer.opacity.keyTime(k) != currentCompLayerEnd)
+                                                                                        explodedTextLayer.opacity.addKey(currentCompLayerEnd);
+                                                                                }
+                                                                            }
+                                                                            for (var k = 1; k <= explodedTextLayer.opacity.numKeys; k++) {
                                                                                 var keyframe = {};
                                                                                 keyframe.time = milliseconds(explodedTextLayer.opacity.keyTime(k) + currentComp.displayStartTime);
                                                                                 keyframe.value = explodedTextLayer.opacity.keyValue(k) / 100;
@@ -3373,11 +3515,48 @@
                                                                         }
                                                                         else if (explodedTextLayer.opacity.numKeys === 0) {
                                                                             // et.transform.fade.keyframed = false;
-                                                                            var keyframe = {};
-                                                                            keyframe.time = layer.startTime + currentComp.displayStartTime;
-                                                                            keyframe.value = explodedTextLayer.opacity.value / 100;
-                                                                            keyframe.easing = "None";
-                                                                            et.transform.fade.push(keyframe);
+                                                                            explodedTextLayer.opacity.addKey(currentCompLayerStart);
+                                                                            explodedTextLayer.opacity.addKey(currentCompLayerEnd);
+                                                                            for (var k = 1; k <= explodedTextLayer.opacity.numKeys; k++) {
+                                                                                var keyframe = {};
+                                                                                keyframe.time = milliseconds(explodedTextLayer.opacity.keyTime(k) + currentComp.displayStartTime);
+                                                                                keyframe.value = explodedTextLayer.opacity.keyValue(k) / 100;
+                                                                                keyframe.easing = easingType(explodedTextLayer.opacity, k);
+                                                                                et.transform.fade.push(keyframe);
+                                                                            }
+
+                                                                            // var keyframe = {};
+                                                                            // keyframe.time = layer.startTime + currentComp.displayStartTime;
+                                                                            // keyframe.value = explodedTextLayer.opacity.value / 100;
+                                                                            // keyframe.easing = "None";
+                                                                            // et.transform.fade.push(keyframe);
+                                                                        }
+
+                                                                        // effects
+                                                                        et.transform.effect = {};
+                                
+                                                                        // Fill
+                                                                        if (effectExists(currentCompLayer, "Fill")) {
+                                                                            var fillEffectProp = currentCompLayer.effect("Fill")("Color");
+                                                                            et.transform.effect.fill = [];
+                                                                            if (fillEffectProp.numKeys !== 0) {
+                                                                                // layer.transform.effect.fill.keyframed = true;
+                                                                                for (var k = 1; k <= fillEffectProp.numKeys; k++) {
+                                                                                    var keyframe = {};
+                                                                                    keyframe.time = milliseconds(fillEffectProp.keyTime(k) + currentComp.displayStartTime);
+                                                                                    keyframe.value = rgbColor(fillEffectProp.keyValue(k));
+                                                                                    keyframe.easing = easingType(fillEffectProp, k);
+                                                                                    et.transform.effect.fill.push(keyframe);
+                                                                                }
+                                                                            }
+                                                                            else if (fillEffectProp.numKeys === 0) {
+                                                                                // layer.transform.effect.fill.keyframed = false;
+                                                                                var keyframe = {};
+                                                                                keyframe.time = et.startTime + currentComp.displayStartTime;
+                                                                                keyframe.value = rgbColor(fillEffectProp.value);
+                                                                                keyframe.easing = "None";
+                                                                                et.transform.effect.fill.push(keyframe);
+                                                                            }
                                                                         }
     
                                                                         et.transform.position = {};
@@ -4244,7 +4423,9 @@
                                         wasSelected = true;
                                     }
                                 }
-                                
+                                if (currentCompLayer.comment == "parented=true;")
+                                    layer.comments = "parented=true;";
+                                else layer.comments = layerComment;
                                 composition.layers.push(layer);
                                 updateLayerSteps(10, currentComp.layer(la).name, "Layer data has been pushed!");
 
@@ -5147,7 +5328,7 @@
                 }
             }
 
-            renderAndImport_iconbutton.onClick = function () {
+            openOutputLocation_iconbutton.onClick = function () {
                 scriptSettings = readSettings();
                 var jsonLocation = scriptSettings.outputFolderPath;
 
@@ -5156,6 +5337,18 @@
                 }
                 if (jsonLocation == "") {
                     alert("AeToOsb error: Output path is empty.");
+                }
+            }
+
+            importBookmarks_iconbutton.onClick = function () {
+                scriptSettings = readSettings();
+                var beatmapFilePath = scriptSettings.beatmapFilePath;
+                
+                if (beatmapFilePath == "") {
+                    alert("AeToOsb error: Beatmap path is empty in settings.");
+                }
+                else {
+                    importOsuBookmarks(beatmapFilePath);
                 }
             }
 
@@ -5169,10 +5362,108 @@
                 });
             }
 
+            function getTimeOrDate(getTime) {
+                var date = new Date(Date(0));
+
+                if (!getTime) {
+                    var day = date.getDate();
+                    var month = date.getMonth() + 1;
+                    var year = date.getFullYear() % 100;
+                    var currentDate = month + "/" + day + "/" + year;
+                    return currentDate;
+                }
+                else {
+                    var time = date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+                    return time;
+                }
+            }
+
+            function importOsuBookmarks(osuFilePath) {
+                var onlyComps = true;
+                var beatmapFileBookmarks = [];
+                var osuFile = new File(osuFilePath);
+
+                // get bookmarks from .osu file
+                var currentLine;
+                var lines = [];
+                osuFile.open('r');
+                while(!osuFile.eof) {
+                    currentLine = osuFile.readln();
+                    lines.push(currentLine);
+                }
+                osuFile.close();
+                
+                for (var l = 0; l < lines.length; l++) {
+                    if (lines[l].includes('Bookmarks:')) {
+                        var bookmarks = lines[l].slice(11, lines[l].length);
+                        var bookmark = bookmarks.split(',');
+                        
+                        for (var b = 0; b < bookmark.length; b++)
+                            beatmapFileBookmarks.push(parseInt(bookmark[b]) / 1000);
+                        break;
+                    }
+                    else continue;
+                }
+                // end
+
+                if (app.project.selection.length != 0) {
+                    for (var i = 0; i < app.project.selection.length; i++) {
+                        if (app.project.selection[i] instanceof CompItem)
+                            continue;
+                        else {
+                            alert("AeToOsb error: Please only select compositions.");
+                            onlyComps = false;
+                            break;
+                        }
+                    }
+                    if (onlyComps) {
+                        for (var i = 0; i < app.project.selection.length; i++) {
+                            var c = app.project.selection[i];
+                            var boomarksExists = false;
+                            if (c.markerProperty.numKeys != 0) {
+                                for (var m = 1; m <= c.markerProperty.numKeys; m++) {
+                                    if (c.markerProperty.keyValue(m).label == 6 && c.markerProperty.keyValue(m).chapter == "osu!") {
+                                        for (var m = 1; m <= (c.markerProperty.numKeys * 100); m++)
+                                            c.markerProperty.removeKey(1);
+                                        boomarksExists = true;
+                                        continue;
+                                    }
+                                    else continue;
+                                }
+                                if (boomarksExists) alert("AeToOsb error: Bookmarks already exists, and has been removed.");
+                            }
+                            if (!boomarksExists) {
+                                // add comp markers
+                                if (beatmapFileBookmarks.length > 0) {
+                                    var compMarker = new MarkerValue("");
+                                    compMarker.label = 6;
+                                    compMarker.chapter = "osu!";
+                                    for (var m = 0; m < beatmapFileBookmarks.length; m++)
+                                        c.markerProperty.setValueAtTime(beatmapFileBookmarks[m], compMarker);
+                                }
+                                else {
+                                    alert("AeToOsb error: The .osu file doesn't have any bookmarks.");
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    else alert("AeToOsb error: Please only select compositions.");
+                }
+                else alert("AeToOsb error: Please select target composition(s).");
+            }
+
             function getChildPosition(layer, parentLayer, isRotating, hasParent) {
+                // backup process
+                for (var pi = 1; pi <= app.project.numItems; pi++) {
+                    layer.containingComp.duplicate().name = layer.containingComp.name + " (bckp)_" + getTimeOrDate(true);
+                    break;
+                }
+
                 scriptSettings = readSettings();
                 var oldLayer = layer.duplicate();
                 layer.parent = null;
+                layerComment = "parented=true;";
 
                 var parentLayerPropX; parentLayerPropX = parentLayer.property("Transform").property("X Position");
                 var parentLayerPropY; parentLayerPropY = parentLayer.property("Transform").property("Y Position");
@@ -5267,8 +5558,8 @@
                         layer.position.expressionEnabled = false;
                         removeDuplicateKeyframes(layer.property("Transform").property("Position"));
 
-                        getChildRotation(layer, parentLayer, oldLayer, true);
-                        getChildScale(layer, parentLayer, oldLayer, true);
+                        getChildScale(layer, parentLayer, oldLayer);
+                        getChildRotation(layer, parentLayer, oldLayer);
                         oldLayer.remove();
 
                         layer.property("Transform").property("Position").dimensionsSeparated = true;
@@ -5371,8 +5662,8 @@
                         layer.position.expressionEnabled = false;
                         removeDuplicateKeyframes(layer.property("Transform").property("Position"));
 
-                        getChildRotation(layer, parentLayer, oldLayer);
                         getChildScale(layer, parentLayer, oldLayer);
+                        getChildRotation(layer, parentLayer, oldLayer);
                         oldLayer.remove();
 
                         layer.property("Transform").property("Position").dimensionsSeparated = true;
@@ -5381,14 +5672,15 @@
                     else if ((parentLayerPropX.numKeys == 0 || parentLayerPropY.numKeys == 0) && isRotating == false) {
                         layer.property("Transform").property("Position").dimensionsSeparated = true;
 
-                        getChildRotation(layer, parentLayer, oldLayer);
                         getChildScale(layer, parentLayer, oldLayer);
+                        getChildRotation(layer, parentLayer, oldLayer);
                         oldLayer.remove();
                         return layer;
                     }
                 }
                 else if (hasParent == true) {
                     if (parentLayerPropX.numKeys != 0 || parentLayerPropY.numKeys != 0) {
+                        // alert("1");
                         // alert("oof");
                         var parentLayerKeyTimesX = [];
                         var parentLayerKeyTimesY = [];
@@ -5481,8 +5773,8 @@
                         layer.position.expressionEnabled = false;
                         removeDuplicateKeyframes(layer.property("Transform").property("Position"));
 
-                        getChildRotation(layer, parentLayer, oldLayer);
                         getChildScale(layer, parentLayer, oldLayer);
+                        getChildRotation(layer, parentLayer, oldLayer);
                         oldLayer.remove();
 
                         layer.property("Transform").property("Position").dimensionsSeparated = true;
@@ -5490,6 +5782,7 @@
                         return layer;
                     }
                     else if ((parentLayerPropX.numKeys == 0 || parentLayerPropY.numKeys == 0) && isRotating == true) {
+                        // alert("2");
                         layer.property("Transform").property("Position").dimensionsSeparated = false;
                         var layerProp = layer.property("Transform").property("Position");
 
@@ -5561,20 +5854,21 @@
                         layer.position.expressionEnabled = false;
                         removeDuplicateKeyframes(layer.property("Transform").property("Position"));
 
-                        getChildRotation(layer, parentLayer, oldLayer);
                         getChildScale(layer, parentLayer, oldLayer);
+                        getChildRotation(layer, parentLayer, oldLayer);
                         oldLayer.remove();
 
                         layer.property("Transform").property("Position").dimensionsSeparated = true;
                         return layer;
                     }
                     else if ((parentLayerPropX.numKeys == 0 || parentLayerPropY.numKeys == 0) && isRotating == false) {
+                        // alert("3");
                         layer.property("Transform").property("Position").dimensionsSeparated = false;
 
                         var posValueArray = [];
                         var keyframeTimes = [];
 
-                        var timeStep = scriptSettings.keyframeHelper.interval / 1000;
+                        var timeStep = (scriptSettings.keyframeHelper.interval / 2) / 1000;
                         var start = layerStart(layer.containingComp, layer.inPoint);
                         var end = layerEnd(layer.containingComp, layer.outPoint);
                         var duration = end - start;
@@ -5582,8 +5876,8 @@
                         var prevTime = layer.containingComp.time;
 
                         for (var i = start; i <= end; i = i + timeStep) {
-                            if (i >= end) i = end - (layer.containingComp.frameRate / 1000);
-                            if (Math.abs(i - end) < timeStep * 2.9) i = end - (layer.containingComp.frameRate / 1000);
+                            if (i >= end) i = end;
+                            if (Math.abs(i - end) < timeStep * 2.9) i = end;
 
                             oldLayer.containingComp.time = i;
                             var tempLayer = oldLayer.duplicate();
@@ -5599,11 +5893,11 @@
                         while (layer.position.numKeys > 0) layer.position.removeKey(layer.position.numKeys);
                         layer.position.setValuesAtTimes(keyframeTimes, posValueArray);
                         removeDuplicateKeyframes(layer.property("Transform").property("Position"));
-                        setParentEasing(layer.property("Transform").property("Position"), parentLayer.property("Transform").property("Position"));
+                        // setParentEasing(layer.property("Transform").property("Position"), parentLayer.property("Transform").property("Position"));
                         layer.position.expressionEnabled = false;
-
-                        getChildRotation(layer, parentLayer, oldLayer);
+                        
                         getChildScale(layer, parentLayer, oldLayer);
+                        getChildRotation(layer, parentLayer, oldLayer);
                         oldLayer.remove();
 
                         layer.property("Transform").property("Position").dimensionsSeparated = true;
@@ -5619,16 +5913,16 @@
                 var rotationValueArray = [];
                 var keyframeTimes = [];
 
-                var timeStep = scriptSettings.keyframeHelper.interval / 1000;
+                var timeStep = (scriptSettings.keyframeHelper.interval / 2) / 1000;
                 var start = layerStart(layer.containingComp, layer.inPoint);
                 var end = layerEnd(layer.containingComp, layer.outPoint);
                 var duration = end - start;
-                timeStep = (timeStep / duration) * duration;
+                timeStep = (timeStep / duration) * duration; timeStep = layer.containingComp.frameRate / 1000;
                 var prevTime = layer.containingComp.time;
 
                 for (var i = start; i <= end; i = i + timeStep) {
-                    if (i > end) i = end - (layer.containingComp.frameRate / 1000);
-                    if (Math.abs(i - end) < timeStep * 2.9) i = end - (layer.containingComp.frameRate / 1000);
+                    if (i > end) i = end;
+                    if (Math.abs(i - end) < timeStep * 2.9) i = end;
 
                     oldLayer.containingComp.time = i;
                     var tempLayer = oldLayer.duplicate();
@@ -5644,7 +5938,7 @@
                 while (layer.rotation.numKeys > 0) layer.rotation.removeKey(layer.rotation.numKeys);
                 layer.rotation.setValuesAtTimes(keyframeTimes, rotationValueArray);
                 removeDuplicateKeyframes(layer.property("Transform").property("Rotation"));
-                setParentEasing(layer.property("Transform").property("Rotation"), parentLayer.property("Transform").property("Rotation"));
+                // setParentEasing(layer.property("Transform").property("Rotation"), parentLayer.property("Transform").property("Rotation"));
                 layer.rotation.expressionEnabled = false;
             }
 
@@ -5654,7 +5948,7 @@
                 var scaleValueArray = [];
                 var keyframeTimes = [];
 
-                var timeStep = scriptSettings.keyframeHelper.interval / 1000;
+                var timeStep = (scriptSettings.keyframeHelper.interval / 2) / 1000;
                 var start = layerStart(layer.containingComp, layer.inPoint);
                 var end = layerEnd(layer.containingComp, layer.outPoint);
                 var duration = end - start;
@@ -5662,8 +5956,8 @@
                 var prevTime = layer.containingComp.time;
 
                 for (var i = start; i <= end; i = i + timeStep) {
-                    if (i > end) i = end - (layer.containingComp.frameRate / 1000);
-                    if (Math.abs(i - end) < timeStep * 2.9) i = end - (layer.containingComp.frameRate / 1000);
+                    if (i > end) i = end;
+                    if (Math.abs(i - end) < timeStep * 2.9) i = end;
                     
                     oldLayer.containingComp.time = i;
                     var tempLayer = oldLayer.duplicate();
@@ -5679,7 +5973,7 @@
                 while (layer.scale.numKeys > 0) layer.scale.removeKey(layer.scale.numKeys);
                 layer.scale.setValuesAtTimes(keyframeTimes, scaleValueArray);
                 removeDuplicateKeyframes(layer.property("Transform").property("Scale"));
-                setParentEasing(layer.property("Transform").property("Scale"), parentLayer.property("Transform").property("Scale"));
+                // setParentEasing(layer.property("Transform").property("Scale"), parentLayer.property("Transform").property("Scale"));
                 layer.scale.expressionEnabled = false;
             }
 
@@ -5689,23 +5983,6 @@
                     try {
                         prop.setInterpolationTypeAtKey(1, KeyframeInterpolationType.LINEAR);
                         prop.setInterpolationTypeAtKey(prop.numKeys, KeyframeInterpolationType.LINEAR);
-                        
-                        // if (prop.numKeys > 2) {
-                        //     if (prop.propertyValueType == 6414 || prop.propertyValueType == 6416 || prop.propertyValueType == 6417) {
-                        //         for (var e = 0; e < prop.keyInTemporalEase(1).length; e++) {
-                        //             prop.keyInTemporalEase(3)[e].influence = 0;
-                        //             prop.keyOutTemporalEase(3)[e].influence = 0;
-                        //             prop.keyInTemporalEase(prop.numKeys - 2)[e].influence = 0;
-                        //             prop.keyOutTemporalEase(prop.numKeys - 2)[e].influence = 0;
-                                    
-                        //             prop.keyInTemporalEase(2)[e].influence = 20;
-                        //             prop.keyOutTemporalEase(2)[e].influence = 20;
-                        //             prop.keyInTemporalEase(prop.numKeys - 1)[e].influence = 20;
-                        //             prop.keyOutTemporalEase(prop.numKeys - 1)[e].influence = 20;
-                        //             alert("yes");
-                        //         }
-                        //     }
-                        // }
                     }
                     catch (e) {}
                 }
@@ -5827,21 +6104,22 @@
             function backupProject() {
                 scriptSettings = readSettings();
 
-                if (File(app.project.file.fsName).exists == false) {
+                if (File(app.project.file.fsName.replace("%20", " ")).exists == false) {
                     alert("AeToOsb WARNING: Backup cannot be made." + "\r\n" + "Please save your project before performing this action.");
                 }
-                if (File(app.project.file.fsName).exists !== false) {
+                if (File(app.project.file.fsName.replace("%20", " ")).exists !== false) {
+                    var backupSuffix = ".aep_bckp " + (getTimeOrDate(false) + "_" + getTimeOrDate(true));
                     var backupPath = scriptSettings.outputFolderPath + "\\" + app.project.file.name.replace("%20", " ");
-                    var backupProject = new File(backupPath.slice(0, -4) + ".aep_bckp");
+                    var backupProject = new File(backupPath.slice(0, -4) + backupSuffix);
                     var projectFile = File(backupPath);
 
-                    if (backupProject.exists !== true) {
-                        projectFile.copy(backupPath.slice(0, -4) + ".aep_bckp");
-                    }
-                    if (backupProject.exists == true) {
-                        backupProject.remove(backupPath.slice(0, -4) + ".aep_bckp");
-                        projectFile.copy(backupPath.slice(0, -4) + ".aep_bckp");
-                    }
+                    // if (backupProject.exists !== true) {
+                        projectFile.copy(backupPath.slice(0, -4) + backupSuffix);
+                    // }
+                    // if (backupProject.exists == true) {
+                    //     backupProject.remove(backupPath.slice(0, -4) + backupSuffix);
+                    //     projectFile.copy(backupPath.slice(0, -4) + backupSuffix);
+                    // }
                 }
             }
 
@@ -5873,6 +6151,7 @@
                 contents_group: AeToOsb.findElement("contents_group"), // group
                 scriptslibrary_button: AeToOsb.findElement("scriptslibrary_button"), // button
                 outputpath_button: AeToOsb.findElement("outputpath_button"), // button
+                beatmapFilePath_button: AeToOsb.findElement("beatmapFilePath_button"), // button
                 home: AeToOsb.findElement("home"), // tab
                 export_section: AeToOsb.findElement("export_section"), // group
                 export_button: AeToOsb.findElement("export_button"), // iconbutton
@@ -5946,7 +6225,7 @@
             };
             if (AeToOsb instanceof Window) AeToOsb.show();
 
-            AeToOsb.itemsArray = [AeToOsb, logo, tabbedpanel, settings, contents_group, scriptslibrary_button, outputpath_button, home, export_section, export_button, github, discord1, discord2, website, atsStatus, atsStatusGroup, utilities, , utilGeneral, utilLayerGroup, utilLayerGroupInfo, utilLayerGroupName, utilLayerGroupNameInput, utilLayerGroupApplyButton, utilLayerOrigins, utilLayerOriginTop, utilLayerOriginTopLeft, utilLayerOriginTopCentre, utilLayerOriginTopRight, utilLayerOriginCenter, utilLayerOriginCentreLeft, utilLayerOriginCentre, utilLayerOriginCentreRight, utilLayerOriginBottom, utilLayerOriginBottomLeft, utilLayerOriginBottomCentre, utilLayerOriginBottomRight, utilLayerLayering, utilLayerLayeringGroup1, utilLayerLayeringDefault, utilLayerLayeringDefaultTypes, utilLayerLayeringApplyButton, utilTextAndKeyframeHelper, utilText, utilTextTitle, utilTextGroup, utilTextLetterButton, utilTextWordButton, utilTextLineButton, utilKeyframe, utilKeyframeGroup, utilKeyframeTitle, utilKeyframeIntervalInput, utilKeyframeMs, utilKeyframeGroup1, utilKeyframeCheckbox1, utilKeyframeCheckbox2, utilKeyframeCheckbox3, utilKeyframeGroup2, utilKeyframeCheckbox4, utilKeyframeCheckbox5, utilKeyframeGenerateButton, utilKeyframeCheckbox6, utilLoopHelper, utilLoopInfo, utilLoopStart, utilLoopStartInput, utilLoopInfo1, utilLoopEnd, utilLoopEndInput, utilLoopTypeInfo, utilLoopType, utilLoopTypes, utilLoopButtons, utilLoopFrameButton, utilLoopApplyButton];
+            AeToOsb.itemsArray = [AeToOsb, logo, tabbedpanel, settings, contents_group, scriptslibrary_button, outputpath_button, beatmapFilePath_button, home, export_section, export_button, github, discord1, discord2, website, atsStatus, atsStatusGroup, utilities, , utilGeneral, utilLayerGroup, utilLayerGroupInfo, utilLayerGroupName, utilLayerGroupNameInput, utilLayerGroupApplyButton, utilLayerOrigins, utilLayerOriginTop, utilLayerOriginTopLeft, utilLayerOriginTopCentre, utilLayerOriginTopRight, utilLayerOriginCenter, utilLayerOriginCentreLeft, utilLayerOriginCentre, utilLayerOriginCentreRight, utilLayerOriginBottom, utilLayerOriginBottomLeft, utilLayerOriginBottomCentre, utilLayerOriginBottomRight, utilLayerLayering, utilLayerLayeringGroup1, utilLayerLayeringDefault, utilLayerLayeringDefaultTypes, utilLayerLayeringApplyButton, utilTextAndKeyframeHelper, utilText, utilTextTitle, utilTextGroup, utilTextLetterButton, utilTextWordButton, utilTextLineButton, utilKeyframe, utilKeyframeGroup, utilKeyframeTitle, utilKeyframeIntervalInput, utilKeyframeMs, utilKeyframeGroup1, utilKeyframeCheckbox1, utilKeyframeCheckbox2, utilKeyframeCheckbox3, utilKeyframeGroup2, utilKeyframeCheckbox4, utilKeyframeCheckbox5, utilKeyframeGenerateButton, utilKeyframeCheckbox6, utilLoopHelper, utilLoopInfo, utilLoopStart, utilLoopStartInput, utilLoopInfo1, utilLoopEnd, utilLoopEndInput, utilLoopTypeInfo, utilLoopType, utilLoopTypes, utilLoopButtons, utilLoopFrameButton, utilLoopApplyButton];
             return AeToOsb;
         }());
     }

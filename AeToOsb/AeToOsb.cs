@@ -88,6 +88,9 @@ namespace StorybrewScripts
         private float frameDuration;
         private string aeToOsbOutput;
 
+        // effect globals
+        private List<Fill> spriteEffectFill;
+
         // sprite parameters
         private int spriteStart;
         private int spriteEnd;
@@ -141,6 +144,7 @@ namespace StorybrewScripts
         private bool autoGen;
         private bool hasParent;
         private string parentName;
+        private string spriteComments;
         private string spriteType;
         private string spriteLayer;
         private string sequenceLoopType;
@@ -342,6 +346,7 @@ namespace StorybrewScripts
                             layerName = compLayer.Name;
                             spriteFilePath = compLayer.Path;
                             layerFileName = compLayer.FileName;
+                            spriteComments = compLayer.Comments;
                             spriteType = compLayer.Type;
                             spriteLayer = compLayer.LayerLayer;
                             sequenceLoopType = compLayer.LoopType;
@@ -359,6 +364,18 @@ namespace StorybrewScripts
                             spriteTransform = compLayer.Transform;
                             spriteLayerGroup = compLayer.LayerGroup;
                             spriteLoopGroup = compLayer.LoopGroup;
+
+                            // effects
+                            if (spriteTransform.Effect != null)
+                            {
+                                var spriteEffect = spriteTransform.Effect;
+                                // Fill
+                                if (spriteEffect.Fill != null)
+                                {
+                                    spriteEffectFill = spriteEffect.Fill;
+                                }
+                                else spriteEffectFill = null;
+                            }
 
                             // layer group info
                             if (spriteLayerGroup != "" && spriteLayerGroup != null)
@@ -539,6 +556,8 @@ namespace StorybrewScripts
                                                             scale(charaTransform.Scale, sprite, new OsbSprite());
                                                             // rotation
                                                             rotation(spriteTransform.Rotation, sprite, new OsbSprite());
+                                                            // color
+                                                            color(spriteEffectFill, sprite);
                                                             // additive
                                                             if (spriteAdditive)
                                                                 additive(sprite, spriteStart, spriteEnd);
@@ -556,6 +575,8 @@ namespace StorybrewScripts
                                                             scale(charaTransform.Scale, sprite, new OsbSprite());
                                                             // rotation
                                                             rotation(spriteTransform.Rotation, sprite, new OsbSprite());
+                                                            // color
+                                                            color(spriteEffectFill, sprite);
                                                             // additive
                                                             if (spriteAdditive)
                                                                 additive(sprite, spriteStart, spriteEnd);
@@ -925,6 +946,9 @@ namespace StorybrewScripts
                                     scale(spriteTransform.Scale, sprite, spriteStroke);
                                     // rotation
                                     rotation(spriteTransform.Rotation, sprite, spriteStroke);
+                                    // color
+                                    color(spriteEffectFill, sprite);
+                                    color(spriteEffectFill, spriteStroke);
                                     // color solid
                                     if (spriteType == "Solid")
                                         colorSolid(solid.Color, sprite);
@@ -960,6 +984,9 @@ namespace StorybrewScripts
                                     scale(spriteTransform.Scale, sprite, spriteStroke);
                                     // rotation
                                     rotation(spriteTransform.Rotation, sprite, spriteStroke);
+                                    // color
+                                    color(spriteEffectFill, sprite);
+                                    color(spriteEffectFill, spriteStroke);
                                     // color solid
                                     if (spriteType == "Solid")
                                         colorSolid(solid.Color, sprite);
@@ -1057,6 +1084,8 @@ namespace StorybrewScripts
                                             scale(spriteTransform.Scale, sprite, new OsbSprite());
                                             // rotation
                                             rotation(spriteTransform.Rotation, sprite, new OsbSprite());
+                                            // color
+                                            color(spriteEffectFill, sprite);
                                             // additive
                                             if (spriteAdditive)
                                                 additive(sprite, spriteStart, spriteEnd);
@@ -1074,6 +1103,8 @@ namespace StorybrewScripts
                                             scale(spriteTransform.Scale, sprite, new OsbSprite());
                                             // rotation
                                             rotation(spriteTransform.Rotation, sprite, new OsbSprite());
+                                            // color
+                                            color(spriteEffectFill, sprite);
                                             // additive
                                             if (spriteAdditive)
                                                 additive(sprite, spriteStart, spriteEnd);
@@ -1581,7 +1612,7 @@ namespace StorybrewScripts
                             keyframe.Time = keyframe.Time - spriteLoopStart;
                         }
 
-                        if (keyframe.Value != 1922 && (offsetText.X != 0 && offsetEverything.X != 0 && shapeOffsetX != 0))
+                        if (keyframe.Value != 961 || (offsetText.X != 0 && shapeOffsetX != 0) || offsetEverything.X != 0)
                         {
                             if (spriteType == "Text")
                                 sprite.MoveX(keyframe.Time, (k1 * downScale) + offsetEverything.X + offsetText.X);
@@ -1741,7 +1772,7 @@ namespace StorybrewScripts
                             keyframe.Time = keyframe.Time - spriteLoopStart;
                         }
 
-                        if (keyframe.Value != 1080 && (offsetText.Y != 0 && offsetEverything.Y != 0 && letterHeightOffset != 0 && shapeOffsetY != 0))
+                        if (keyframe.Value != 540 || (offsetText.Y != 0 && letterHeightOffset != 0 && shapeOffsetY != 0) || offsetEverything.Y != 0)
                         {
                             if (spriteType == "Text")
                                 sprite.MoveY(keyframe.Time, (k1 * downScale) + offsetEverything.Y + offsetText.Y + letterHeightOffset);
@@ -1759,12 +1790,7 @@ namespace StorybrewScripts
 
         public void scale(Scale transform, OsbSprite sprite, OsbSprite spriteStroke)
         {
-            Vector2 solidSize = new Vector2(0, 0);
-            if (spriteType == "Solid")
-            {
-                solidSize = new Vector2(solid.Bitmap.Width * (float)downScale, solid.Bitmap.Height * (float)downScale);
-            }
-            // Log("solidSize: " + solidSize);
+            Vector2 solidSize = new Vector2(solid.Bitmap.Width, solid.Bitmap.Height);
 
             // scale
             if (transform != null)
@@ -1802,25 +1828,29 @@ namespace StorybrewScripts
                             }
 
                             // Log("1value1: " + key1 + " | value2: " + key2);
+                            if (spriteType == "Solid")
+                                sprite.ScaleVec(getEasing(keysX[key1].Easing, keysX[key2].Easing), keysX[key1].Time, keysX[key2].Time + frameDuration,
+                                    new Vector2((float)((solidSize.X * keysX[key1].Value) * downScale), (float)((solidSize.Y * keysY[key1].Value) * downScale)),
+                                    new Vector2((float)((solidSize.X * keysX[key2].Value) * downScale), (float)((solidSize.Y * keysY[key2].Value) * downScale)));
                             if (spriteType == "Text")
                                 sprite.ScaleVec(getEasing(keysX[key1].Easing, keysX[key2].Easing), keysX[key1].Time, keysX[key2].Time + frameDuration,
                                     new Vector2((float)(keysX[key1].Value * downScale) * fontScaleShift, (float)(keysY[key1].Value * downScale) * fontScaleShift),
                                     new Vector2((float)(keysX[key2].Value * downScale) * fontScaleShift, (float)(keysY[key2].Value * downScale) * fontScaleShift));
-                            if (spriteType != "Text")
+                            if (spriteType != "Text" && spriteType != "Solid")
                                 sprite.ScaleVec(getEasing(keysX[key1].Easing, keysX[key2].Easing), keysX[key1].Time, keysX[key2].Time + frameDuration,
-                                    new Vector2((float)(keysX[key1].Value * downScale) + fillScaleShift + solidSize.X, (float)(keysY[key1].Value * downScale) + fillScaleShift + solidSize.Y),
-                                    new Vector2((float)(keysX[key2].Value * downScale) + fillScaleShift + solidSize.X, (float)(keysY[key2].Value * downScale) + fillScaleShift + solidSize.Y));
+                                    new Vector2((float)(keysX[key1].Value * downScale) + fillScaleShift, (float)(keysY[key1].Value * downScale) + fillScaleShift),
+                                    new Vector2((float)(keysX[key2].Value * downScale) + fillScaleShift, (float)(keysY[key2].Value * downScale) + fillScaleShift));
 
                             if (shapeHasStroke && shapeHasFill && shapeType != "Path" && spriteType == "Shape")
-                                if (spriteType != "Text")
+                                if (spriteType != "Text" && spriteType != "Solid")
                                     spriteStroke.ScaleVec(getEasing(keysX[key1].Easing, keysX[key2].Easing), keysX[key1].Time, keysX[key2].Time + frameDuration,
-                                        new Vector2((float)((solidSize.X * keysX[key1].Value) * downScale), (float)((solidSize.Y * keysY[key1].Value) * downScale)),
-                                        new Vector2((float)((solidSize.X * keysX[key2].Value) * downScale), (float)((solidSize.Y * keysY[key2].Value) * downScale)));
+                                        new Vector2((float)((keysX[key1].Value) * downScale), (float)(keysY[key1].Value * downScale)),
+                                        new Vector2((float)((keysX[key2].Value) * downScale), (float)(keysY[key2].Value * downScale)));
 
                             // if (sprite.TexturePath.Contains("bg.jpg")) {
                             //     Log("transform.X.Count: " + transform.X.Count);
-                            //     Log("(solidSize.Y * keysY[key1].Value): " + (solidSize.Y * keysY[key1].Value));
-                            //     Log("(solidSize.Y * keysY[key2].Value): " + (solidSize.Y * keysY[key2].Value));
+                            //     Log("keysY[key1].Value: " + keysY[key1].Value);
+                            //     Log("keysY[key2].Value: " + keysY[key2].Value);
                             // }
                         }
                         else if (key2 > 1 && key2 + 1 < keysX.Count && keysX.Count % 2 == 0)
@@ -1852,20 +1882,24 @@ namespace StorybrewScripts
                                 keysY[lastKey2].Time = keysY[lastKey2].Time - spriteLoopStart;
                             }
                             
+                            if (spriteType == "Solid")
+                                sprite.ScaleVec(getEasing(keysX[lastKey1].Easing, keysX[lastKey2].Easing), keysX[lastKey1].Time + frameDuration, keysX[lastKey2].Time + frameDuration,
+                                    new Vector2((float)((solidSize.X * keysX[lastKey1].Value) * downScale), (float)((solidSize.Y * keysY[lastKey1].Value) * downScale)),
+                                    new Vector2((float)((solidSize.X * keysX[lastKey2].Value) * downScale), (float)((solidSize.Y * keysY[lastKey2].Value) * downScale)));
                             if (spriteType == "Text")
                                 sprite.ScaleVec(getEasing(keysX[lastKey1].Easing, keysX[lastKey2].Easing), keysX[lastKey1].Time + frameDuration, keysX[lastKey2].Time + frameDuration,
                                     new Vector2((float)(keysX[lastKey1].Value * downScale) * fontScaleShift, (float)(keysY[lastKey1].Value * downScale) * fontScaleShift),
                                     new Vector2((float)(keysX[lastKey2].Value * downScale) * fontScaleShift, (float)(keysY[lastKey2].Value * downScale) * fontScaleShift));
-                            if (spriteType != "Text")
+                            if (spriteType != "Text" && spriteType != "Solid")
                                 sprite.ScaleVec(getEasing(keysX[lastKey1].Easing, keysX[lastKey2].Easing), keysX[lastKey1].Time + frameDuration, keysX[lastKey2].Time + frameDuration,
-                                    new Vector2((float)(keysX[lastKey1].Value * downScale) + fillScaleShift + solidSize.X, (float)(keysY[lastKey1].Value * downScale) + fillScaleShift + solidSize.Y),
-                                    new Vector2((float)(keysX[lastKey2].Value * downScale) + fillScaleShift + solidSize.X, (float)(keysY[lastKey2].Value * downScale) + fillScaleShift + solidSize.Y));
+                                    new Vector2((float)(keysX[lastKey1].Value * downScale) + fillScaleShift, (float)(keysY[lastKey1].Value * downScale) + fillScaleShift),
+                                    new Vector2((float)(keysX[lastKey2].Value * downScale) + fillScaleShift, (float)(keysY[lastKey2].Value * downScale) + fillScaleShift));
 
                             if (shapeHasStroke && shapeHasFill && shapeType != "Path" && spriteType == "Shape")
-                                if (spriteType != "Text")
+                                if (spriteType != "Text" && spriteType != "Solid")
                                     spriteStroke.ScaleVec(getEasing(keysX[lastKey1].Easing, keysX[lastKey2].Easing), keysX[lastKey1].Time + frameDuration, keysX[lastKey2].Time + frameDuration,
-                                        new Vector2((float)((solidSize.X * keysX[lastKey1].Value) * downScale), (float)((solidSize.Y * keysY[lastKey1].Value) * downScale)),
-                                        new Vector2((float)((solidSize.X * keysX[lastKey2].Value) * downScale), (float)((solidSize.Y * keysY[lastKey2].Value) * downScale)));
+                                        new Vector2((float)((keysX[lastKey1].Value) * downScale), (float)(keysY[lastKey1].Value * downScale)),
+                                        new Vector2((float)((keysX[lastKey2].Value) * downScale), (float)(keysY[lastKey2].Value * downScale)));
 
                             // after
                             if (spriteLoopGroup != "")
@@ -1890,20 +1924,24 @@ namespace StorybrewScripts
                                 keysY[key2].Time = keysY[key2].Time - spriteLoopStart;
                             }
 
+                            if (spriteType == "Solid")
+                                sprite.ScaleVec(getEasing(keysX[key1].Easing, keysX[key2].Easing), keysX[key1].Time + frameDuration, keysX[key2].Time + frameDuration,
+                                    new Vector2((float)((solidSize.X * keysX[key1].Value) * downScale), (float)((solidSize.Y * keysY[key1].Value) * downScale)),
+                                    new Vector2((float)((solidSize.X * keysX[key2].Value) * downScale), (float)((solidSize.Y * keysY[key2].Value) * downScale)));
                             if (spriteType == "Text")
                                 sprite.ScaleVec(getEasing(keysX[key1].Easing, keysX[key2].Easing), keysX[key1].Time + frameDuration, keysX[key2].Time + frameDuration,
                                     new Vector2((float)(keysX[key1].Value * downScale) * fontScaleShift, (float)(keysY[key1].Value * downScale) * fontScaleShift),
                                     new Vector2((float)(keysX[key2].Value * downScale) * fontScaleShift, (float)(keysY[key2].Value * downScale) * fontScaleShift));
-                            if (spriteType != "Text")
+                            if (spriteType != "Text" && spriteType != "Solid")
                                 sprite.ScaleVec(getEasing(keysX[key1].Easing, keysX[key2].Easing), keysX[key1].Time + frameDuration, keysX[key2].Time + frameDuration,
-                                    new Vector2((float)(keysX[key1].Value * downScale) + fillScaleShift + solidSize.X, (float)(keysY[key1].Value * downScale) + fillScaleShift + solidSize.Y),
-                                    new Vector2((float)(keysX[key2].Value * downScale) + fillScaleShift + solidSize.X, (float)(keysY[key2].Value * downScale) + fillScaleShift + solidSize.Y));
+                                    new Vector2((float)(keysX[key1].Value * downScale) + fillScaleShift, (float)(keysY[key1].Value * downScale) + fillScaleShift),
+                                    new Vector2((float)(keysX[key2].Value * downScale) + fillScaleShift, (float)(keysY[key2].Value * downScale) + fillScaleShift));
 
                             if (shapeHasStroke && shapeHasFill && shapeType != "Path" && spriteType == "Shape")
-                                if (spriteType != "Text")
+                                if (spriteType != "Text" && spriteType != "Solid")
                                     spriteStroke.ScaleVec(getEasing(keysX[key1].Easing, keysX[key2].Easing), keysX[key1].Time + frameDuration, keysX[key2].Time + frameDuration,
-                                        new Vector2((float)((solidSize.X * keysX[key1].Value) * downScale), (float)((solidSize.Y * keysY[key1].Value) * downScale)),
-                                        new Vector2((float)((solidSize.X * keysX[key2].Value) * downScale), (float)((solidSize.Y * keysY[key2].Value) * downScale)));
+                                        new Vector2((float)((keysX[key1].Value) * downScale), (float)(keysY[key1].Value * downScale)),
+                                        new Vector2((float)((keysX[key2].Value) * downScale), (float)(keysY[key2].Value * downScale)));
                             // Log("2value1: " + key1 + " | value2: " + key2);
                         }
                         else
@@ -1932,20 +1970,24 @@ namespace StorybrewScripts
                                     keysY[key2].Time = keysY[key2].Time - spriteLoopStart;
                                 }
 
+                                if (spriteType == "Solid")
+                                    sprite.ScaleVec(getEasing(keysX[key1].Easing, keysX[key2].Easing), keysX[key1].Time + frameDuration, keysX[key2].Time + frameDuration,
+                                        new Vector2((float)((solidSize.X * keysX[key1].Value) * downScale), (float)((solidSize.Y * keysY[key1].Value) * downScale)),
+                                        new Vector2((float)((solidSize.X * keysX[key2].Value) * downScale), (float)((solidSize.Y * keysY[key2].Value) * downScale)));
                                 if (spriteType == "Text")
                                     sprite.ScaleVec(getEasing(keysX[key1].Easing, keysX[key2].Easing), keysX[key1].Time + frameDuration, keysX[key2].Time + frameDuration,
                                         new Vector2((float)(keysX[key1].Value * downScale) * fontScaleShift, (float)(keysY[key1].Value * downScale) * fontScaleShift),
                                         new Vector2((float)(keysX[key2].Value * downScale) * fontScaleShift, (float)(keysY[key2].Value * downScale) * fontScaleShift));
-                                if (spriteType != "Text")
+                                if (spriteType != "Text" && spriteType != "Solid")
                                     sprite.ScaleVec(getEasing(keysX[key1].Easing, keysX[key2].Easing), keysX[key1].Time + frameDuration, keysX[key2].Time + frameDuration,
-                                        new Vector2((float)(keysX[key1].Value * downScale) + fillScaleShift + solidSize.X, (float)(keysY[key1].Value * downScale) + fillScaleShift + solidSize.Y),
-                                        new Vector2((float)(keysX[key2].Value * downScale) + fillScaleShift + solidSize.X, (float)(keysY[key2].Value * downScale) + fillScaleShift + solidSize.Y));
+                                        new Vector2((float)(keysX[key1].Value * downScale) + fillScaleShift, (float)(keysY[key1].Value * downScale) + fillScaleShift),
+                                        new Vector2((float)(keysX[key2].Value * downScale) + fillScaleShift, (float)(keysY[key2].Value * downScale) + fillScaleShift));
 
                                 if (shapeHasStroke && shapeHasFill && shapeType != "Path" && spriteType == "Shape")
-                                    if (spriteType != "Text")
+                                    if (spriteType != "Text" && spriteType != "Solid")
                                         spriteStroke.ScaleVec(getEasing(keysX[key1].Easing, keysX[key2].Easing), keysX[key1].Time + frameDuration, keysX[key2].Time + frameDuration,
-                                            new Vector2((float)((solidSize.X * keysX[key1].Value) * downScale), (float)((solidSize.Y * keysY[key1].Value) * downScale)),
-                                            new Vector2((float)(keysX[key2].Value * downScale), (float)((solidSize.Y * keysY[key2].Value) * downScale)));
+                                            new Vector2((float)((keysX[key1].Value) * downScale), (float)(keysY[key1].Value * downScale)),
+                                            new Vector2((float)(keysX[key2].Value * downScale), (float)(keysY[key2].Value * downScale)));
                             }
                         }
                     }
@@ -1960,17 +2002,21 @@ namespace StorybrewScripts
 
                     foreach (var keyframe in transform.X)
                     {
+                        if (spriteType == "Solid")
+                            scaleX.Add(((solidSize.X * keyframe.Value) * downScale));
                         if (spriteType == "Text")
                             scaleX.Add((keyframe.Value * downScale) * fontScaleShift);
-                        if (spriteType != "Text")
+                        if (spriteType != "Text" && spriteType != "Solid")
                             scaleX.Add(keyframe.Value * downScale);
                     }
 
                     foreach (var keyframe in transform.Y)
                     {
+                        if (spriteType == "Solid")
+                            scaleY.Add(((solidSize.Y * keyframe.Value) * downScale));
                         if (spriteType == "Text")
                             scaleY.Add((keyframe.Value * downScale) * fontScaleShift);
-                        if (spriteType != "Text")
+                        if (spriteType != "Text" && spriteType != "Solid")
                             scaleY.Add(keyframe.Value * downScale);
                     }
 
@@ -1984,10 +2030,12 @@ namespace StorybrewScripts
 
                     if (scaleX[k] != 1 && scaleY[k] != 1)
                     {
+                        if (spriteType == "Solid")
+                            sprite.ScaleVec(t[k].Time, new Vector2((float)scaleX[k], (float)scaleY[k]));
                         if (spriteType == "Text")
                             sprite.ScaleVec(t[k].Time, new Vector2((float)scaleX[k], (float)scaleY[k]));
-                        if (spriteType != "Text")
-                            sprite.ScaleVec(t[k].Time, new Vector2((float)scaleX[k] + fillScaleShift + solidSize.X, (float)scaleY[k] + fillScaleShift + solidSize.Y));
+                        if (spriteType != "Text" && spriteType != "Solid")
+                            sprite.ScaleVec(t[k].Time, new Vector2((float)scaleX[k] + fillScaleShift, (float)scaleY[k] + fillScaleShift));
 
                         if (shapeHasStroke && shapeHasFill && shapeType != "Path" && spriteType == "Shape")
                                 spriteStroke.ScaleVec(t[k].Time, new Vector2((float)scaleX[k], (float)scaleY[k]));
@@ -2219,7 +2267,7 @@ namespace StorybrewScripts
                         }
 
                         if (keyframe.Value != "#ffffff")
-                        sprite.Color(keyframe.Time, spriteEnd, keyframe.Value, keyframe.Value);
+                        sprite.Color(keyframe.Time, keyframe.Value);
                     }
                 }
             }
@@ -2326,7 +2374,114 @@ namespace StorybrewScripts
                         }
 
                         if (keyframe.Value != "#ffffff")
-                        sprite.Color(keyframe.Time, spriteEnd, keyframe.Value, keyframe.Value);
+                        sprite.Color(keyframe.Time, keyframe.Value);
+                    }
+                }
+            }
+        }
+
+        public void color(List<Fill> color, OsbSprite sprite)
+        {
+            if (color != null)
+            {
+                if (color.Count > 1)
+                {
+                    var keys = color;
+                    for (int key1 = 0, key2 = 1; key1 < keys.Count; key1++, key2++)
+                    {
+                        if (key1 == 0 && key1 < key2 && keys.Count % 2 == 0)
+                        {
+                            if (spriteLoopGroup != "")
+                            {
+                                if (keys[key1].Time < spriteLoopStart) keys[key1].Time = 0;
+                                if (keys[key2].Time > spriteEnd) keys[key2].Time = spriteEnd;
+                                if (keys[key1].Time - spriteLoopStart < spriteLoopStart || keys[key2].Time - spriteLoopStart < spriteLoopStart)
+                                {
+                                    keys[key1].Time = Math.Abs(keys[key1].Time);
+                                    keys[key2].Time = Math.Abs(keys[key2].Time);
+                                }
+                                keys[key1].Time = keys[key1].Time - spriteLoopStart;
+                                keys[key2].Time = keys[key2].Time - spriteLoopStart;
+                            }
+
+                            // Log("1value1: " + key1 + " | value2: " + key2);
+                            sprite.Color(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time, keys[key2].Time + frameDuration, keys[key1].Value, keys[key2].Value);
+                        }
+                        else if (key2 > 1 && key2 + 1 < keys.Count && keys.Count % 2 == 0)
+                        {
+                            var lastKey1 = key1;
+                            var lastKey2 = key2;
+                            key1 = key1 + 1; key2 = key2 + 1;
+
+                            // tweening
+                            if (spriteLoopGroup != "")
+                            {
+                                if (keys[lastKey1].Time < spriteLoopStart) keys[lastKey1].Time = 0;
+                                if (keys[lastKey2].Time > spriteEnd) keys[lastKey2].Time = spriteEnd;
+                                if (keys[lastKey1].Time - spriteLoopStart < spriteLoopStart || keys[lastKey2].Time - spriteLoopStart < spriteLoopStart)
+                                {
+                                    keys[lastKey1].Time = Math.Abs(keys[lastKey1].Time);
+                                    keys[lastKey2].Time = Math.Abs(keys[lastKey2].Time);
+                                }
+                                keys[lastKey1].Time = keys[lastKey1].Time - spriteLoopStart;
+                                keys[lastKey2].Time = keys[lastKey2].Time - spriteLoopStart;
+                            }
+                            
+                            sprite.Color(getEasing(keys[lastKey1].Easing, keys[lastKey2].Easing), keys[lastKey1].Time + frameDuration, keys[lastKey2].Time + frameDuration, keys[lastKey1].Value, keys[lastKey2].Value);
+
+                            // after
+                            if (spriteLoopGroup != "")
+                            {
+                                if (keys[key1].Time < spriteLoopStart) keys[key1].Time = 0;
+                                if (keys[key2].Time > spriteEnd) keys[key2].Time = spriteEnd;
+                                if (keys[key1].Time - spriteLoopStart < spriteLoopStart || keys[key2].Time - spriteLoopStart < spriteLoopStart)
+                                {
+                                    keys[key1].Time = Math.Abs(keys[key1].Time);
+                                    keys[key2].Time = Math.Abs(keys[key2].Time);
+                                }
+                                keys[key1].Time = keys[key1].Time - spriteLoopStart;
+                                keys[key2].Time = keys[key2].Time - spriteLoopStart;
+                            }
+                            
+                            sprite.Color(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, keys[key1].Value, keys[key2].Value);
+                            // Log("2value1: " + key1 + " | value2: " + key2);
+                        }
+                        else
+                        {
+                            if (key2 < keys.Count)
+                            {
+                                if (spriteLoopGroup != "")
+                                {
+                                    if (keys[key1].Time < spriteLoopStart) keys[key1].Time = 0;
+                                    if (keys[key2].Time > spriteEnd) keys[key2].Time = spriteEnd;
+                                    if (keys[key1].Time - spriteLoopStart < spriteLoopStart || keys[key2].Time - spriteLoopStart < spriteLoopStart)
+                                    {
+                                        keys[key1].Time = Math.Abs(keys[key1].Time);
+                                        keys[key2].Time = Math.Abs(keys[key2].Time);
+                                    }
+                                    keys[key1].Time = keys[key1].Time - spriteLoopStart;
+                                    keys[key2].Time = keys[key2].Time - spriteLoopStart;
+                                }
+
+                                sprite.Color(getEasing(keys[key1].Easing, keys[key2].Easing), keys[key1].Time + frameDuration, keys[key2].Time + frameDuration, keys[key1].Value, keys[key2].Value);
+                            }
+                        }
+                    }
+                }
+                else if (color.Count <= 1)
+                {
+                    foreach (var keyframe in color)
+                    {
+                        if (spriteLoopGroup != "")
+                        {
+                            if (keyframe.Time < spriteLoopStart) keyframe.Time = 0;
+                            if (keyframe.Time > spriteEnd) keyframe.Time = spriteEnd;
+                            if (keyframe.Time - spriteLoopStart < spriteLoopStart) keyframe.Time = Math.Abs(keyframe.Time);
+                            keyframe.Time = keyframe.Time - spriteLoopStart;
+                        }
+
+                        if (keyframe.Value != "#ffffff")
+                        sprite.Color(keyframe.Time, keyframe.Value);
                     }
                 }
             }
@@ -2537,6 +2692,7 @@ namespace StorybrewScripts
                     newEasing = OsbEasing.None;
                     break;
             }
+            if (hasParent || spriteComments.Contains("parented=true;")) newEasing = OsbEasing.None;
             return newEasing;
         }
 

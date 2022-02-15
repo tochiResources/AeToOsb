@@ -1,6 +1,7 @@
 {
     "scriptslibraryFolderPath": "",
     "outputFolderPath": "",
+    "beatmapFilePath": "",
     "options": {
         "exportJsonOnly": false,
         "exportTextPerLetter": false,

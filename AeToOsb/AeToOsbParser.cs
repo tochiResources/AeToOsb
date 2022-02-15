@@ -77,6 +77,9 @@ namespace AeToOsbParser
         [JsonProperty("duration")]
         public int Duration { get; set; }
 
+        [JsonProperty("comments")]
+        public string Comments { get; set; }
+
         [JsonProperty("type")]
         public string Type { get; set; }
 
@@ -235,6 +238,9 @@ namespace AeToOsbParser
 
         [JsonProperty("fade", NullValueHandling = NullValueHandling.Ignore)]
         public List<Fade> Fade { get; set; }
+
+        [JsonProperty("effect", NullValueHandling = NullValueHandling.Ignore)]
+        public Effect Effect { get; set; }
 
         [JsonProperty("position", NullValueHandling = NullValueHandling.Ignore)]
         public Position Position { get; set; }
@@ -402,6 +408,18 @@ namespace AeToOsbParser
         public string Easing { get; set; }
     }
 
+    public partial class Fill
+    {
+        [JsonProperty("time")]
+        public int Time { get; set; }
+
+        [JsonProperty("value")]
+        public string Value { get; set; }
+
+        [JsonProperty("easing")]
+        public string Easing { get; set; }
+    }
+
     public partial class Rotation
     {
         [JsonProperty("time")]
@@ -421,6 +439,12 @@ namespace AeToOsbParser
 
         [JsonProperty("y")]
         public List<Y> Y { get; set; }
+    }
+
+    public partial class Effect
+    {
+        [JsonProperty("fill", NullValueHandling = NullValueHandling.Ignore)]
+        public List<Fill> Fill { get; set; }
     }
 
     public partial class Position
