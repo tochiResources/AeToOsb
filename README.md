@@ -29,4 +29,4 @@ Official Todo list can be found [here](https://github.com/T0chi/AeToOsb/wiki#tod
 ![easings1](https://i.imgur.com/fnTvguD.gif)
 ![easings2](https://i.imgur.com/xdZoXWc.gif)
 
-^^^^ Created in less that 15 minutes! ^^^^
+Above animation was created in less that 15 minutes.
