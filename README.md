@@ -8,7 +8,7 @@ Get started here! https://github.com/T0chi/AeToOsb/wiki/Getting-Started
 Want to help/contribute? Check the [Todo list](https://github.com/T0chi/AeToOsb/wiki#todo-list)!
 
 # Features
-**Current items & features:**
+**Current functionality:**
 - [x] Export multiple compositions
 - [x] Easings
 - [x] Keyframes
