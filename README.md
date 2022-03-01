@@ -1,5 +1,11 @@
 # AeToOsb
-Status: **Partly unstable**
+**Update Progress:**
+
+![](https://us-central1-progress-markdown.cloudfunctions.net/progress/73)
+
+**Functionality:**
+
+![](https://us-central1-progress-markdown.cloudfunctions.net/progress/67)
 
 After Effects plugin that exports a project to a storybrew effect by [-Tochi](https://osu.ppy.sh/users/3664366).
 
