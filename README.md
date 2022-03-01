@@ -1,5 +1,5 @@
 # AeToOsb
-**Update Progress:**
+**Next Update Progress:**
 
 ![](https://us-central1-progress-markdown.cloudfunctions.net/progress/73)
 
