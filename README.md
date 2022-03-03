@@ -3,7 +3,7 @@
 
 ![](https://us-central1-progress-markdown.cloudfunctions.net/progress/73)
 
-**Functionality:**
+**Stability:**
 
 ![](https://us-central1-progress-markdown.cloudfunctions.net/progress/67)
 
