@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://i.imgur.com/1oQcCq7.png" alt="After Effects to Storyboard Logo">
+  <a href="https://github.com/T0chi/AeToOsb"><img src="https://i.imgur.com/1oQcCq7.png" alt="After Effects to Storyboard Logo"></a>
 </p>
 <p align="center">
   <a href="https://github.com/T0chi/AeToOsb/releases/latest"><img src="https://img.shields.io/badge/version-v1.0.7-brightgreen" alt="Latest version"></a>
