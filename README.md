@@ -2,13 +2,13 @@
   <a href="https://github.com/T0chi/AeToOsb"><img src="https://i.imgur.com/1oQcCq7.png" alt="After Effects to Storyboard Logo"></a>
 </p>
 <p align="center">
-  <a href="https://github.com/T0chi/AeToOsb/releases/latest"><img src="https://img.shields.io/badge/version-v1.0.7-brightgreen" alt="Latest version"></a>
-  <a href="https://github.com/T0chi/AeToOsb/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-success" alt="MIT license"></a>
+  <a href="https://github.com/T0chi/AeToOsb/releases/latest"><img src="https://img.shields.io/github/v/release/T0chi/AeToOsb?color=success&label=version" alt="Latest version"></a>
+  <a href="https://github.com/T0chi/AeToOsb/blob/main/LICENSE"><img src="https://img.shields.io/github/license/T0chi/AeToOsb" alt="MIT license"></a>
   <a href="https://github.com/T0chi/AeToOsb/wiki"><img src="https://img.shields.io/badge/documentation-%F0%9F%94%8D-blue" alt="Documentation"></a>
 </p>
 <p align="center">
-  <a href="https://discord.gg/QZjD3yb"><img src="https://img.shields.io/badge/pochiii-storyboarding-2b2b2b?logo=discord" alt="PoNo & -Tochi's Discord server"></a>
-  <a href="https://discord.gg/B8NX7YW"><img src="https://img.shields.io/badge/osu!-storyboarder%20banquet-2b2b2b?logo=discord" alt="osu! Storyboarder Banquet Discord server"></a>
+  <a href="https://discord.gg/QZjD3yb"><img src="https://img.shields.io/discord/501887495445807135?label=pochiii%20storyboarding&logo=discord&logoColor=white" alt="PoNo & -Tochi's Discord server"></a>
+  <a href="https://discord.gg/B8NX7YW"><img src="https://img.shields.io/discord/203050773645492224?label=storyboarder%20banquet&logo=discord&logoColor=white" alt="osu! Storyboarder Banquet Discord server"></a>
   <a href="https://twitter.com/tochiiDesign"><img src="https://img.shields.io/badge/-tochiiDesign-5b5b5b?logo=twitter" alt="@tochiiDesign's twitter"></a>
   <a href="https://osu.ppy.sh/users/3664366"><img src="https://img.shields.io/badge/osu!-profile-ff69b4" alt="-Tochi's osu! profile"></a>
 </p>
