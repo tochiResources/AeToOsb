@@ -3,7 +3,7 @@
 </p>
 <p align="center">
   <a href="https://github.com/T0chi/AeToOsb/releases/latest"><img src="https://img.shields.io/badge/version-v1.0.7-brightgreen" alt="Latest version"></a>
-  <img src="https://img.shields.io/badge/license-MIT-success" alt="MIT license">
+  <a href="https://github.com/T0chi/AeToOsb/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-success" alt="MIT license"></a>
   <a href="https://github.com/T0chi/AeToOsb/wiki"><img src="https://img.shields.io/badge/documentation-%F0%9F%94%8D-blue" alt="Documentation"></a>
 </p>
 <p align="center">
