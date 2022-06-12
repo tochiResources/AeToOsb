@@ -12,6 +12,7 @@
   <a href="https://discord.gg/B8NX7YW"><img src="https://img.shields.io/discord/203050773645492224?label=storyboarder%20banquet&logo=discord&logoColor=white" alt="osu! Storyboarder Banquet Discord server"></a>
   <a href="https://osu.ppy.sh/users/3664366"><img src="https://img.shields.io/badge/osu!-profile-ff69b4" alt="-Tochi's osu! profile"></a>
 </p>
+<p align="center">STILL IN DEVELOPMENT - NOT STABLE</p>
 <p align="center">After Effects plugin that exports a project to a storybrew effect by <a href="https://osu.ppy.sh/users/3664366">-Tochi</a>.</p>
 <p align="center">Get started here! <a href="https://github.com/T0chi/AeToOsb/wiki/Getting-Started">wiki/Getting Started</a>.</p>
 <p align="center">Want to help/contribute? Check the <a href="https://github.com/T0chi/AeToOsb/wiki#todo-list">Todo List</a>.</p>
