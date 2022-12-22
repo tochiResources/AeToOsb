@@ -6,7 +6,7 @@
   <a href=""><img src="https://img.shields.io/badge/documentation-%F0%9F%94%8D-blue" alt="Documentation"></a>
   <a href="https://twitter.com/tochiiDesign"><img src="https://img.shields.io/badge/-tochiiDesign-5b5b5b?logo=twitter" alt="@tochiiDesign's twitter"></a>
 </p>
-<p align="center">AeToOsb is still in development.</p>
+<p align="center">AeToOsb is still under development.</p>
 
 # Expected Features
 - 3D functionality
