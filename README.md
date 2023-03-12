@@ -30,6 +30,7 @@
 - [x] Solids
 - [x] Sequences
 - [x] Parented layers
+- [ ] Trace paths
 - [ ] Audio
 - [ ] Loop layers
 
