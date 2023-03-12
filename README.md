@@ -10,6 +10,14 @@
 <p align="center">Used with <a href="https://github.com/T0chi/AeBrew">AeBrew</a> & <a href="https://www.adobe.com/products/aftereffects/free-trial-download.html">After Effects</a>.</p>
 <p align="center">Official release will be announced on my <a href="https://twitter.com/tochiiDesign">Twitter</a> and <a href="https://discord.gg/QZjD3yb">Discord server</a>.</p>
 
+
+<p align="center">
+  <img src="https://i.imgur.com/CRHncre.png" alt="preview 1" width="200px">
+  <img src="https://i.imgur.com/xXIqWTS.png" alt="preview 2" width="200px">
+  <img src="https://i.imgur.com/zQoU60Z.png" alt="preview 3" width="200px">
+</p>
+
+
 # Expected Features
 - [x] 3D functionality
 - [x] Export multiple compositions
