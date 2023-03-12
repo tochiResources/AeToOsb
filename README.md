@@ -8,6 +8,7 @@
 </p>
 <p align="center">AeToOsb is still under development.</p>
 <p align="center">Used with <a href="https://github.com/T0chi/AeBrew">AeBrew</a> & <a href="https://www.adobe.com/products/aftereffects/free-trial-download.html">After Effects</a>.</p>
+<p align="center">Official release will be announced on my <a href="https://twitter.com/tochiiDesign">Twitter</a> and <a href="https://discord.gg/QZjD3yb">Discord server</a>.</p>
 
 # Expected Features
 - [x] 3D functionality
