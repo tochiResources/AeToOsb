@@ -7,19 +7,34 @@
   <a href="https://twitter.com/tochiiDesign"><img src="https://img.shields.io/badge/-tochiiDesign-5b5b5b?logo=twitter" alt="@tochiiDesign's twitter"></a>
 </p>
 <p align="center">AeToOsb is still under development.</p>
+<p align="center">Used with <a href="https://github.com/T0chi/AeBrew">AeBrew</a> & <a href="https://www.adobe.com/products/aftereffects/free-trial-download.html">After Effects</a>.</p>
 
 # Expected Features
-- 3D functionality
-- Export multiple compositions
-- Easings
-- Keyframes
-- Import osu! bookmarks
-- Text layers
-- Transform properties
-- Shapes
-- Loop layers
-- Solids
-- Sequences
-- Audio
-- Parented layers
-- Particle, spectrum & other effects
+- [x] 3D functionality
+- [x] Export multiple compositions
+- [x] Easings
+- [x] Keyframes
+- [x] Import osu! bookmarks
+- [x] Text layers
+- [x] Transform properties
+- [x] Shapes
+- [x] Solids
+- [x] Sequences
+- [x] Parented layers
+- [ ] Audio
+- [ ] Loop layers
+
+# Expected Supported Effects
+- [x] Fill
+- [x] Audio Spectrum
+- [x] Audio Waveform
+- [ ] CC Particle World
+- [ ] CC Particle Systems II
+- [ ] Particle Playground
+- [ ] Basic Text Expressions/Animators
+- [ ] Drop Shadow
+- [ ] Gaussian Blur
+- [ ] Directional Blur
+- [ ] Lens Flare
+- [ ] CC Rainfall
+- [ ] CC Snowfall
