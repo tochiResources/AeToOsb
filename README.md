@@ -18,7 +18,7 @@
 </p>
 
 
-# Expected Features
+# Initial Features
 - [x] 3D functionality
 - [x] Export multiple compositions
 - [x] Easings
@@ -30,11 +30,11 @@
 - [x] Solids
 - [x] Sequences
 - [x] Parented layers
-- [ ] Trace paths
-- [ ] Audio
-- [ ] Loop layers
+- [x] Trace paths
+- [x] Audio
+- [x] Loop layers
 
-# Expected Supported Effects
+# Initial Supported Effects
 - [x] Fill
 - [x] Audio Spectrum
 - [x] Audio Waveform
