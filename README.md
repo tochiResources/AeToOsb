@@ -18,7 +18,7 @@
   <img src="https://i.imgur.com/DE4BloA.png" alt="preview 4" width="200px">
 </p>
 
-<p align="center">(uses map map background)</p>
+<p align="center">(uses map background)</p>
 
 
 # Initial Features
