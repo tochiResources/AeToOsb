@@ -15,7 +15,7 @@
   <img src="https://i.imgur.com/8aAed2v.png" alt="preview 1" width="200px">
   <img src="https://i.imgur.com/nHIhnMu.png" alt="preview 2" width="200px">
   <img src="https://i.imgur.com/ZUNu7Hw.png" alt="preview 3" width="200px">
-  <img src="https://i.imgur.com/DE4BloA.png" alt="preview 4" width="200px">
+  <img src="https://i.imgur.com/Ggug9NY.png" alt="preview 4" width="200px">
 </p>
 
 
