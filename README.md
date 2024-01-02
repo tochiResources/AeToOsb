@@ -12,10 +12,9 @@
 
 
 <p align="center">
-  <img src="https://i.imgur.com/8aAed2v.png" alt="preview 1" width="200px">
-  <img src="https://i.imgur.com/nHIhnMu.png" alt="preview 2" width="200px">
-  <img src="https://i.imgur.com/ZUNu7Hw.png" alt="preview 3" width="200px">
-  <img src="https://i.imgur.com/Ggug9NY.png" alt="preview 4" width="200px">
+  <img src="https://i.imgur.com/L9t3uMa.png" alt="preview 1" width="266px">
+  <img src="https://i.imgur.com/6LlEIXT.png" alt="preview 2" width="266px">
+  <img src="https://i.imgur.com/98XMJro.png" alt="preview 3" width="266px">
 </p>
 
 
